@@ -13,6 +13,7 @@
 
 - 现代化 UI 设计
 - 响应式布局，适配所有设备
+- 适配 Transmission 4.0+ 版本
 - [x] 种子管理，信息查看
 - [x] 配置设置
 - [x] 拖拽/粘贴添加种子
@@ -60,7 +61,14 @@ docker-compose down    # 停止并移除容器
 2. 下载最新或稳定版本（如 `transmission-next-ui-v1.0.0.zip`）
 3. 解压并将其中的内容复制到 Transmission 的 Web 目录（如 `transmission/web/src`）
 
-Tips: 如果使用群辉套件，流程可参考[解决群晖DSM7.0安装Transmission与汉化UI问题](https://post.smzdm.com/p/apxwp352/)
+Tips: 如果使用**群辉**套件，可参考以下脚本，其中使用的套件来源为矿神群晖SPK，首先从[Release](https://github.com/hisproc/transmission-next-ui/releases)下载最新版本的压缩包`release.zip`，并下载[synology.sh](scripts/synology.sh)脚本到同一目录下，执行以下命令，脚本将自动解压并尝试解压到目标路径:
+
+```bash
+chmod +x synology.sh
+sudo bash synology.sh
+```
+
+输出 `Deployment complete` 即表示安装完成。
 
 ### 3. 源代码打包
 
