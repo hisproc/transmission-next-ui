@@ -2,7 +2,7 @@
 
 [English](README.md) | 简体中文
 
-一个Transmission的Web前端页面，使用shadcn/ui和Vite构建。
+一个[Transmission](https://github.com/transmission/transmission)的第三方Web UI，使用shadcn/ui和Vite构建。
 
 ## 预览
 
