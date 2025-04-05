@@ -141,5 +141,10 @@
     "Announce Time": "Announce Time",
     "Seeders": "Seeders",
     "Leechers": "Leechers",
-    "Success": "Success"
+    "Success": "Success",
+    "Active": "Active",
+    "h": "h",
+    "m": "m",
+    "s": "s",
+    "eta": "eta"
 }
