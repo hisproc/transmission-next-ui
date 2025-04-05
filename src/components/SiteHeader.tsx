@@ -19,7 +19,7 @@ export function SiteHeader() {
   const [newVersion, setNewVersion] = useState(false);
 
   useEffect(() => {
-    axios.get("https://api.github.co/repos/hisproc/transmission-next-ui/releases/latest")
+    axios.get("https://api.github.com/repos/hisproc/transmission-next-ui/releases/latest")
       .then((res) => res.data)
       .then((data) => {
         const latest = data.tag_name;
