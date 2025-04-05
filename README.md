@@ -2,7 +2,7 @@
 
 English | [简体中文](README_cn.md)
 
-A modern web-based frontend for Transmission, offering a sleek and responsive UI for managing your torrents with ease, built using shadcn/ui and Vite.
+A third-party modern web-based frontend for [Transmission](https://github.com/transmission/transmission), offering a sleek and responsive UI for managing your torrents with ease, built using shadcn/ui and Vite.
 
 ## Preview
 
