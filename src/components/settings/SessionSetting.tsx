@@ -186,6 +186,10 @@ export function SessionSetting() {
                                     "speed-limit-up-enabled": uploadLimitEnabled,
                                     "speed-limit-down": downloadLimit,
                                     "speed-limit-down-enabled": downloadLimitEnabled,
+                                    "seedRatioLimit": seedRatioLimit,
+                                    "seedRatioLimited": seedRatioLimited,
+                                    "idle-seeding-limit": idleSeedingLimit,
+                                    "idle-seeding-limit-enabled": idleSeedingLimitEnabled,
                                 });
                             }}>{t("Save changes")}</Button>
                         </CardFooter>
