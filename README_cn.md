@@ -60,6 +60,8 @@ docker-compose down    # 停止并移除容器
 2. 下载最新或稳定版本（如 `transmission-next-ui-v1.0.0.zip`）
 3. 解压并将其中的内容复制到 Transmission 的 Web 目录（如 `transmission/web/src`）
 
+Tips: 如果使用群辉套件，流程可参考[解决群晖DSM7.0安装Transmission与汉化UI问题](https://post.smzdm.com/p/apxwp352/)
+
 ### 3. 源代码打包
 
 ```bash
