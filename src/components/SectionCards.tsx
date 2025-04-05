@@ -8,6 +8,7 @@ import {
 import { filesize } from "filesize"
 import { FreeSpace, SessionStats, TransmissionSession } from "@/lib/types"
 import { useTranslation } from "react-i18next"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip.tsx";
 
 
 export function SectionCards({ data, session, freespace }: { data: SessionStats, session: TransmissionSession, freespace: FreeSpace }) {
@@ -80,9 +81,18 @@ export function SectionCards({ data, session, freespace }: { data: SessionStats,
             <span>{t("Total Space")}</span>
             <span>{filesize(freespace["total_size"] || 0)}</span>
           </div>
-          <div className="line-clamp-1 flex justify-between w-full font-medium">
-            <span>{t("Path")}</span>
-            <span>{session["download-dir"]}</span>
+          <div className="line-clamp-1 flex justify-between w-full font-medium gap-x-2">
+            <span className="text-nowrap" >{t("Path")}</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="truncate text-left [direction:rtl]">{session["download-dir"]}</span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {session["download-dir"]}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </CardFooter>
       </Card>

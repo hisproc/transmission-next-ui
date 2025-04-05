@@ -6,6 +6,10 @@ dayjs.extend(duration);
 dayjs.extend(durationFormat);
 
 export function formatEta(seconds: number, t: Function) {
+
+    if (seconds < 0) {
+        return "";
+    }
     const h = Math.floor(seconds / 3600)
     const m = Math.floor((seconds % 3600) / 60)
     const s = seconds % 60
