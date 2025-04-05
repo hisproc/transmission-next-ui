@@ -11,7 +11,7 @@ export default function About({ session }: { session: TransmissionSession }) {
                 <CardContent>
                     <div className="text-center">
                         <p className="mt-2 text-sm text-gray-600"><span className="text-sm font-bold text-black">{t("Transmission Version")}:</span> {session?.version}</p>
-                        <p className="mt-2 text-sm text-gray-600"><span className="text-sm font-bold text-black">{t("UI Version")}:</span>{version}</p>
+                        <p className="mt-2 text-sm text-gray-600"><span className="text-sm font-bold text-black">{t("UI Version")}:</span> {version}</p>
                         <p className="mt-2 text-sm text-gray-600"><span className="text-sm font-bold text-black">{t("RPC Version")}:</span> {session?.["rpc-version"]}</p>
                     </div>
                 </CardContent>
