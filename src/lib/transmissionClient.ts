@@ -36,7 +36,7 @@ transmission.interceptors.response.use(
     }
 );
 
-export const allTorrentFields = ["id", "name", "status", "hashString", "totalSize", "percentDone", "addedDate", "trackerStats", "leftUntilDone", "rateDownload", "rateUpload", "recheckProgress", "rateDownload", "rateUpload", "peersGettingFromUs", "peersSendingToUs", "uploadRatio", "uploadedEver", "downloadedEver", "downloadDir", "error", "errorString", "doneDate", "queuePosition", "activityDate"];
+export const allTorrentFields = ["id", "name", "status", "hashString", "totalSize", "percentDone", "addedDate", "trackerStats", "leftUntilDone", "rateDownload", "rateUpload", "recheckProgress", "rateDownload", "rateUpload", "peersGettingFromUs", "peersSendingToUs", "uploadRatio", "uploadedEver", "downloadedEver", "downloadDir", "error", "errorString", "doneDate", "queuePosition", "activityDate", "eta"];
 
 export const singleTorrentFields = ["fileStats", "trackerStats", "peers", "leftUntilDone", "status", "rateDownload", "rateUpload", "uploadedEver", "uploadRatio", "error", "errorString", "pieces", "pieceCount", "pieceSize", "files", "trackers", "comment", "dateCreated", "creator", "downloadDir", "hashString", "addedDate"];
 

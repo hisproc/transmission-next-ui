@@ -15,7 +15,6 @@ import { Badge } from "./ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { IconAlertTriangle, IconArrowDown, IconArrowUp, IconClock, IconDotsVertical, IconDownload, IconEdit, IconLoader, IconPlayerPlay, IconPlayerStop, IconTrash, IconUpload } from "@tabler/icons-react"
-import dayjs from "dayjs"
 import { Button } from "./ui/button"
 import { useStartTorrent, useStopTorrent } from "../hooks/useTorrentActions"
 import { RowDialog } from "./RowDialog"
@@ -23,6 +22,8 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
+import dayjs, { formatEta } from "@/lib/dayjs"
+
 
 
 function TorrentStatus({ error, status }: { error: number; status: number }) {
@@ -82,7 +83,7 @@ function SortableHeader({ column, title, className }: { column: any, title: stri
 
     return (
         <div
-            className={cn("cursor-pointer select-none inline-flex items-center gap-1", className)}
+            className={cn("cursor-pointer select-none flex items-center gap-1", className)}
             onClick={() => column.toggleSorting()}
         >
             <span>{title}</span>
@@ -149,6 +150,22 @@ export function getColumns(t: Function): ColumnDef<z.infer<typeof schema>>[] {
                     {(row.original.percentDone * 100).toFixed(2)}%
                 </div>
             ),
+        },
+        {
+            id: "eta",
+            accessorKey: "eta",
+            header: ({ column }) => <SortableHeader column={column} title={t("eta")} className="w-30 justify-end" />,
+            cell: ({ row }) => {
+                const eta = row.original.eta
+                if (eta === -1) {
+                    return <div className="text-right"></div>
+                }
+                return (
+                    <div className="text-right">
+                        {formatEta(eta, t)}
+                    </div>
+                )
+            },
         },
         {
             id: "Status",

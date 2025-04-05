@@ -14,6 +14,7 @@ export const schema = z.object({
     downloadDir: z.string(),
     addedDate: z.number(),
     error: z.number(),
+    eta: z.number(),
     errorString: z.string(),
     peersSendingToUs: z.number(),
     trackerStats: z.array(z.object({

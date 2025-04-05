@@ -140,5 +140,10 @@
     "Announce Time": "最后更新时间",
     "Seeders": "做种数",
     "Leechers": "下载数",
-    "Success": "成功"
+    "Success": "成功",
+    "Active": "活跃中",
+    "h": "小时",
+    "m": "分钟",
+    "s": "秒",
+    "eta": "剩余时间"
 }
