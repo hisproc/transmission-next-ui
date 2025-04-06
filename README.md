@@ -8,6 +8,7 @@ A third-party modern web-based frontend for [Transmission](https://github.com/tr
 
 ![demo.png](pic/demo.png)
 ![demo2.png](pic/demo2.png)
+![demo3.png](pic/demo3.png)
 
 ## Features
 
