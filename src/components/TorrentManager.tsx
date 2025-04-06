@@ -6,9 +6,11 @@ import {
 import {
     IconChevronDown,
     IconLayoutColumns,
+    IconPlus,
 } from "@tabler/icons-react"
 import {
     ColumnFiltersState,
+    Row,
     SortingState,
     VisibilityState,
     getCoreRowModel,
@@ -45,11 +47,14 @@ import {
 } from "@/components/ui/tabs"
 
 import { getColumns } from "@/components/TorrentColumns"
-import { TorrentToolbar } from "@/components/TorrentToolbar"
-import { schema } from "../schemas/torrentSchema"
+import { schema, torrentSchema } from "../schemas/torrentSchema"
 import { TorrentTable } from "./TorrentTable"
-import { TransmissionSession } from "@/lib/types"
+import { DialogType, TransmissionSession } from "@/lib/types"
 import { useTranslation } from "react-i18next"
+import { Input } from "./ui/input"
+import { DeleteDialog } from "./dialog/DeleteDialog"
+import { EditDialog } from "./dialog/EditDialog"
+import { AddDialog } from "@/components/dialog/AddDialog.tsx";
 
 export function TorrentManager({
     data: initialData,
@@ -60,20 +65,12 @@ export function TorrentManager({
 }) {
     const [rowSelection, setRowSelection] = useState({})
     const [file, setFile] = useState<File | null>(null)
-    const [filename, setFilename] = useState("");
     const [isDragging, setIsDragging] = useState(false)
-    const dragCounter = useRef(0)
-    const [dialogOpen, setDialogOpen] = useState(false)
+    const dragCounter = useRef(0);
+    const [globalFilter, setGlobalFilter] = useState("");
+    const [dialogType, setDialogType] = useState<DialogType | null>(null);
+    const [targetRows, setTargetRows] = useState<Row<torrentSchema>[]>([])
 
-    const diaLogOnOpenChange = (open: boolean) => {
-        if (!open) {
-            dragCounter.current = 0;
-            setIsDragging(false);
-            setFile(null);
-            setFilename("");
-        }
-        setDialogOpen(open)
-    }
 
     useEffect(() => {
         const handleDragEnter = (e: DragEvent) => {
@@ -102,7 +99,7 @@ export function TorrentManager({
             if (files && files.length > 0) {
                 const file = files[0]
                 setFile(file)
-                setDialogOpen(true)
+                setDialogType(DialogType.Add)
             }
         }
 
@@ -134,19 +131,19 @@ export function TorrentManager({
         () => initialData?.map(({ id }) => id) || [],
         [initialData]
     );
-    const downloadDirs = Array.from(new Set(initialData.map(item => item.downloadDir)));
-    const [directory, setDirectory] = useState(session["download-dir"] || "")
+    const downloadDirs = Array.from(new Set([...initialData.map((item) => item.downloadDir), session["download-dir"] || ""]))
     const [tabValue, setTabValue] = useState("all")
     const { t } = useTranslation()
     const table = useReactTable({
         data: initialData,
-        columns: useMemo(() => getColumns(t), [t]),
+        columns: useMemo(() => getColumns({ t, setDialogType, setTargetRows }), [t]),
         state: {
             sorting,
             columnVisibility,
             rowSelection,
             columnFilters,
             pagination,
+            globalFilter,
         },
         getRowId: (row) => row.id.toString(),
         enableRowSelection: true,
@@ -155,6 +152,7 @@ export function TorrentManager({
         onColumnFiltersChange: setColumnFilters,
         onColumnVisibilityChange: setColumnVisibility,
         onPaginationChange: setPagination,
+        onGlobalFilterChange: setGlobalFilter,
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
@@ -162,6 +160,22 @@ export function TorrentManager({
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedUniqueValues: getFacetedUniqueValues(),
     })
+
+    const filteredRows = useMemo(() => {
+        const allRows = table.getRowModel().rows;
+        switch (tabValue) {
+            case "active":
+                return allRows.filter(row => row.original.rateUpload > 0 || row.original.rateDownload > 0);
+            case "downloading":
+                return allRows.filter(row => row.original.status === 4);
+            case "seeding":
+                return allRows.filter(row => row.original.status === 6);
+            case "stopped":
+                return allRows.filter(row => row.original.status === 0);
+            default:
+                return allRows;
+        }
+    }, [table.getRowModel().rows, tabValue]);
 
     return (
         <Tabs
@@ -173,13 +187,13 @@ export function TorrentManager({
             className="w-full flex-col justify-start gap-6"
         >
             {
-                isDragging && !dialogOpen && (
+                isDragging && dialogType !== DialogType.Add && (
                     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center text-white text-xl font-semibold pointer-events-none">
                         Drop .torrent file to upload
                     </div>
                 )
             }
-            <div className="flex items-center justify-between px-4 lg:px-6">
+            <div className="flex items-center justify-between px-4 lg:px-6 gap-x-2">
                 <Label htmlFor="view-selector" className="sr-only">
                     View
                 </Label>
@@ -205,7 +219,6 @@ export function TorrentManager({
                 <TabsList
                     className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
                     <TabsTrigger value="all">{t("All")} <Badge variant="secondary">{table.getRowModel().rows.length}</Badge>
-
                     </TabsTrigger>
                     <TabsTrigger value="active">{t("Active")} <Badge variant="secondary">{table.getRowModel().rows.filter(row => row.original.rateUpload > 0 || row.original.rateDownload > 0).length}</Badge>
                     </TabsTrigger>
@@ -217,7 +230,13 @@ export function TorrentManager({
 
                     </TabsTrigger>
                 </TabsList>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-full">
+                    <Input
+                        type="text"
+                        placeholder={t("Search ...")}
+                        value={globalFilter}
+                        onChange={(e) => setGlobalFilter(e.target.value)}
+                    />
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm">
@@ -242,7 +261,7 @@ export function TorrentManager({
                                             className="capitalize"
                                             checked={column.getIsVisible()}
                                             onCheckedChange={(value) =>
-                                                column.toggleVisibility(!!value)
+                                                column.toggleVisibility(value)
                                             }
                                         >
                                             {t(column.id)}
@@ -251,34 +270,24 @@ export function TorrentManager({
                                 })}
                         </DropdownMenuContent>
                     </DropdownMenu>
-                    <TorrentToolbar fileProps={{ file, setFile }}
-                        directoryProps={{ defaultDirectory: directory, directories: downloadDirs, setDirectory }}
-                        openProps={{ open: dialogOpen, onOpenChange: diaLogOnOpenChange }}
-                        filenameProps={{ filename, setFilename }}
-                    />
+                    <Button variant="outline" size="sm" onClick={() => setDialogType(DialogType.Add)}>
+                        <IconPlus />
+                        <span className="hidden lg:inline">{t("Add Torrent")}</span>
+                    </Button>
                 </div>
             </div>
-            <TabsContent value="all" className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
-                <TorrentTable table={table} rows={table.getRowModel().rows} />
+            <TabsContent value={tabValue} className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
+                <TorrentTable table={table} rows={filteredRows} setDialogType={setDialogType} setTargetRows={setTargetRows} />
             </TabsContent>
-            <TabsContent value="active" className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
-                <TorrentTable table={table} rows={table.getRowModel().rows.filter(row => row.original.rateUpload > 0 || row.original.rateDownload > 0)} />
-            </TabsContent>
-            <TabsContent
-                value="downloading"
-                className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"
-            >
-                <TorrentTable table={table} rows={table.getRowModel().rows.filter(row => row.original.status === 4)} />
-            </TabsContent>
-            <TabsContent value="seeding" className="flex flex-col px-4 lg:px-6">
-                <TorrentTable table={table} rows={table.getRowModel().rows.filter(row => row.original.status === 6)} />
-            </TabsContent>
-            <TabsContent
-                value="stopped"
-                className="flex flex-col px-4 lg:px-6"
-            >
-                <TorrentTable table={table} rows={table.getRowModel().rows.filter(row => row.original.status === 0)} />
-            </TabsContent>
+            <DeleteDialog open={dialogType === DialogType.Delete} onOpenChange={(open) => !open && setDialogType(null)} targetRows={targetRows} />
+            <EditDialog open={dialogType === DialogType.Edit} onOpenChange={(open) => !open && setDialogType(null)} targetRows={targetRows} directories={downloadDirs} />
+            <AddDialog open={dialogType === DialogType.Add} onOpenChange={(open) => {
+                if (!open) {
+                    setDialogType(null)
+                    setIsDragging(false)
+                    dragCounter.current = 0
+                }
+            }} file={file} setFile={setFile} directories={downloadDirs} />
         </Tabs>
     )
 }

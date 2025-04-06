@@ -30,7 +30,7 @@
     "Stop Selected Torrents": "停止选中的种子",
     "Delete Selected Torrents": "删除选中的种子",
     "Confirm": "确认",
-    "Rows per page": "每页行数",
+    "RowsPerPage": "每页行数",
     "Page": "当前页",
     "Go to first page": "跳转到第一页",
     "Go to last page": "跳转到最后一页",
@@ -122,6 +122,8 @@
     "Torrent deleted successfully": "种子删除成功",
     "Torrent started successfully": "种子开始成功",
     "Torrent stopped successfully": "种子停止成功",
+    "Torrent path renamed successfully": "种子路径重命名成功",
+    "Torrent location set successfully": "种子数据保存路径设置成功",
     "Port test successfully": "端口测试成功",
     "Failed to test port": "端口测试失败",
     "Failed to add torrent": "添加种子失败",
@@ -145,5 +147,7 @@
     "h": "小时",
     "m": "分钟",
     "s": "秒",
-    "eta": "剩余时间"
+    "eta": "剩余时间",
+    "Search ...": "搜索 ...",
+    "EditingFollowingTorrent": "正在编辑该种子"
 }

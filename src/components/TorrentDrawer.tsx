@@ -2,8 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter, DrawerClose } from "@/components/ui/drawer"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { z } from "zod"
-import { schema } from "../schemas/torrentSchema"
+import { torrentSchema} from "../schemas/torrentSchema"
 import { getTorrents, singleTorrentFields } from "@/lib/transmissionClient"
 import { GetTorrentResponse } from "@/lib/types"
 import { useState } from "react"
@@ -26,7 +25,7 @@ function ButtonSquare({ active = false }: { active?: boolean }) {
     )
 }
 
-export function TorrentDrawer({ item }: { item: z.infer<typeof schema> }) {
+export function TorrentDrawer({ item }: { item: torrentSchema }) {
     const isMobile = useIsMobile()
     const [open, setOpen] = useState(false)
 

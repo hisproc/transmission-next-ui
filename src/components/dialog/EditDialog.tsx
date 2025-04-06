@@ -1,57 +1,39 @@
-import { DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog"
-import { Checkbox } from "./ui/checkbox"
-import { Label } from "./ui/label"
-import { useState } from "react"
-import { useDeleteTorrent, useRenamePathTorrent, useSetLocationTorrent } from "../hooks/useTorrentActions"
-import { Button } from "./ui/button"
-import { Input } from "./ui/input"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
-import { IconChevronDown } from "@tabler/icons-react"
-import { Row } from "@tanstack/react-table"
-import { useTranslation } from "react-i18next"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog"
+import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
+import { Label } from "../ui/label";
+import { Row } from "@tanstack/react-table";
+import { useTranslation } from "react-i18next";
+import { Input } from "../ui/input";
+import {useRenamePathTorrent, useSetLocationTorrent} from "@/hooks/useTorrentActions";
+import { useEffect, useState } from "react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { IconChevronDown } from "@tabler/icons-react";
+import { torrentSchema} from "@/schemas/torrentSchema.ts";
 
+export function EditDialog({ open, onOpenChange, targetRows, directories }: { open: boolean, onOpenChange: (open: boolean) => void, targetRows: Row<torrentSchema>[], directories: string[] }) {
+    const { t } = useTranslation();
 
-export function RowDialog({ row, selectedRows, dialogOption, directories }: { row: Row<any>, selectedRows: Row<any>[], dialogOption: any, directories: string[] }) {
-    const [location, setLocation] = useState(row.original.downloadDir)
-    const [deleteData, setDeleteData] = useState(false)
-    const [pathname, setPathname] = useState(row.original.name)
-    const [oldPathname, oldLocation] = [row.original.name, row.original.downloadDir]
-    const [moveData, setMoveData] = useState(false)
-    const deleteTorrent = useDeleteTorrent();
     const renamePathTorrent = useRenamePathTorrent();
     const setLocationTorrent = useSetLocationTorrent();
-    const { t } = useTranslation();
-    const targetRows: Row<any>[] = dialogOption == "deleteMultiple" ? selectedRows : [row];
+    const row = targetRows?.[0];
+    const [oldPathname, oldLocation] = [row?.original.name, row?.original.downloadDir]
+    const [location, setLocation] = useState(row?.original.downloadDir)
+    const [moveData, setMoveData] = useState(false)
+    const [pathname, setPathname] = useState(row?.original.name)
+
+    useEffect(() => {
+        setPathname(row?.original.name)
+        setLocation(row?.original.downloadDir)
+    }, [open])
+
     return (
-        <>
-            {(dialogOption == "delete" || dialogOption == "deleteMultiple") && (<DialogContent>
-                <DialogHeader>
-                    <DialogTitle>{t("Are you sure you want to do this?")}</DialogTitle>
-                    <DialogDescription className="break-all">
-                        {t("The following torrents will be deleted")}:
-                        <ul className="list-disc list-inside mt-2">
-                            {targetRows.map((row) => (
-                                <li key={row.original.id} className="font-semibold">{row.original.name}</li>
-                            ))}
-                        </ul>
-                    </DialogDescription>
-                    <div className="py-2 flex items-center gap-2">
-                        <Checkbox id="delete-data" checked={deleteData} onCheckedChange={() => setDeleteData(!deleteData)} />
-                        <Label>{t("Delete data")}</Label>
-                    </div>
-                </DialogHeader>
-                <DialogFooter>
-                    <Button type="submit" onClick={() => {
-                        deleteTorrent.mutate({ ids: targetRows.map((row) => row.original.id), deleteData: deleteData })
-                    }}>{t("Confirm")}</Button>
-                </DialogFooter>
-            </DialogContent>)
-            }
-            {dialogOption == "edit" && (<DialogContent>
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent>
                 <DialogHeader>
                     <DialogTitle>{t("Edit")}</DialogTitle>
                     <DialogDescription>
-                        Edit the following torrent <span className="font-semibold">"{row.original.name}"</span>.
+                        {t("EditingFollowingTorrent")} <span className="font-semibold">"{row?.original.name}"</span>.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
@@ -98,7 +80,7 @@ export function RowDialog({ row, selectedRows, dialogOption, directories }: { ro
                     <DialogClose asChild>
                         <Button type="submit" onClick={() => {
                             if (pathname != oldPathname) {
-                                renamePathTorrent.mutate({ ids: [row.original.id], path: pathname, name: pathname })
+                                renamePathTorrent.mutate({ ids: [row.original.id], path: oldPathname, name: pathname })
                             }
                             if (location != oldLocation) {
                                 setLocationTorrent.mutate({ ids: [row.original.id], location: location, move: moveData })
@@ -107,8 +89,7 @@ export function RowDialog({ row, selectedRows, dialogOption, directories }: { ro
                         }>{t("Submit")}</Button>
                     </DialogClose>
                 </DialogFooter>
-            </DialogContent>)
-            }
-        </>
+            </DialogContent>
+        </Dialog >
     )
 }
