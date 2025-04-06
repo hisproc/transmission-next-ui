@@ -2,10 +2,9 @@ import {IconArrowDown, IconArrowUp} from "@tabler/icons-react";
 import {ChevronsUpDown} from "lucide-react";
 import {cn} from "@/lib/utils.ts";
 import {Column} from "@tanstack/react-table";
-import {schema} from "@/schemas/torrentSchema.ts";
-import {z} from "zod";
+import {torrentSchema} from "@/schemas/torrentSchema.ts";
 
-export function SortableHeader({ column, title, className }: { column: Column<z.infer<typeof schema>>, title: string, className?: string }) {
+export function SortableHeader({ column, title, className }: { column: Column<torrentSchema>, title: string, className?: string }) {
     const sort = column.getIsSorted()
     const icon =
         sort === "asc"

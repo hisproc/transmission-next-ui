@@ -2,22 +2,17 @@ import { IconDotsVertical, IconEdit, IconPlayerPlay, IconPlayerStop, IconTrash }
 import { Button } from "../ui/button";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { RowDialog } from "../RowDialog";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
-import { Row, Table } from "@tanstack/react-table";
+import { Row } from "@tanstack/react-table";
 import { useStartTorrent, useStopTorrent } from "@/hooks/useTorrentActions";
-import { schema } from "@/schemas/torrentSchema";
-import {z} from "zod";
+import {torrentSchema} from "@/schemas/torrentSchema";
+import { DialogType } from "@/lib/types";
 
-export function ActionButton({ row, table }: { row: Row<z.infer<typeof schema>>; table: Table<z.infer<typeof schema>> }) {
+export function ActionButton({ row, setDialogType, setTargetRows}: { row: Row<torrentSchema>; setDialogType: (type: DialogType) => void, setTargetRows: (rows: Row<torrentSchema>[]) => void }) {
 
     const { t } = useTranslation();
-
     const stopTorrent = useStopTorrent();
     const startTorrent = useStartTorrent();
-
-    const [dialogOption, setDialogOption] = useState<string>("");
 
     return (
         <Dialog key={row.id}>
@@ -33,7 +28,10 @@ export function ActionButton({ row, table }: { row: Row<z.infer<typeof schema>>;
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-32">
-                    <DialogTrigger asChild onClick={() => setDialogOption("edit")}>
+                    <DialogTrigger asChild onClick={() => {
+                        setDialogType(DialogType.Edit);
+                        setTargetRows([row]);
+                    }}>
                         <DropdownMenuItem>
                             <IconEdit className="mr-2 h-4 w-4 text-muted-foreground" />
                             {t("Edit")}
@@ -52,14 +50,16 @@ export function ActionButton({ row, table }: { row: Row<z.infer<typeof schema>>;
                         </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />
-                    <DialogTrigger asChild onClick={() => setDialogOption("delete")}>
+                    <DialogTrigger asChild onClick={() => {
+                        setDialogType(DialogType.Delete);
+                        setTargetRows([row]);
+                    }}>
                         <DropdownMenuItem variant="destructive">
                             <IconTrash className="mr-2 h-4 w-4 text-red-500" />
                             {t("Delete")}
                         </DropdownMenuItem>
                     </DialogTrigger>
                 </DropdownMenuContent>
-                <RowDialog row={row} selectedRows={table.getSelectedRowModel().rows} dialogOption={dialogOption} directories={[...new Set(table.getRowModel().rows.map(row => row.original.downloadDir))]} />
             </DropdownMenu>
         </Dialog>
     )

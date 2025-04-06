@@ -13,6 +13,11 @@ export interface AddTorrentOptions {
     cookies?: string;       // 设置 cookie
 }
 
+export enum DialogType {
+    Edit = "edit",
+    Delete = "delete"
+}
+
 export interface PortTestOptions {
     "ip_protocol": string;
 }

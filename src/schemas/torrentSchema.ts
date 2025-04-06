@@ -22,3 +22,5 @@ export const schema = z.object({
         leecherCount: z.number(),
     })),
 })
+
+export type torrentSchema = z.infer<typeof schema>;

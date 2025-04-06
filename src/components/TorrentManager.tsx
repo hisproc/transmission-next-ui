@@ -9,6 +9,7 @@ import {
 } from "@tabler/icons-react"
 import {
     ColumnFiltersState,
+    Row,
     SortingState,
     VisibilityState,
     getCoreRowModel,
@@ -46,11 +47,13 @@ import {
 
 import { getColumns } from "@/components/TorrentColumns"
 import { TorrentToolbar } from "@/components/TorrentToolbar"
-import { schema } from "../schemas/torrentSchema"
+import {schema, torrentSchema} from "../schemas/torrentSchema"
 import { TorrentTable } from "./TorrentTable"
-import { TransmissionSession } from "@/lib/types"
+import { DialogType, TransmissionSession } from "@/lib/types"
 import { useTranslation } from "react-i18next"
 import { Input } from "./ui/input"
+import { DeleteDialog } from "./dialog/DeleteDialog"
+import { EditDialog } from "./dialog/EditDialog"
 
 export function TorrentManager({
     data: initialData,
@@ -66,6 +69,9 @@ export function TorrentManager({
     const dragCounter = useRef(0)
     const [dialogOpen, setDialogOpen] = useState(false)
     const [globalFilter, setGlobalFilter] = useState("");
+    const [dialogType, setDialogType] = useState<DialogType | null>(null);
+    const [targetRows, setTargetRows] = useState<Row<torrentSchema>[]>([])
+
 
     const diaLogOnOpenChange = (open: boolean) => {
         if (!open) {
@@ -142,7 +148,7 @@ export function TorrentManager({
     const { t } = useTranslation()
     const table = useReactTable({
         data: initialData,
-        columns: useMemo(() => getColumns(t), [t]),
+        columns: useMemo(() => getColumns({ t, setDialogType, setTargetRows }), [t]),
         state: {
             sorting,
             columnVisibility,
@@ -166,6 +172,22 @@ export function TorrentManager({
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedUniqueValues: getFacetedUniqueValues(),
     })
+
+    const filteredRows = useMemo(() => {
+        const allRows = table.getRowModel().rows;
+        switch (tabValue) {
+            case "active":
+                return allRows.filter(row => row.original.rateUpload > 0 || row.original.rateDownload > 0);
+            case "downloading":
+                return allRows.filter(row => row.original.status === 4);
+            case "seeding":
+                return allRows.filter(row => row.original.status === 6);
+            case "stopped":
+                return allRows.filter(row => row.original.status === 0);
+            default:
+                return allRows;
+        }
+    }, [table.getRowModel().rows, tabValue]);
 
     return (
         <Tabs
@@ -267,27 +289,11 @@ export function TorrentManager({
                     />
                 </div>
             </div>
-            <TabsContent value="all" className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
-                <TorrentTable table={table} rows={table.getRowModel().rows} />
+            <TabsContent value={tabValue} className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
+                <TorrentTable table={table} rows={filteredRows} setDialogType={setDialogType} setTargetRows={setTargetRows} />
             </TabsContent>
-            <TabsContent value="active" className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
-                <TorrentTable table={table} rows={table.getRowModel().rows.filter(row => row.original.rateUpload > 0 || row.original.rateDownload > 0)} />
-            </TabsContent>
-            <TabsContent
-                value="downloading"
-                className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"
-            >
-                <TorrentTable table={table} rows={table.getRowModel().rows.filter(row => row.original.status === 4)} />
-            </TabsContent>
-            <TabsContent value="seeding" className="flex flex-col px-4 lg:px-6">
-                <TorrentTable table={table} rows={table.getRowModel().rows.filter(row => row.original.status === 6)} />
-            </TabsContent>
-            <TabsContent
-                value="stopped"
-                className="flex flex-col px-4 lg:px-6"
-            >
-                <TorrentTable table={table} rows={table.getRowModel().rows.filter(row => row.original.status === 0)} />
-            </TabsContent>
+            <DeleteDialog open={dialogType === DialogType.Delete} onOpenChange={(open) => !open && setDialogType(null)} targetRows={targetRows} />
+            <EditDialog open={dialogType === DialogType.Edit} onOpenChange={(open) => !open && setDialogType(null)} targetRows={targetRows} directories={downloadDirs} />
         </Tabs>
     )
 }

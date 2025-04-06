@@ -4,8 +4,7 @@ import {
     Table
 } from "@tanstack/react-table"
 
-import { z } from "zod"
-import { schema } from "../schemas/torrentSchema"
+import {torrentSchema} from "../schemas/torrentSchema"
 import { Checkbox } from "./ui/checkbox"
 import { TorrentDrawer } from "@/components/TorrentDrawer"
 import { filesize } from "filesize"
@@ -15,11 +14,12 @@ import { Badge } from "./ui/badge"
 
 import dayjs, { formatEta } from "@/lib/dayjs"
 import { ActionButton } from "./table/ActionButton"
-import {TFunction} from "i18next";
-import {TorrentStatus} from "@/components/table/TorrentStatus.tsx";
-import {SortableHeader} from "@/components/table/SortableHeader.tsx";
+import { TFunction } from "i18next";
+import { TorrentStatus } from "@/components/table/TorrentStatus.tsx";
+import { SortableHeader } from "@/components/table/SortableHeader.tsx";
+import { DialogType } from "@/lib/types"
 
-export function getColumns(t: TFunction): ColumnDef<z.infer<typeof schema>>[] {
+export function getColumns({ t, setDialogType, setTargetRows }: { t: TFunction, setDialogType: (type: DialogType) => void, setTargetRows: (rows: Row<torrentSchema>[]) => void }): ColumnDef<torrentSchema>[] {
     return [
         {
             id: "select",
@@ -189,12 +189,12 @@ export function getColumns(t: TFunction): ColumnDef<z.infer<typeof schema>>[] {
         },
         {
             id: "actions",
-            cell: ({ row, table }: {
-                row: Row<z.infer<typeof schema>>;
-                table: Table<z.infer<typeof schema>>;
+            cell: ({ row }: {
+                row: Row<torrentSchema>;
+                table: Table<torrentSchema>;
             }) => {
                 return (
-                    <ActionButton row={row} table={table} />
+                    <ActionButton row={row} setDialogType={setDialogType} setTargetRows={setTargetRows} />
                 )
             },
         },
