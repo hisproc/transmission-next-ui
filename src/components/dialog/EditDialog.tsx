@@ -33,7 +33,7 @@ export function EditDialog({ open, onOpenChange, targetRows, directories }: { op
                 <DialogHeader>
                     <DialogTitle>{t("Edit")}</DialogTitle>
                     <DialogDescription>
-                        Edit the following torrent <span className="font-semibold">"{row?.original.name}"</span>.
+                        {t("EditingFollowingTorrent")} <span className="font-semibold">"{row?.original.name}"</span>.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">

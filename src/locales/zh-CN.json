@@ -148,5 +148,6 @@
     "m": "分钟",
     "s": "秒",
     "eta": "剩余时间",
-    "Search ...": "搜索 ..."
+    "Search ...": "搜索 ...",
+    "EditingFollowingTorrent": "正在编辑该种子"
 }
