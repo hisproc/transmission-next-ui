@@ -68,7 +68,7 @@ chmod +x synology.sh
 sudo bash synology.sh
 ```
 
-输出 `Deployment complete` 即表示安装完成。
+输出 `Deployment complete` 即表示安装完成，旧的web目录内容会备份到当前执行目录下，文件为`backup.zip`，如果需要恢复到安装前的状态，请重命名`backup.zip`为`release.zip`，并重新执行上述命令。
 
 ### 3. 源代码打包
 
