@@ -14,7 +14,7 @@ export function useAddTorrent() {
             await addTorrent({
                 metainfo: file ? await fileToBase64(file) : undefined,
                 filename: filename ? filename : undefined,
-                downloadDir: directory,
+                "download-dir": directory,
                 paused: false
             });
         },

@@ -6,6 +6,7 @@ import {
 import {
     IconChevronDown,
     IconLayoutColumns,
+    IconPlus,
 } from "@tabler/icons-react"
 import {
     ColumnFiltersState,
@@ -46,14 +47,14 @@ import {
 } from "@/components/ui/tabs"
 
 import { getColumns } from "@/components/TorrentColumns"
-import { TorrentToolbar } from "@/components/TorrentToolbar"
-import {schema, torrentSchema} from "../schemas/torrentSchema"
+import { schema, torrentSchema } from "../schemas/torrentSchema"
 import { TorrentTable } from "./TorrentTable"
 import { DialogType, TransmissionSession } from "@/lib/types"
 import { useTranslation } from "react-i18next"
 import { Input } from "./ui/input"
 import { DeleteDialog } from "./dialog/DeleteDialog"
 import { EditDialog } from "./dialog/EditDialog"
+import { AddDialog } from "@/components/dialog/AddDialog.tsx";
 
 export function TorrentManager({
     data: initialData,
@@ -64,24 +65,12 @@ export function TorrentManager({
 }) {
     const [rowSelection, setRowSelection] = useState({})
     const [file, setFile] = useState<File | null>(null)
-    const [filename, setFilename] = useState("");
     const [isDragging, setIsDragging] = useState(false)
-    const dragCounter = useRef(0)
-    const [dialogOpen, setDialogOpen] = useState(false)
+    const dragCounter = useRef(0);
     const [globalFilter, setGlobalFilter] = useState("");
     const [dialogType, setDialogType] = useState<DialogType | null>(null);
     const [targetRows, setTargetRows] = useState<Row<torrentSchema>[]>([])
 
-
-    const diaLogOnOpenChange = (open: boolean) => {
-        if (!open) {
-            dragCounter.current = 0;
-            setIsDragging(false);
-            setFile(null);
-            setFilename("");
-        }
-        setDialogOpen(open)
-    }
 
     useEffect(() => {
         const handleDragEnter = (e: DragEvent) => {
@@ -110,7 +99,7 @@ export function TorrentManager({
             if (files && files.length > 0) {
                 const file = files[0]
                 setFile(file)
-                setDialogOpen(true)
+                setDialogType(DialogType.Add)
             }
         }
 
@@ -143,7 +132,6 @@ export function TorrentManager({
         [initialData]
     );
     const downloadDirs = Array.from(new Set([...initialData.map((item) => item.downloadDir), session["download-dir"] || ""]))
-    const [directory, setDirectory] = useState(session["download-dir"] || "")
     const [tabValue, setTabValue] = useState("all")
     const { t } = useTranslation()
     const table = useReactTable({
@@ -199,7 +187,7 @@ export function TorrentManager({
             className="w-full flex-col justify-start gap-6"
         >
             {
-                isDragging && !dialogOpen && (
+                isDragging && dialogType !== DialogType.Add && (
                     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center text-white text-xl font-semibold pointer-events-none">
                         Drop .torrent file to upload
                     </div>
@@ -282,11 +270,10 @@ export function TorrentManager({
                                 })}
                         </DropdownMenuContent>
                     </DropdownMenu>
-                    <TorrentToolbar fileProps={{ file, setFile }}
-                        directoryProps={{ defaultDirectory: directory, directories: downloadDirs, setDirectory }}
-                        openProps={{ open: dialogOpen, onOpenChange: diaLogOnOpenChange }}
-                        filenameProps={{ filename, setFilename }}
-                    />
+                    <Button variant="outline" size="sm" onClick={() => setDialogType(DialogType.Add)}>
+                        <IconPlus />
+                        <span className="hidden lg:inline">{t("Add Torrent")}</span>
+                    </Button>
                 </div>
             </div>
             <TabsContent value={tabValue} className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
@@ -294,6 +281,13 @@ export function TorrentManager({
             </TabsContent>
             <DeleteDialog open={dialogType === DialogType.Delete} onOpenChange={(open) => !open && setDialogType(null)} targetRows={targetRows} />
             <EditDialog open={dialogType === DialogType.Edit} onOpenChange={(open) => !open && setDialogType(null)} targetRows={targetRows} directories={downloadDirs} />
+            <AddDialog open={dialogType === DialogType.Add} onOpenChange={(open) => {
+                if (!open) {
+                    setDialogType(null)
+                    setIsDragging(false)
+                    dragCounter.current = 0
+                }
+            }} file={file} setFile={setFile} directories={downloadDirs} />
         </Tabs>
     )
 }

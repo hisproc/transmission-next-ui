@@ -6,7 +6,7 @@ export interface GetTorrentsOptions {
 export interface AddTorrentOptions {
     filename?: string;      // 磁力链接 或 URL
     metainfo?: string;      // base64 编码的 .torrent 文件内容
-    downloadDir?: string;   // 可选的下载目录
+    "download-dir"?: string;   // 可选的下载目录
     paused?: boolean;       // 是否暂停添加
     peerLimit?: number;     // 同时连接的peer数限制
     bandwidthPriority?: number; // 带宽优先级
@@ -15,7 +15,8 @@ export interface AddTorrentOptions {
 
 export enum DialogType {
     Edit = "edit",
-    Delete = "delete"
+    Delete = "delete",
+    Add = "add",
 }
 
 export interface PortTestOptions {
