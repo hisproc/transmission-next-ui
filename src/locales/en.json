@@ -124,6 +124,8 @@
     "Torrent deleted successfully": "Torrent deleted successfully",
     "Torrent started successfully": "Torrent started successfully",
     "Torrent stopped successfully": "Torrent stopped successfully",
+    "Torrent path renamed successfully": "Torrent path renamed successfully",
+    "Torrent location set successfully": "Torrent location set successfully",
     "Port test successfully": "Port test successfully",
     "Failed to test port": "Failed to test port",
     "Failed to add torrent": "Failed to add torrent",

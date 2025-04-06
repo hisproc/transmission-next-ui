@@ -80,7 +80,7 @@ export function EditDialog({ open, onOpenChange, targetRows, directories }: { op
                     <DialogClose asChild>
                         <Button type="submit" onClick={() => {
                             if (pathname != oldPathname) {
-                                renamePathTorrent.mutate({ ids: [row.original.id], path: pathname, name: pathname })
+                                renamePathTorrent.mutate({ ids: [row.original.id], path: oldPathname, name: pathname })
                             }
                             if (location != oldLocation) {
                                 setLocationTorrent.mutate({ ids: [row.original.id], location: location, move: moveData })

@@ -122,6 +122,8 @@
     "Torrent deleted successfully": "种子删除成功",
     "Torrent started successfully": "种子开始成功",
     "Torrent stopped successfully": "种子停止成功",
+    "Torrent path renamed successfully": "种子路径重命名成功",
+    "Torrent location set successfully": "种子数据保存路径设置成功",
     "Port test successfully": "端口测试成功",
     "Failed to test port": "端口测试失败",
     "Failed to add torrent": "添加种子失败",
