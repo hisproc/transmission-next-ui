@@ -12,82 +12,14 @@ import { filesize } from "filesize"
 import { Progress } from "./ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip"
 import { Badge } from "./ui/badge"
-import { IconAlertTriangle, IconArrowDown, IconArrowUp, IconClock, IconDownload, IconLoader, IconPlayerStop, IconUpload } from "@tabler/icons-react"
-import { useTranslation } from "react-i18next"
-import { ChevronsUpDown } from "lucide-react"
-import { cn } from "@/lib/utils"
+
 import dayjs, { formatEta } from "@/lib/dayjs"
 import { ActionButton } from "./table/ActionButton"
+import {TFunction} from "i18next";
+import {TorrentStatus} from "@/components/table/TorrentStatus.tsx";
+import {SortableHeader} from "@/components/table/SortableHeader.tsx";
 
-
-
-function TorrentStatus({ error, status }: { error: number; status: number }) {
-    const { t } = useTranslation()
-    if (error !== 0) {
-        return (
-            <>
-                <IconAlertTriangle className="text-red-500" />
-                {t("Error")}
-            </>
-        )
-    }
-
-    let statusDetails;
-    switch (status) {
-        case 0:
-            statusDetails = { icon: <IconPlayerStop className="text-red-500" />, text: t("Stopped") };
-            break;
-        case 1:
-            statusDetails = { icon: <IconClock className="text-yellow-500" />, text: t("Queued") };
-            break;
-        case 2:
-            statusDetails = { icon: <IconLoader className="animate-spin text-blue-500" />, text: t("Verifying") };
-            break;
-        case 3:
-            statusDetails = { icon: <IconClock className="text-yellow-500" />, text: t("Queued") };
-            break;
-        case 4:
-            statusDetails = { icon: <IconDownload className="text-green-500" />, text: t("Downloading") };
-            break;
-        case 5:
-            statusDetails = { icon: <IconClock className="text-yellow-500" />, text: t("Queued") };
-            break;
-        case 6:
-            statusDetails = { icon: <IconUpload className="text-purple-500" />, text: t("Seeding") };
-            break;
-        default:
-            statusDetails = { icon: null, text: t("Unknown") };
-    }
-
-    return (
-        <>
-            {statusDetails.icon}
-            {statusDetails.text}
-        </>
-    )
-}
-
-function SortableHeader({ column, title, className }: { column: any, title: string, className?: string }) {
-    const sort = column.getIsSorted()
-    const icon =
-        sort === "asc"
-            ? <IconArrowUp className="h-5 w-5 text-muted-foreground/70" />
-            : sort === "desc"
-                ? <IconArrowDown className="h-5 w-5 text-muted-foreground/70" />
-                : <ChevronsUpDown className="h-5 w-5 text-muted-foreground/70" />
-
-    return (
-        <div
-            className={cn("cursor-pointer select-none flex items-center gap-1", className)}
-            onClick={() => column.toggleSorting()}
-        >
-            <span>{title}</span>
-            {icon}
-        </div>
-    )
-}
-
-export function getColumns(t: Function): ColumnDef<z.infer<typeof schema>>[] {
+export function getColumns(t: TFunction): ColumnDef<z.infer<typeof schema>>[] {
     return [
         {
             id: "select",
