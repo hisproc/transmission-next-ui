@@ -4,7 +4,7 @@ import {
     Table
 } from "@tanstack/react-table"
 
-import {torrentSchema} from "../schemas/torrentSchema"
+import { torrentSchema } from "../schemas/torrentSchema"
 import { Checkbox } from "./ui/checkbox"
 import { TorrentDrawer } from "@/components/TorrentDrawer"
 import { filesize } from "filesize"
@@ -139,22 +139,22 @@ export function getColumns({ t, setDialogType, setTargetRows }: { t: TFunction, 
             id: "Download Peers",
             header: ({ column }) => <SortableHeader column={column} title={t("Download Peers")} className="w-full justify-end" />,
             cell: ({ row }) => {
-                const totalSeeders = row.original.trackerStats.reduce(
-                    (sum, tracker) => sum + tracker.seederCount,
+                const totalLeechers = row.original.trackerStats.reduce(
+                    (sum, tracker) => sum + tracker.leecherCount,
                     0
                 )
-                return <div className="text-right">{totalSeeders}({row.original.peersSendingToUs})</div>
+                return <div className="text-right">{totalLeechers}({row.original.peersSendingToUs})</div>
             },
         },
         {
             id: "Upload Peers",
             header: ({ column }) => <SortableHeader column={column} title={t("Upload Peers")} className="w-full justify-end" />,
             cell: ({ row }) => {
-                const totalLeechers = row.original.trackerStats.reduce(
-                    (sum, tracker) => sum + tracker.leecherCount,
+                const totalSeeders = row.original.trackerStats.reduce(
+                    (sum, tracker) => sum + tracker.seederCount,
                     0
                 )
-                return <div className="text-right">{totalLeechers}({row.original.peersGettingFromUs})</div>
+                return <div className="text-right">{totalSeeders}({row.original.peersGettingFromUs})</div>
             },
         },
         {
