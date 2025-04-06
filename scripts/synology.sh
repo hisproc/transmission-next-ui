@@ -11,6 +11,14 @@ for vol in /volume*; do
   if [ -d "$TARGET_PATH" ]; then
     echo "✅ Found transmission web path at: $TARGET_PATH"
 
+    # 备份当前目录内容
+    BACKUP_ZIP="./backup.zip"
+    echo "🗂️  Backing up current contents to $BACKUP_ZIP"
+    rm -f "$BACKUP_ZIP"
+    cd "$TARGET_PATH"
+    zip -r "$OLDPWD/backup.zip" ./*
+    cd - > /dev/null
+
     # 清空目标目录
     echo "🧹 Clearing old files..."
     rm -rf "$TARGET_PATH"/*
