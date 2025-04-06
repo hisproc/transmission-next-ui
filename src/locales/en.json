@@ -31,7 +31,8 @@
     "Stop Selected Torrents": "Stop Selected Torrents",
     "Delete Selected Torrents": "Delete Selected Torrents",
     "Confirm": "Confirm",
-    "Rows Per Page": "Rows Per Page",
+    "aa": "bb",
+    "RowsPerPage": "Rows Per Page",
     "Page": "Page",
     "Go to first page": "Go to first page",
     "Go to last page": "Go to last page",
@@ -146,5 +147,6 @@
     "h": "h",
     "m": "m",
     "s": "s",
-    "eta": "eta"
+    "eta": "eta",
+    "Search ...": "Search ..."
 }

@@ -50,6 +50,7 @@ import { schema } from "../schemas/torrentSchema"
 import { TorrentTable } from "./TorrentTable"
 import { TransmissionSession } from "@/lib/types"
 import { useTranslation } from "react-i18next"
+import { Input } from "./ui/input"
 
 export function TorrentManager({
     data: initialData,
@@ -64,6 +65,7 @@ export function TorrentManager({
     const [isDragging, setIsDragging] = useState(false)
     const dragCounter = useRef(0)
     const [dialogOpen, setDialogOpen] = useState(false)
+    const [globalFilter, setGlobalFilter] = useState("");
 
     const diaLogOnOpenChange = (open: boolean) => {
         if (!open) {
@@ -147,6 +149,7 @@ export function TorrentManager({
             rowSelection,
             columnFilters,
             pagination,
+            globalFilter,
         },
         getRowId: (row) => row.id.toString(),
         enableRowSelection: true,
@@ -155,6 +158,7 @@ export function TorrentManager({
         onColumnFiltersChange: setColumnFilters,
         onColumnVisibilityChange: setColumnVisibility,
         onPaginationChange: setPagination,
+        onGlobalFilterChange: setGlobalFilter,
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
@@ -179,7 +183,7 @@ export function TorrentManager({
                     </div>
                 )
             }
-            <div className="flex items-center justify-between px-4 lg:px-6">
+            <div className="flex items-center justify-between px-4 lg:px-6 gap-x-2">
                 <Label htmlFor="view-selector" className="sr-only">
                     View
                 </Label>
@@ -205,7 +209,6 @@ export function TorrentManager({
                 <TabsList
                     className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
                     <TabsTrigger value="all">{t("All")} <Badge variant="secondary">{table.getRowModel().rows.length}</Badge>
-
                     </TabsTrigger>
                     <TabsTrigger value="active">{t("Active")} <Badge variant="secondary">{table.getRowModel().rows.filter(row => row.original.rateUpload > 0 || row.original.rateDownload > 0).length}</Badge>
                     </TabsTrigger>
@@ -217,7 +220,13 @@ export function TorrentManager({
 
                     </TabsTrigger>
                 </TabsList>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-full">
+                    <Input
+                        type="text"
+                        placeholder={t("Search ...")}
+                        value={globalFilter}
+                        onChange={(e) => setGlobalFilter(e.target.value)}
+                    />
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm">

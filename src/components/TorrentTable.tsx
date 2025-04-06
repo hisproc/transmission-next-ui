@@ -112,7 +112,7 @@ export function TorrentTable({ table, rows }: { table: ReactTable<any>, rows: Ro
             <div className="flex w-full items-center gap-8 lg:w-fit">
                 <div className="hidden items-center gap-2 lg:flex">
                     <Label htmlFor="rows-per-page" className="text-sm font-medium">
-                        {t("Rows per page")}
+                        {t("RowsPerPage")}
                     </Label>
                     <Select
                         value={`${table.getState().pagination.pageSize}`}
