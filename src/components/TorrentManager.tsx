@@ -136,7 +136,7 @@ export function TorrentManager({
         () => initialData?.map(({ id }) => id) || [],
         [initialData]
     );
-    const downloadDirs = Array.from(new Set(initialData.map(item => item.downloadDir)));
+    const downloadDirs = Array.from(new Set([...initialData.map((item) => item.downloadDir), session["download-dir"] || ""]))
     const [directory, setDirectory] = useState(session["download-dir"] || "")
     const [tabValue, setTabValue] = useState("all")
     const { t } = useTranslation()
@@ -251,7 +251,7 @@ export function TorrentManager({
                                             className="capitalize"
                                             checked={column.getIsVisible()}
                                             onCheckedChange={(value) =>
-                                                column.toggleVisibility(!!value)
+                                                column.toggleVisibility(value)
                                             }
                                         >
                                             {t(column.id)}
