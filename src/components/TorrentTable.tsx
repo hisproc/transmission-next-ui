@@ -7,13 +7,12 @@ import { Label } from "./ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { Button } from "./ui/button"
 import { Dialog, DialogTrigger } from "./ui/dialog"
-import { RowDialog } from "./RowDialog"
-import { useState } from "react"
 import { useTranslation } from "react-i18next"
+import { DialogType } from "@/lib/types"
+import {torrentSchema} from "@/schemas/torrentSchema.ts";
 
-export function TorrentTable({ table, rows }: { table: ReactTable<any>, rows: Row<any>[] }) {
+export function TorrentTable({ table, rows, setDialogType, setTargetRows }: { table: ReactTable<torrentSchema>, rows: Row<torrentSchema>[], setDialogType: (type: DialogType) => void, setTargetRows: (rows: Row<torrentSchema>[]) => void }) {
 
-    const [dialogOption, setDialogOption] = useState("")
     const startTorrent = useStartTorrent();
     const stopTorrent = useStopTorrent();
     const { t } = useTranslation()
@@ -52,7 +51,10 @@ export function TorrentTable({ table, rows }: { table: ReactTable<any>, rows: Ro
                                     </TableRow>
                                 </ContextMenuTrigger>
                                 <ContextMenuContent>
-                                    <DialogTrigger asChild onClick={() => setDialogOption("edit")}>
+                                    <DialogTrigger asChild onClick={() => {
+                                        setDialogType(DialogType.Edit)
+                                        setTargetRows([row])
+                                    }}>
                                         <ContextMenuItem>
                                             <IconEdit className="mr-2 h-4 w-4 text-muted-foreground" />
                                             {t("Edit")}
@@ -70,7 +72,10 @@ export function TorrentTable({ table, rows }: { table: ReactTable<any>, rows: Ro
                                             {t("Stop")}
                                         </ContextMenuItem>
                                     )}
-                                    <DialogTrigger asChild onClick={() => setDialogOption("delete")}>
+                                    <DialogTrigger asChild onClick={() => {
+                                        setTargetRows([row])
+                                        setDialogType(DialogType.Delete)
+                                    }}>
                                         <ContextMenuItem>
                                             <IconTrash className="mr-2 h-4 w-4 text-red-500" /> {t("Delete")}
                                         </ContextMenuItem>
@@ -87,7 +92,10 @@ export function TorrentTable({ table, rows }: { table: ReactTable<any>, rows: Ro
                                                     <IconPlayerStop className="mr-2 h-4 w-4 text-red-500" />
                                                     {t("Stop Selected Torrents")}
                                                 </ContextMenuItem>
-                                                <DialogTrigger asChild onClick={() => setDialogOption("deleteMultiple")}>
+                                                <DialogTrigger asChild onClick={() => {
+                                                    setTargetRows(table.getSelectedRowModel().rows)
+                                                    setDialogType(DialogType.Delete)
+                                                }}>
                                                     <ContextMenuItem>
                                                         <IconTrash className="mr-2 h-4 w-4 text-red-500" />
                                                         {t("Delete Selected Torrents")}
@@ -98,7 +106,6 @@ export function TorrentTable({ table, rows }: { table: ReactTable<any>, rows: Ro
                                     }
                                 </ContextMenuContent>
                             </ContextMenu>
-                            <RowDialog row={row} selectedRows={table.getSelectedRowModel().rows} dialogOption={dialogOption} directories={[...new Set(table.getRowModel().rows.map(row => row.original.downloadDir))]} />
                         </Dialog>
                     ))}
                 </TableBody>
@@ -112,7 +119,7 @@ export function TorrentTable({ table, rows }: { table: ReactTable<any>, rows: Ro
             <div className="flex w-full items-center gap-8 lg:w-fit">
                 <div className="hidden items-center gap-2 lg:flex">
                     <Label htmlFor="rows-per-page" className="text-sm font-medium">
-                        {t("Rows per page")}
+                        {t("RowsPerPage")}
                     </Label>
                     <Select
                         value={`${table.getState().pagination.pageSize}`}

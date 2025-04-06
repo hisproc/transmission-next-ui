@@ -14,7 +14,7 @@ export function useAddTorrent() {
             await addTorrent({
                 metainfo: file ? await fileToBase64(file) : undefined,
                 filename: filename ? filename : undefined,
-                downloadDir: directory,
+                "download-dir": directory,
                 paused: false
             });
         },
@@ -117,6 +117,9 @@ export function useRenamePathTorrent() {
             });
         },
         onSuccess: () => {
+            toast.success(t("Torrent path renamed successfully"), {
+                "position": "top-right",
+            });
             setTimeout(() => { queryClient.refetchQueries({ queryKey: ["torrent"] }); }, 1000);
         },
         onError: (error) => {
@@ -139,6 +142,9 @@ export function useSetLocationTorrent() {
             });
         },
         onSuccess: () => {
+            toast.success(t("Torrent location set successfully"), {
+                "position": "top-right",
+            });
             setTimeout(() => { queryClient.refetchQueries({ queryKey: ["torrent"] }); }, 1000);
         },
         onError: (error) => {

@@ -31,7 +31,8 @@
     "Stop Selected Torrents": "Stop Selected Torrents",
     "Delete Selected Torrents": "Delete Selected Torrents",
     "Confirm": "Confirm",
-    "Rows Per Page": "Rows Per Page",
+    "aa": "bb",
+    "RowsPerPage": "Rows Per Page",
     "Page": "Page",
     "Go to first page": "Go to first page",
     "Go to last page": "Go to last page",
@@ -123,6 +124,8 @@
     "Torrent deleted successfully": "Torrent deleted successfully",
     "Torrent started successfully": "Torrent started successfully",
     "Torrent stopped successfully": "Torrent stopped successfully",
+    "Torrent path renamed successfully": "Torrent path renamed successfully",
+    "Torrent location set successfully": "Torrent location set successfully",
     "Port test successfully": "Port test successfully",
     "Failed to test port": "Failed to test port",
     "Failed to add torrent": "Failed to add torrent",
@@ -146,5 +149,7 @@
     "h": "h",
     "m": "m",
     "s": "s",
-    "eta": "eta"
+    "eta": "eta",
+    "Search ...": "Search ...",
+    "EditingFollowingTorrent": "Edit the following torrent"
 }

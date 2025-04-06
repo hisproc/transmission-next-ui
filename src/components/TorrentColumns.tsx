@@ -4,95 +4,22 @@ import {
     Table
 } from "@tanstack/react-table"
 
-import { z } from "zod"
-import { schema } from "../schemas/torrentSchema"
+import { torrentSchema } from "../schemas/torrentSchema"
 import { Checkbox } from "./ui/checkbox"
 import { TorrentDrawer } from "@/components/TorrentDrawer"
 import { filesize } from "filesize"
 import { Progress } from "./ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip"
 import { Badge } from "./ui/badge"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu"
-import { Dialog, DialogTrigger } from "@/components/ui/dialog"
-import { IconAlertTriangle, IconArrowDown, IconArrowUp, IconClock, IconDotsVertical, IconDownload, IconEdit, IconLoader, IconPlayerPlay, IconPlayerStop, IconTrash, IconUpload } from "@tabler/icons-react"
-import { Button } from "./ui/button"
-import { useStartTorrent, useStopTorrent } from "../hooks/useTorrentActions"
-import { RowDialog } from "./RowDialog"
-import { useState } from "react"
-import { useTranslation } from "react-i18next"
-import { ChevronsUpDown } from "lucide-react"
-import { cn } from "@/lib/utils"
+
 import dayjs, { formatEta } from "@/lib/dayjs"
+import { ActionButton } from "./table/ActionButton"
+import { TFunction } from "i18next";
+import { TorrentStatus } from "@/components/table/TorrentStatus.tsx";
+import { SortableHeader } from "@/components/table/SortableHeader.tsx";
+import { DialogType } from "@/lib/types"
 
-
-
-function TorrentStatus({ error, status }: { error: number; status: number }) {
-    const { t } = useTranslation()
-    if (error !== 0) {
-        return (
-            <>
-                <IconAlertTriangle className="text-red-500" />
-                {t("Error")}
-            </>
-        )
-    }
-
-    let statusDetails;
-    switch (status) {
-        case 0:
-            statusDetails = { icon: <IconPlayerStop className="text-red-500" />, text: t("Stopped") };
-            break;
-        case 1:
-            statusDetails = { icon: <IconClock className="text-yellow-500" />, text: t("Queued") };
-            break;
-        case 2:
-            statusDetails = { icon: <IconLoader className="animate-spin text-blue-500" />, text: t("Verifying") };
-            break;
-        case 3:
-            statusDetails = { icon: <IconClock className="text-yellow-500" />, text: t("Queued") };
-            break;
-        case 4:
-            statusDetails = { icon: <IconDownload className="text-green-500" />, text: t("Downloading") };
-            break;
-        case 5:
-            statusDetails = { icon: <IconClock className="text-yellow-500" />, text: t("Queued") };
-            break;
-        case 6:
-            statusDetails = { icon: <IconUpload className="text-purple-500" />, text: t("Seeding") };
-            break;
-        default:
-            statusDetails = { icon: null, text: t("Unknown") };
-    }
-
-    return (
-        <>
-            {statusDetails.icon}
-            {statusDetails.text}
-        </>
-    )
-}
-
-function SortableHeader({ column, title, className }: { column: any, title: string, className?: string }) {
-    const sort = column.getIsSorted()
-    const icon =
-        sort === "asc"
-            ? <IconArrowUp className="h-5 w-5 text-muted-foreground/70" />
-            : sort === "desc"
-                ? <IconArrowDown className="h-5 w-5 text-muted-foreground/70" />
-                : <ChevronsUpDown className="h-5 w-5 text-muted-foreground/70" />
-
-    return (
-        <div
-            className={cn("cursor-pointer select-none flex items-center gap-1", className)}
-            onClick={() => column.toggleSorting()}
-        >
-            <span>{title}</span>
-            {icon}
-        </div>
-    )
-}
-
-export function getColumns(t: Function): ColumnDef<z.infer<typeof schema>>[] {
+export function getColumns({ t, setDialogType, setTargetRows }: { t: TFunction, setDialogType: (type: DialogType) => void, setTargetRows: (rows: Row<torrentSchema>[]) => void }): ColumnDef<torrentSchema>[] {
     return [
         {
             id: "select",
@@ -212,22 +139,22 @@ export function getColumns(t: Function): ColumnDef<z.infer<typeof schema>>[] {
             id: "Download Peers",
             header: ({ column }) => <SortableHeader column={column} title={t("Download Peers")} className="w-full justify-end" />,
             cell: ({ row }) => {
-                const totalSeeders = row.original.trackerStats.reduce(
-                    (sum, tracker) => sum + tracker.seederCount,
+                const totalLeechers = row.original.trackerStats.reduce(
+                    (sum, tracker) => sum + tracker.leecherCount,
                     0
                 )
-                return <div className="text-right">{totalSeeders}({row.original.peersSendingToUs})</div>
+                return <div className="text-right">{totalLeechers}({row.original.peersSendingToUs})</div>
             },
         },
         {
             id: "Upload Peers",
             header: ({ column }) => <SortableHeader column={column} title={t("Upload Peers")} className="w-full justify-end" />,
             cell: ({ row }) => {
-                const totalLeechers = row.original.trackerStats.reduce(
-                    (sum, tracker) => sum + tracker.leecherCount,
+                const totalSeeders = row.original.trackerStats.reduce(
+                    (sum, tracker) => sum + tracker.seederCount,
                     0
                 )
-                return <div className="text-right">{totalLeechers}({row.original.peersGettingFromUs})</div>
+                return <div className="text-right">{totalSeeders}({row.original.peersGettingFromUs})</div>
             },
         },
         {
@@ -262,58 +189,12 @@ export function getColumns(t: Function): ColumnDef<z.infer<typeof schema>>[] {
         },
         {
             id: "actions",
-            cell: ({ row, table }: {
-                row: Row<any>;
-                table: Table<any>;
+            cell: ({ row }: {
+                row: Row<torrentSchema>;
+                table: Table<torrentSchema>;
             }) => {
-
-                const stopTorrent = useStopTorrent()
-                const startTorrent = useStartTorrent()
-
-                const [dialogOption, setDialogOption] = useState<string>("")
                 return (
-                    <Dialog key={row.id}>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-                                    size="icon"
-                                >
-                                    <IconDotsVertical />
-                                    <span className="sr-only">{t("Open menu")}</span>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-32">
-                                <DialogTrigger asChild onClick={() => setDialogOption("edit")}>
-                                    <DropdownMenuItem>
-                                        <IconEdit className="mr-2 h-4 w-4 text-muted-foreground" />
-                                        {t("Edit")}
-                                    </DropdownMenuItem>
-                                </DialogTrigger>
-                                {row.original.status === 0 && (
-                                    <DropdownMenuItem onClick={() => startTorrent.mutate([row.original.id])}>
-                                        <IconPlayerPlay className="mr-2 h-4 w-4 text-green-500" />
-                                        {t("Start")}
-                                    </DropdownMenuItem>
-                                )}
-                                {row.original.status !== 0 && (
-                                    <DropdownMenuItem onClick={() => stopTorrent.mutate([row.original.id])}>
-                                        <IconPlayerStop className="mr-2 h-4 w-4 text-red-500" />
-                                        {t("Stop")}
-                                    </DropdownMenuItem>
-                                )}
-                                <DropdownMenuSeparator />
-                                <DialogTrigger asChild onClick={() => setDialogOption("delete")}>
-                                    <DropdownMenuItem variant="destructive">
-                                        <IconTrash className="mr-2 h-4 w-4 text-red-500" />
-                                        {t("Delete")}
-                                    </DropdownMenuItem>
-                                </DialogTrigger>
-                            </DropdownMenuContent>
-                            <RowDialog row={row} selectedRows={table.getSelectedRowModel().rows} dialogOption={dialogOption} directories={[...new Set(table.getRowModel().rows.map(row => row.original.downloadDir))]} />
-                        </DropdownMenu>
-                    </Dialog>
+                    <ActionButton row={row} setDialogType={setDialogType} setTargetRows={setTargetRows} />
                 )
             },
         },
