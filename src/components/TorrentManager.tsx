@@ -58,7 +58,7 @@ import { AddDialog } from "@/components/dialog/AddDialog.tsx";
 
 const statusTabs = [
     { value: "all", label: "All", filter: [] },
-    { value: "active", label: "Active", filter: [{ id: "Download Speed", value: 0 }, { id: "Upload Speed", value: 0 }] },
+    { value: "active", label: "Active", filter: [{ id: "Download Speed", value: 0 }] },
     { value: "downloading", label: "Downloading", filter: [{ id: "Status", value: 4 }] },
     { value: "seeding", label: "Seeding", filter: [{ id: "Status", value: 6 }] },
     { value: "stopped", label: "Stopped", filter: [{ id: "Status", value: 0 }] },
