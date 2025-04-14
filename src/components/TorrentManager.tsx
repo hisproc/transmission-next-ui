@@ -55,6 +55,7 @@ import { Input } from "./ui/input"
 import { DeleteDialog } from "./dialog/DeleteDialog"
 import { EditDialog } from "./dialog/EditDialog"
 import { AddDialog } from "@/components/dialog/AddDialog.tsx";
+import { STORAGE_KEYS } from "@/constants/storage"
 
 const statusTabs = [
     { value: "all", label: "All", filter: [] },
@@ -133,7 +134,7 @@ export function TorrentManager({
     ])
     const [pagination, setPagination] = useState({
         pageIndex: 0,
-        pageSize: 50,
+        pageSize: Number(localStorage.getItem(STORAGE_KEYS.PAGE_SIZE)) || 50,
     })
     useMemo<UniqueIdentifier[]>(
         () => initialData?.map(({ id }) => id) || [],

@@ -10,6 +10,7 @@ import { Dialog, DialogTrigger } from "./ui/dialog"
 import { useTranslation } from "react-i18next"
 import { DialogType } from "@/lib/types"
 import { torrentSchema } from "@/schemas/torrentSchema.ts";
+import { STORAGE_KEYS } from "@/constants/storage"
 
 const pageSizeOption = [
     { "label": "10", "value": 10 },
@@ -134,6 +135,7 @@ export function TorrentTable({ table, setDialogType, setTargetRows }: { table: R
                     <Select
                         value={`${table.getState().pagination.pageSize}`}
                         onValueChange={(value) => {
+                            localStorage.setItem(STORAGE_KEYS.PAGE_SIZE, value)
                             table.setPageSize(Number(value))
                         }}
                     >
