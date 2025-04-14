@@ -114,6 +114,7 @@ export function getColumns({ t, setDialogType, setTargetRows }: { t: TFunction, 
                     </Tooltip>
                 </TooltipProvider>
             ),
+            filterFn: 'equals',
         },
         {
             id: "Download Speed",
@@ -124,6 +125,10 @@ export function getColumns({ t, setDialogType, setTargetRows }: { t: TFunction, 
                     {filesize(row.original.rateDownload)}/s
                 </div>
             ),
+            filterFn: (row, columnId, value) => {
+                const cellValue: number = row.getValue(columnId)
+                return cellValue > value
+            }
         },
         {
             id: "Upload Speed",
@@ -134,6 +139,10 @@ export function getColumns({ t, setDialogType, setTargetRows }: { t: TFunction, 
                     {filesize(row.original.rateUpload)}/s
                 </div>
             ),
+            filterFn: (row, columnId, value) => {
+                const cellValue: number = row.getValue(columnId)
+                return cellValue > value
+            }
         },
         {
             id: "Download Peers",

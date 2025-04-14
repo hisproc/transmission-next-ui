@@ -56,6 +56,14 @@ import { DeleteDialog } from "./dialog/DeleteDialog"
 import { EditDialog } from "./dialog/EditDialog"
 import { AddDialog } from "@/components/dialog/AddDialog.tsx";
 
+const statusTabs = [
+    { value: "all", label: "All", filter: [] },
+    { value: "active", label: "Active", filter: [{ id: "Download Speed", value: 0 }, { id: "Upload Speed", value: 0 }] },
+    { value: "downloading", label: "Downloading", filter: [{ id: "Status", value: 4 }] },
+    { value: "seeding", label: "Seeding", filter: [{ id: "Status", value: 6 }] },
+    { value: "stopped", label: "Stopped", filter: [{ id: "Status", value: 0 }] },
+]
+
 export function TorrentManager({
     data: initialData,
     session: session,
@@ -159,23 +167,30 @@ export function TorrentManager({
         getSortedRowModel: getSortedRowModel(),
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedUniqueValues: getFacetedUniqueValues(),
+        autoResetPageIndex: false
     })
 
-    const filteredRows = useMemo(() => {
-        const allRows = table.getRowModel().rows;
-        switch (tabValue) {
-            case "active":
-                return allRows.filter(row => row.original.rateUpload > 0 || row.original.rateDownload > 0);
-            case "downloading":
-                return allRows.filter(row => row.original.status === 4);
-            case "seeding":
-                return allRows.filter(row => row.original.status === 6);
-            case "stopped":
-                return allRows.filter(row => row.original.status === 0);
-            default:
-                return allRows;
-        }
-    }, [table.getRowModel().rows, tabValue]);
+    const tableCount = statusTabs.map((tab => {
+        const tempTable = useReactTable({
+            data: initialData,
+            columns: useMemo(() => getColumns({ t, setDialogType, setTargetRows }), [t]),
+            state: {
+                sorting,
+                columnVisibility,
+                rowSelection,
+                columnFilters: tab.filter,
+                pagination,
+                globalFilter,
+            },
+            getRowId: (row) => row.id.toString(),
+            onGlobalFilterChange: setGlobalFilter,
+            getCoreRowModel: getCoreRowModel(),
+            getFilteredRowModel: getFilteredRowModel(),
+            getPaginationRowModel: getPaginationRowModel()
+        })
+        return { value: tab.value, count: tempTable.getFilteredRowModel().rows.length }
+    }
+    ))
 
     return (
         <Tabs
@@ -218,17 +233,15 @@ export function TorrentManager({
                 </Select>
                 <TabsList
                     className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
-                    <TabsTrigger value="all">{t("All")} <Badge variant="secondary">{table.getRowModel().rows.length}</Badge>
-                    </TabsTrigger>
-                    <TabsTrigger value="active">{t("Active")} <Badge variant="secondary">{table.getRowModel().rows.filter(row => row.original.rateUpload > 0 || row.original.rateDownload > 0).length}</Badge>
-                    </TabsTrigger>
-                    <TabsTrigger value="downloading">{t("Downloading")} <Badge variant="secondary">{table.getRowModel().rows.filter(row => row.original.status === 4).length}</Badge>
-                    </TabsTrigger>
-                    <TabsTrigger value="seeding">{t("Seeding")} <Badge variant="secondary">{table.getRowModel().rows.filter(row => row.original.status === 6).length}</Badge>
-                    </TabsTrigger>
-                    <TabsTrigger value="stopped">{t("Stopped")} <Badge variant="secondary">{table.getRowModel().rows.filter(row => row.original.status === 0).length}</Badge>
-
-                    </TabsTrigger>
+                    {statusTabs.map(tab => (
+                        <TabsTrigger key={tab.value} value={tab.value} onClick={() => {
+                            table.setColumnFilters(tab.filter)
+                        }}>
+                            {t(tab.label)} <Badge variant="secondary">
+                                {tableCount.find(tc => tc.value === tab.value)?.count ?? 0}
+                            </Badge>
+                        </TabsTrigger>
+                    ))}
                 </TabsList>
                 <div className="flex items-center gap-2 w-full">
                     <Input
@@ -277,7 +290,7 @@ export function TorrentManager({
                 </div>
             </div>
             <TabsContent value={tabValue} className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
-                <TorrentTable table={table} rows={filteredRows} setDialogType={setDialogType} setTargetRows={setTargetRows} />
+                <TorrentTable table={table} setDialogType={setDialogType} setTargetRows={setTargetRows} />
             </TabsContent>
             <DeleteDialog open={dialogType === DialogType.Delete} onOpenChange={(open) => !open && setDialogType(null)} targetRows={targetRows} />
             <EditDialog open={dialogType === DialogType.Edit} onOpenChange={(open) => !open && setDialogType(null)} targetRows={targetRows} directories={downloadDirs} />
