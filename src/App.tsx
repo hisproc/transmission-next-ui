@@ -56,6 +56,7 @@ function Main() {
                                     <Routes>
                                         <Route path="/" element={<>
                                             <SectionCards
+                                                torrentData={torrentData || []}
                                                 data={sessionStats || {}}
                                                 session={session || {}}
                                                 freespace={freeSpace || {}}

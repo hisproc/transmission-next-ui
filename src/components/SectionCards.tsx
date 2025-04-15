@@ -6,20 +6,34 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { filesize } from "filesize"
-import { FreeSpace, SessionStats, TransmissionSession } from "@/lib/types"
+import { FreeSpace, SessionStats, Torrent, TransmissionSession } from "@/lib/types"
 import { useTranslation } from "react-i18next"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip.tsx";
+import { STORAGE_KEYS } from "@/constants/storage";
 
+function summarySpeed(torrentData: Torrent[], field: string) {
+  return torrentData.reduce((acc, torrent) => {
+    const speed = field === "uploadSpeed" ? torrent.rateUpload : torrent.rateDownload;
+    return acc + speed;
+  }, 0);
+}
 
-export function SectionCards({ data, session, freespace }: { data: SessionStats, session: TransmissionSession, freespace: FreeSpace }) {
-  const { t } = useTranslation()
+export function SectionCards({ torrentData, data, session, freespace }: { torrentData: Torrent[], data: SessionStats, session: TransmissionSession, freespace: FreeSpace }) {
+
+  const { t } = useTranslation();
+
+  const clientNetworkSpeedSummary = localStorage.getItem(STORAGE_KEYS.CLIENT_NETWORK_SPEED_SUMMARY) === "true";
+
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
       <Card className="@container/card">
         <CardHeader>
           <CardDescription>{t("Upload Speed")}</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {filesize(data?.uploadSpeed || 0)} /s
+            {clientNetworkSpeedSummary ?
+              filesize(summarySpeed(torrentData, "uploadSpeed") || 0) :
+              filesize(data?.uploadSpeed || 0)
+            } /s
           </CardTitle>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
@@ -37,7 +51,10 @@ export function SectionCards({ data, session, freespace }: { data: SessionStats,
         <CardHeader>
           <CardDescription>{t("Download Speed")}</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {filesize(data?.downloadSpeed || 0)} /s
+            {clientNetworkSpeedSummary ?
+              filesize(summarySpeed(torrentData, "downloadSpeed") || 0) :
+              filesize(data?.downloadSpeed || 0)
+            } /s
           </CardTitle>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
