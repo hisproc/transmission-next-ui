@@ -65,6 +65,32 @@ const statusTabs = [
     { value: "stopped", label: "Stopped", filter: [{ id: "Status", value: 0 }] },
 ]
 
+function getFilterCount(data: torrentSchema[], filter: { id: string, value: number }[], globalFilter: string) {
+    const filteredData = data.filter((item) => {
+        return filter.every((f) => {
+            if (f.id === "Status") {
+                return item.status === f.value
+            } else if (f.id === "Download Speed") {
+                return item.rateDownload > f.value || item.rateUpload > f.value
+            }
+            if (globalFilter !== "") {
+                return item.name.includes(globalFilter.toLocaleLowerCase())
+            }
+            return true
+        })
+    })
+
+    if (globalFilter) {
+        return filteredData.filter((item) =>
+            Object.values(item).some((value) =>
+                String(value).toLowerCase().includes(globalFilter.toLowerCase())
+            )
+        ).length
+    }
+
+    return filteredData.length
+}
+
 export function TorrentManager({
     data: initialData,
     session: session,
@@ -171,28 +197,6 @@ export function TorrentManager({
         autoResetPageIndex: false
     })
 
-    const tableCount = statusTabs.map((tab => {
-        const tempTable = useReactTable({
-            data: initialData,
-            columns: useMemo(() => getColumns({ t, setDialogType, setTargetRows }), [t]),
-            state: {
-                sorting,
-                columnVisibility,
-                rowSelection,
-                columnFilters: tab.filter,
-                pagination,
-                globalFilter,
-            },
-            getRowId: (row) => row.id.toString(),
-            onGlobalFilterChange: setGlobalFilter,
-            getCoreRowModel: getCoreRowModel(),
-            getFilteredRowModel: getFilteredRowModel(),
-            getPaginationRowModel: getPaginationRowModel()
-        })
-        return { value: tab.value, count: tempTable.getFilteredRowModel().rows.length }
-    }
-    ))
-
     return (
         <Tabs
             value={tabValue}
@@ -239,7 +243,7 @@ export function TorrentManager({
                             table.setColumnFilters(tab.filter)
                         }}>
                             {t(tab.label)} <Badge variant="secondary">
-                                {tableCount.find(tc => tc.value === tab.value)?.count ?? 0}
+                                {getFilterCount(initialData, tab.filter, globalFilter)}
                             </Badge>
                         </TabsTrigger>
                     ))}
