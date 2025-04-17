@@ -67,28 +67,25 @@ const statusTabs = [
 
 function getFilterCount(data: torrentSchema[], filter: { id: string, value: number }[], globalFilter: string) {
     const filteredData = data.filter((item) => {
-        return filter.every((f) => {
+        const isFiltered = filter.every((f) => {
             if (f.id === "Status") {
-                return item.status === f.value
+                return item.status === f.value;
             } else if (f.id === "Download Speed") {
-                return item.rateDownload > f.value || item.rateUpload > f.value
+                return item.rateDownload > f.value || item.rateUpload > f.value;
             }
+            return true;
+        });
+
+        if (isFiltered) {
             if (globalFilter !== "") {
-                return item.name.includes(globalFilter.toLocaleLowerCase())
+                return item.name.toLowerCase().includes(globalFilter.toLowerCase());
             }
-            return true
-        })
-    })
+            return true;
+        }
+        return false;
+    });
 
-    if (globalFilter) {
-        return filteredData.filter((item) =>
-            Object.values(item).some((value) =>
-                String(value).toLowerCase().includes(globalFilter.toLowerCase())
-            )
-        ).length
-    }
-
-    return filteredData.length
+    return filteredData.length;
 }
 
 export function TorrentManager({

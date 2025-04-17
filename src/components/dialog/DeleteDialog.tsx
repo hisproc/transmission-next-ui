@@ -25,10 +25,10 @@ export function DeleteDialog({ open, onOpenChange, targetRows }: { open: boolean
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>{t("Are you sure you want to do this?")}</DialogTitle>
-                    <DialogDescription className="break-all">
+                    <DialogDescription>
                         {t("The following torrents will be deleted")}:
                     </DialogDescription>
-                    <ul className="list-disc pl-5 text-sm text-muted-foreground">
+                    <ul className="list-disc pl-5 text-sm text-left text-muted-foreground break-all">
                         {targetRows.map((row) => (
                             <li key={row.original.id} className="font-medium text-foreground">{row.original.name}</li>
                         ))}
