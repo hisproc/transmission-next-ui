@@ -175,6 +175,8 @@ export interface Torrent {
     trackerStats: TrackerStats[];
     pieces: string;
     pieceCount: number;
+    rateDownload: number;
+    rateUpload: number;
     peers: Peer[];
     files: TorrentFile[];
 }

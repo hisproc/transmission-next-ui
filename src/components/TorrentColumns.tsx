@@ -1,5 +1,6 @@
 import {
     ColumnDef,
+    FilterFn,
     Row,
     Table
 } from "@tanstack/react-table"
@@ -18,6 +19,10 @@ import { TFunction } from "i18next";
 import { TorrentStatus } from "@/components/table/TorrentStatus.tsx";
 import { SortableHeader } from "@/components/table/SortableHeader.tsx";
 import { DialogType } from "@/lib/types"
+
+const activeFilter: FilterFn<torrentSchema> = (row) => {
+    return row.original.rateDownload > 0 || row.original.rateUpload > 0
+}
 
 export function getColumns({ t, setDialogType, setTargetRows }: { t: TFunction, setDialogType: (type: DialogType) => void, setTargetRows: (rows: Row<torrentSchema>[]) => void }): ColumnDef<torrentSchema>[] {
     return [
@@ -114,6 +119,7 @@ export function getColumns({ t, setDialogType, setTargetRows }: { t: TFunction, 
                     </Tooltip>
                 </TooltipProvider>
             ),
+            filterFn: 'equals',
         },
         {
             id: "Download Speed",
@@ -124,6 +130,7 @@ export function getColumns({ t, setDialogType, setTargetRows }: { t: TFunction, 
                     {filesize(row.original.rateDownload)}/s
                 </div>
             ),
+            filterFn: activeFilter,
         },
         {
             id: "Upload Speed",

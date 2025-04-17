@@ -9,13 +9,24 @@ import { Button } from "./ui/button"
 import { Dialog, DialogTrigger } from "./ui/dialog"
 import { useTranslation } from "react-i18next"
 import { DialogType } from "@/lib/types"
-import {torrentSchema} from "@/schemas/torrentSchema.ts";
+import { torrentSchema } from "@/schemas/torrentSchema.ts";
+import { STORAGE_KEYS } from "@/constants/storage"
 
-export function TorrentTable({ table, rows, setDialogType, setTargetRows }: { table: ReactTable<torrentSchema>, rows: Row<torrentSchema>[], setDialogType: (type: DialogType) => void, setTargetRows: (rows: Row<torrentSchema>[]) => void }) {
+const pageSizeOption = [
+    { "label": "10", "value": 10 },
+    { "label": "25", "value": 25 },
+    { "label": "50", "value": 50 },
+    { "label": "100", "value": 100 },
+    { "label": "All", "value": 100000 }
+]
+
+export function TorrentTable({ table, setDialogType, setTargetRows }: { table: ReactTable<torrentSchema>, setDialogType: (type: DialogType) => void, setTargetRows: (rows: Row<torrentSchema>[]) => void }) {
 
     const startTorrent = useStartTorrent();
     const stopTorrent = useStopTorrent();
-    const { t } = useTranslation()
+    const { t } = useTranslation();
+    const rows = table.getRowModel().rows;
+
     return (<>
         <div className="overflow-hidden rounded-lg border">
             <Table>
@@ -124,18 +135,19 @@ export function TorrentTable({ table, rows, setDialogType, setTargetRows }: { ta
                     <Select
                         value={`${table.getState().pagination.pageSize}`}
                         onValueChange={(value) => {
+                            localStorage.setItem(STORAGE_KEYS.PAGE_SIZE, value)
                             table.setPageSize(Number(value))
                         }}
                     >
-                        <SelectTrigger size="sm" className="w-20" id="rows-per-page">
+                        <SelectTrigger size="sm" className="w-24" id="rows-per-page">
                             <SelectValue
                                 placeholder={table.getState().pagination.pageSize}
                             />
                         </SelectTrigger>
                         <SelectContent side="top">
-                            {[10, 20, 30, 40, 50].map((pageSize) => (
-                                <SelectItem key={pageSize} value={`${pageSize}`}>
-                                    {pageSize}
+                            {pageSizeOption.map(({ value, label }) => (
+                                <SelectItem key={value} value={`${value}`}>
+                                    {t(label)}
                                 </SelectItem>
                             ))}
                         </SelectContent>
