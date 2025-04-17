@@ -203,6 +203,7 @@ export function TorrentManager({
             onValueChange={(value) => {
                 setTabValue(value)
                 table.setRowSelection({})
+                table.setPageIndex(0)
             }}
             className="w-full flex-col justify-start gap-6"
         >
@@ -220,6 +221,8 @@ export function TorrentManager({
                 <Select value={tabValue} onValueChange={(value) => {
                     setTabValue(value)
                     table.setRowSelection({})
+                    table.setColumnFilters(statusTabs.find(tab => tab.value === value)?.filter || [])
+                    table.setPageIndex(0)
                 }}>
                     <SelectTrigger
                         className="flex w-fit @4xl/main:hidden"
