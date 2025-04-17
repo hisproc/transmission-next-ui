@@ -151,5 +151,8 @@
     "s": "s",
     "eta": "eta",
     "Search ...": "Search ...",
-    "EditingFollowingTorrent": "Edit the following torrent"
+    "EditingFollowingTorrent": "Edit the following torrent",
+    "UI Settings": "UI Settings",
+    "Client Network Speed Summary": "Client Network Speed Summary",
+    "UI Settings updated": "UI Settings updated"
 }

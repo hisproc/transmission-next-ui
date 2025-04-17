@@ -8,11 +8,12 @@ import { useLocation } from "react-router-dom";
 import { getSession } from "@/lib/transmissionClient";
 import { TransmissionSession } from "@/lib/types";
 import { NumericInput } from "@/components/settings/NumbericInput";
-import { usePortTest, useSetSession } from "../../hooks/useTorrentActions";
+import { usePortTest, useSetSession } from "@/hooks/useTorrentActions.ts";
 import { Switch } from "../ui/switch";
 import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-
+import { STORAGE_KEYS } from "@/constants/storage";
+import { toast } from "sonner";
 
 export function SessionSetting() {
     const [uploadLimitEnabled, setUploadLimitEnabled] = useState(false);
@@ -41,6 +42,7 @@ export function SessionSetting() {
     const [seedRatioLimited, setSeedRatioLimited] = useState(false);
     const [idleSeedingLimit, setIdleSeedingLimit] = useState(0);
     const [idleSeedingLimitEnabled, setIdleSeedingLimitEnabled] = useState(false);
+    const [clientNetworkSpeedSummary, setClientNetworkSpeedSummary] = useState(localStorage.getItem(STORAGE_KEYS.CLIENT_NETWORK_SPEED_SUMMARY) === "true");
     const setSession = useSetSession();
     const portTest = usePortTest();
     const { t } = useTranslation();
@@ -84,11 +86,12 @@ export function SessionSetting() {
     return (
         <>
             <Tabs defaultValue="bandwidth" className="px-4 space-y-6">
-                <TabsList className="grid w-full grid-cols-4">
+                <TabsList className="grid w-full grid-cols-5">
                     <TabsTrigger value="bandwidth">{t("Bandwidth")}</TabsTrigger>
                     <TabsTrigger value="network">{t("Network")}</TabsTrigger>
                     <TabsTrigger value="storage">{t("Storage")}</TabsTrigger>
                     <TabsTrigger value="queue">{t("Queue")}</TabsTrigger>
+                    <TabsTrigger value="ui">{t("UI")}</TabsTrigger>
                 </TabsList>
                 <TabsContent value="bandwidth">
                     <Card>
@@ -455,6 +458,34 @@ export function SessionSetting() {
                                     "seed-queue-enabled": seedQueueEnabled,
                                 });
                             }
+                            }>{t("Save changes")}</Button>
+                        </CardFooter>
+                    </Card>
+                </TabsContent>
+                <TabsContent value="ui">
+                    <Card>
+                        <CardContent className="space-y-4">
+                            <div>
+                                <h3 className="text-lg font-medium">{t("UI Settings")}</h3>
+                            </div>
+                            <div className="flex items-center space-x-4 xl:w-1/2">
+                                <Label htmlFor="show-additional-tracker" className="whitespace-nowrap w-66">{t("Client Network Speed Summary")}</Label>
+                                <Switch
+                                    id="client-network-speed-summary"
+                                    checked={clientNetworkSpeedSummary}
+                                    onCheckedChange={(checked) => setClientNetworkSpeedSummary(!!checked)}
+                                />
+                            </div>
+                            < hr />
+                        </CardContent>
+                        <CardFooter>
+                            <Button onClick={
+                                () => {
+                                    localStorage.setItem(STORAGE_KEYS.CLIENT_NETWORK_SPEED_SUMMARY, clientNetworkSpeedSummary ? "true" : "false");
+                                    toast.success(t("UI Settings updated"), {
+                                        "position": "top-right"
+                                    });
+                                }
                             }>{t("Save changes")}</Button>
                         </CardFooter>
                     </Card>

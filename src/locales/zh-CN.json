@@ -149,5 +149,8 @@
     "s": "秒",
     "eta": "剩余时间",
     "Search ...": "搜索 ...",
-    "EditingFollowingTorrent": "正在编辑该种子"
+    "EditingFollowingTorrent": "正在编辑该种子",
+    "UI Settings": "UI 设置",
+    "Client Network Speed Summary": "本地网速聚合展示",
+    "UI Settings updated": "UI 设置已更新"
 }

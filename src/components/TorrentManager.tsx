@@ -55,6 +55,41 @@ import { Input } from "./ui/input"
 import { DeleteDialog } from "./dialog/DeleteDialog"
 import { EditDialog } from "./dialog/EditDialog"
 import { AddDialog } from "@/components/dialog/AddDialog.tsx";
+import { STORAGE_KEYS } from "@/constants/storage"
+
+const statusTabs = [
+    { value: "all", label: "All", filter: [] },
+    { value: "active", label: "Active", filter: [{ id: "Download Speed", value: 0 }] },
+    { value: "downloading", label: "Downloading", filter: [{ id: "Status", value: 4 }] },
+    { value: "seeding", label: "Seeding", filter: [{ id: "Status", value: 6 }] },
+    { value: "stopped", label: "Stopped", filter: [{ id: "Status", value: 0 }] },
+]
+
+function getFilterCount(data: torrentSchema[], filter: { id: string, value: number }[], globalFilter: string) {
+    const filteredData = data.filter((item) => {
+        return filter.every((f) => {
+            if (f.id === "Status") {
+                return item.status === f.value
+            } else if (f.id === "Download Speed") {
+                return item.rateDownload > f.value || item.rateUpload > f.value
+            }
+            if (globalFilter !== "") {
+                return item.name.includes(globalFilter.toLocaleLowerCase())
+            }
+            return true
+        })
+    })
+
+    if (globalFilter) {
+        return filteredData.filter((item) =>
+            Object.values(item).some((value) =>
+                String(value).toLowerCase().includes(globalFilter.toLowerCase())
+            )
+        ).length
+    }
+
+    return filteredData.length
+}
 
 export function TorrentManager({
     data: initialData,
@@ -125,7 +160,7 @@ export function TorrentManager({
     ])
     const [pagination, setPagination] = useState({
         pageIndex: 0,
-        pageSize: 50,
+        pageSize: Number(localStorage.getItem(STORAGE_KEYS.PAGE_SIZE)) || 50,
     })
     useMemo<UniqueIdentifier[]>(
         () => initialData?.map(({ id }) => id) || [],
@@ -159,23 +194,8 @@ export function TorrentManager({
         getSortedRowModel: getSortedRowModel(),
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedUniqueValues: getFacetedUniqueValues(),
+        autoResetPageIndex: false
     })
-
-    const filteredRows = useMemo(() => {
-        const allRows = table.getRowModel().rows;
-        switch (tabValue) {
-            case "active":
-                return allRows.filter(row => row.original.rateUpload > 0 || row.original.rateDownload > 0);
-            case "downloading":
-                return allRows.filter(row => row.original.status === 4);
-            case "seeding":
-                return allRows.filter(row => row.original.status === 6);
-            case "stopped":
-                return allRows.filter(row => row.original.status === 0);
-            default:
-                return allRows;
-        }
-    }, [table.getRowModel().rows, tabValue]);
 
     return (
         <Tabs
@@ -183,6 +203,7 @@ export function TorrentManager({
             onValueChange={(value) => {
                 setTabValue(value)
                 table.setRowSelection({})
+                table.setPageIndex(0)
             }}
             className="w-full flex-col justify-start gap-6"
         >
@@ -200,6 +221,8 @@ export function TorrentManager({
                 <Select value={tabValue} onValueChange={(value) => {
                     setTabValue(value)
                     table.setRowSelection({})
+                    table.setColumnFilters(statusTabs.find(tab => tab.value === value)?.filter || [])
+                    table.setPageIndex(0)
                 }}>
                     <SelectTrigger
                         className="flex w-fit @4xl/main:hidden"
@@ -218,17 +241,15 @@ export function TorrentManager({
                 </Select>
                 <TabsList
                     className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
-                    <TabsTrigger value="all">{t("All")} <Badge variant="secondary">{table.getRowModel().rows.length}</Badge>
-                    </TabsTrigger>
-                    <TabsTrigger value="active">{t("Active")} <Badge variant="secondary">{table.getRowModel().rows.filter(row => row.original.rateUpload > 0 || row.original.rateDownload > 0).length}</Badge>
-                    </TabsTrigger>
-                    <TabsTrigger value="downloading">{t("Downloading")} <Badge variant="secondary">{table.getRowModel().rows.filter(row => row.original.status === 4).length}</Badge>
-                    </TabsTrigger>
-                    <TabsTrigger value="seeding">{t("Seeding")} <Badge variant="secondary">{table.getRowModel().rows.filter(row => row.original.status === 6).length}</Badge>
-                    </TabsTrigger>
-                    <TabsTrigger value="stopped">{t("Stopped")} <Badge variant="secondary">{table.getRowModel().rows.filter(row => row.original.status === 0).length}</Badge>
-
-                    </TabsTrigger>
+                    {statusTabs.map(tab => (
+                        <TabsTrigger key={tab.value} value={tab.value} onClick={() => {
+                            table.setColumnFilters(tab.filter)
+                        }}>
+                            {t(tab.label)} <Badge variant="secondary">
+                                {getFilterCount(initialData, tab.filter, globalFilter)}
+                            </Badge>
+                        </TabsTrigger>
+                    ))}
                 </TabsList>
                 <div className="flex items-center gap-2 w-full">
                     <Input
@@ -277,7 +298,7 @@ export function TorrentManager({
                 </div>
             </div>
             <TabsContent value={tabValue} className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
-                <TorrentTable table={table} rows={filteredRows} setDialogType={setDialogType} setTargetRows={setTargetRows} />
+                <TorrentTable table={table} setDialogType={setDialogType} setTargetRows={setTargetRows} />
             </TabsContent>
             <DeleteDialog open={dialogType === DialogType.Delete} onOpenChange={(open) => !open && setDialogType(null)} targetRows={targetRows} />
             <EditDialog open={dialogType === DialogType.Edit} onOpenChange={(open) => !open && setDialogType(null)} targetRows={targetRows} directories={downloadDirs} />

@@ -11,6 +11,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { SessionSetting } from './components/settings/SessionSetting'
 import About from './components/About'
+import { ThemeProvider } from './components/ThemeProvider.tsx'
 
 const client = new QueryClient()
 function Main() {
@@ -43,36 +44,39 @@ function Main() {
 
     return (
         <>
-            <SidebarProvider>
-                <Toaster />
-                <AppSidebar variant="inset" />
-                <SidebarInset >
-                    <SiteHeader />
-                    <div className="flex flex-1 flex-col">
-                        <div className="@container/main flex flex-1 flex-col gap-2">
-                            <div className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
-                                <Routes>
-                                    <Route path="/" element={<>
-                                        <SectionCards
-                                            data={sessionStats || {}}
-                                            session={session || {}}
-                                            freespace={freeSpace || {}}
+            <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+                <SidebarProvider>
+                    <Toaster />
+                    <AppSidebar variant="inset" />
+                    <SidebarInset >
+                        <SiteHeader />
+                        <div className="flex flex-1 flex-col">
+                            <div className="@container/main flex flex-1 flex-col gap-2">
+                                <div className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
+                                    <Routes>
+                                        <Route path="/" element={<>
+                                            <SectionCards
+                                                torrentData={torrentData || []}
+                                                data={sessionStats || {}}
+                                                session={session || {}}
+                                                freespace={freeSpace || {}}
+                                            />
+                                            <TorrentManager data={torrentData || []} session={session || {}} />
+                                        </>} />
+                                        <Route path="/settings" element={<>
+                                            <SessionSetting />
+                                        </>} />
+                                        <Route path="/about" element={
+                                            <About session={session || {}} />
+                                        }
                                         />
-                                        <TorrentManager data={torrentData || []} session={session || {}} />
-                                    </>} />
-                                    <Route path="/settings" element={<>
-                                        <SessionSetting />
-                                    </>} />
-                                    <Route path="/about" element={
-                                        <About session={session || {}} />
-                                    }
-                                    />
-                                </Routes>
+                                    </Routes>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </SidebarInset>
-            </SidebarProvider>
+                    </SidebarInset>
+                </SidebarProvider>
+            </ThemeProvider>
         </>
     )
 }

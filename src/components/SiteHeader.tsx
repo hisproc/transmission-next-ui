@@ -11,6 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import axios from "axios";
 import { Tooltip, TooltipContent, TooltipProvider } from "./ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import { ModeToggle } from "./ModeToggle.tsx";
 
 export function SiteHeader() {
   const location = useLocation();
@@ -87,6 +88,7 @@ export function SiteHeader() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <ModeToggle />
         </div>
       </div>
     </header >
