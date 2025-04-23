@@ -7,6 +7,7 @@
 ## 预览
 
 ![demo.png](pic/demo.png)
+![demo_dark.png](pic/demo_dark.png)
 ![demo2.png](pic/demo2.png)
 ![demo3.png](pic/demo3.png)
 
