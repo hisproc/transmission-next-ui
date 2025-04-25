@@ -25,7 +25,7 @@
 
 ## 快速开始
 
-可以通过三种方式部署 Transmission Next UI：
+可以通过三种方式部署 Transmission Next UI，另外提供对于[群辉](doc/NasInstall.md#群辉)和[飞牛OS](doc/NasInstall.md#飞牛OS)的安装指引:
 
 ### 1. 一键安装
 
@@ -63,15 +63,6 @@ docker-compose down    # 停止并移除容器
 1. 打开 [Releases](https://github.com/hisproc/transmission-next-ui/releases) 页面
 2. 下载最新或稳定版本（如 `transmission-next-ui-v1.0.0.zip`）
 3. 解压并将其中的内容复制到 Transmission 的 Web 目录（如 `transmission/web/src`）
-
-Tips: 如果使用**群辉**套件，可参考以下脚本，其中使用的套件来源为矿神群晖SPK，首先从[Release](https://github.com/hisproc/transmission-next-ui/releases)下载最新版本的压缩包`release.zip`，并下载[synology.sh](scripts/synology.sh)脚本到同一目录下，执行以下命令，脚本将自动解压并尝试解压到目标路径:
-
-```bash
-chmod +x synology.sh
-sudo bash synology.sh
-```
-
-输出 `Deployment complete` 即表示安装完成，旧的web目录内容会备份到当前执行目录下，文件为`backup.zip`，如果需要恢复到安装前的状态，请重命名`backup.zip`为`release.zip`，并重新执行上述命令。
 
 ### 3. 源代码打包
 
