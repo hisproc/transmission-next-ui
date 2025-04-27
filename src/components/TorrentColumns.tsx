@@ -185,6 +185,33 @@ export function getColumns({ t, setDialogType, setTargetRows }: { t: TFunction, 
             ),
         },
         {
+            id: "Tracker",
+            accessorKey: "trackerStats",
+            header: ({ column }) => <SortableHeader column={column} title={t("Tracker")} className="w-full justify-start" />,
+            cell: ({ row }) => {
+                return (
+                    <div className="flex flex-col">
+                        {row.original.trackerStats.map((tracker, index) => (
+                            <div key={index} className="text-left">
+                                {tracker.host}
+                            </div>
+                        ))}
+                    </div>
+                )
+            },
+            sortingFn: (rowA, rowB, columnId) => {
+                const a = rowA.getValue(columnId) as { host: string }[] || [];
+                const b = rowB.getValue(columnId) as { host: string }[] || [];
+                const hostA = a[0]?.host || "";
+                const hostB = b[0]?.host || "";
+                return hostA.localeCompare(hostB);
+            },
+            filterFn: (row, columnId, filterValue: string[]) => {
+                const trackers = row.getValue(columnId) as { host: string }[] || [];
+                return trackers.some(tracker => filterValue.includes(tracker.host));
+            },
+        },
+        {
             id: "Added Date",
             accessorKey: "addedDate",
             header: ({ column }) => <SortableHeader column={column} title={t("Added Date")} className="w-full justify-end" />,

@@ -18,6 +18,7 @@ export const schema = z.object({
     errorString: z.string(),
     peersSendingToUs: z.number(),
     trackerStats: z.array(z.object({
+        host: z.string(),
         seederCount: z.number(),
         leecherCount: z.number(),
     })),

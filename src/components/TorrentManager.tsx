@@ -56,6 +56,7 @@ import { DeleteDialog } from "./dialog/DeleteDialog"
 import { EditDialog } from "./dialog/EditDialog"
 import { AddDialog } from "@/components/dialog/AddDialog.tsx";
 import { STORAGE_KEYS } from "@/constants/storage"
+import { ColumnFilter } from "./table/ColumnFilter"
 
 const statusTabs = [
     { value: "all", label: "All", filter: [] },
@@ -65,13 +66,16 @@ const statusTabs = [
     { value: "stopped", label: "Stopped", filter: [{ id: "Status", value: 0 }] },
 ]
 
-function getFilterCount(data: torrentSchema[], filter: { id: string, value: number }[], globalFilter: string) {
+function getFilterCount(data: torrentSchema[], filter: { id: string, value: any }[], globalFilter: string) {
     const filteredData = data.filter((item) => {
         const isFiltered = filter.every((f) => {
             if (f.id === "Status") {
                 return item.status === f.value;
             } else if (f.id === "Download Speed") {
                 return item.rateDownload > f.value || item.rateUpload > f.value;
+            }
+            else if (f.id === "Tracker") {
+                return item.trackerStats.some(tracker => (f.value as string[]).includes(tracker.host));
             }
             return true;
         });
@@ -164,10 +168,27 @@ export function TorrentManager({
         [initialData]
     );
     const downloadDirs = Array.from(new Set([...initialData.map((item) => item.downloadDir), session["download-dir"] || ""]))
+    const trackers = Array.from(new Set(initialData.flatMap((item) => item.trackerStats.map((tracker) => tracker.host)))).map((tracker) => ({
+        label: tracker,
+        value: tracker
+    }))
     const [tabValue, setTabValue] = useState("all")
     const { t } = useTranslation()
+
+    const tabFilterData = useMemo(() => {
+        const tabFilter = statusTabs.find(tab => tab.value === tabValue)?.filter || [];
+        return initialData.filter((item) => tabFilter.every((f) => {
+            if (f.id === "Status") {
+                return item.status === f.value;
+            } else if (f.id === "Download Speed") {
+                return item.rateDownload > f.value || item.rateUpload > f.value;
+            }
+            return true;
+        }))
+    }, [initialData, tabValue]);
+
     const table = useReactTable({
-        data: initialData,
+        data: tabFilterData,
         columns: useMemo(() => getColumns({ t, setDialogType, setTargetRows }), [t]),
         state: {
             sorting,
@@ -202,7 +223,7 @@ export function TorrentManager({
                 table.setRowSelection({})
                 table.setPageIndex(0)
             }}
-            className="w-full flex-col justify-start gap-6"
+            className="w-full flex-col justify-start gap-4"
         >
             {
                 isDragging && dialogType !== DialogType.Add && (
@@ -211,50 +232,44 @@ export function TorrentManager({
                     </div>
                 )
             }
-            <div className="flex items-center justify-between px-4 lg:px-6 gap-x-2">
-                <Label htmlFor="view-selector" className="sr-only">
-                    View
-                </Label>
-                <Select value={tabValue} onValueChange={(value) => {
-                    setTabValue(value)
-                    table.setRowSelection({})
-                    table.setColumnFilters(statusTabs.find(tab => tab.value === value)?.filter || [])
-                    table.setPageIndex(0)
-                }}>
-                    <SelectTrigger
-                        className="flex w-fit @4xl/main:hidden"
-                        size="sm"
-                        id="view-selector"
-                    >
-                        <SelectValue placeholder="Select a view" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">{t("All")}</SelectItem>
-                        <SelectItem value="active">{t("Active")}</SelectItem>
-                        <SelectItem value="downloading">{t("Downloading")}</SelectItem>
-                        <SelectItem value="seeding">{t("Seeding")}</SelectItem>
-                        <SelectItem value="stopped">{t("Stopped")}</SelectItem>
-                    </SelectContent>
-                </Select>
-                <TabsList
-                    className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
-                    {statusTabs.map(tab => (
-                        <TabsTrigger key={tab.value} value={tab.value} onClick={() => {
-                            table.setColumnFilters(tab.filter)
-                        }}>
-                            {t(tab.label)} <Badge variant="secondary">
-                                {getFilterCount(initialData, tab.filter, globalFilter)}
-                            </Badge>
-                        </TabsTrigger>
-                    ))}
-                </TabsList>
-                <div className="flex items-center gap-2 w-full">
-                    <Input
-                        type="text"
-                        placeholder={t("Search ...")}
-                        value={globalFilter}
-                        onChange={(e) => setGlobalFilter(e.target.value)}
-                    />
+            <div className="flex flex-wrap items-center w-full gap-2 px-4 lg:px-6">
+                <div className="flex shrink-0 items-center gap-2">
+                    <Label htmlFor="view-selector" className="sr-only">
+                        View
+                    </Label>
+                    <Select value={tabValue} onValueChange={(value) => {
+                        setTabValue(value)
+                        table.setRowSelection({})
+                        table.setPageIndex(0)
+                    }}>
+                        <SelectTrigger
+                            className="flex w-fit @4xl/main:hidden"
+                            size="sm"
+                            id="view-selector"
+                        >
+                            <SelectValue placeholder="Select a view" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">{t("All")}</SelectItem>
+                            <SelectItem value="active">{t("Active")}</SelectItem>
+                            <SelectItem value="downloading">{t("Downloading")}</SelectItem>
+                            <SelectItem value="seeding">{t("Seeding")}</SelectItem>
+                            <SelectItem value="stopped">{t("Stopped")}</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <TabsList
+                        className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
+                        {statusTabs.map(tab => (
+                            <TabsTrigger key={tab.value} value={tab.value}>
+                                {t(tab.label)} <Badge variant="secondary">
+                                    {getFilterCount(initialData, [...tab.filter, ...table.getState().columnFilters], globalFilter)}
+                                </Badge>
+                            </TabsTrigger>
+                        ))}
+                    </TabsList>
+                </div>
+
+                <div className="flex shrink-0 items-center gap-2 ml-auto">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm">
@@ -292,6 +307,19 @@ export function TorrentManager({
                         <IconPlus />
                         <span className="hidden lg:inline">{t("Add Torrent")}</span>
                     </Button>
+                </div>
+            </div>
+            <div className="flex flex-wrap items-center w-full gap-2 px-4 lg:px-6">
+                <div className="flex min-w-[150px] flex-1 sm:flex-none sm:w-1/3">
+                    <Input
+                        type="text"
+                        placeholder={t("Search ...")}
+                        value={globalFilter}
+                        onChange={(e) => setGlobalFilter(e.target.value)}
+                    />
+                </div>
+                <div className="flex shrink-0 items-center gap-2 ml-auto sm:ml-0">
+                    <ColumnFilter title={"Tracker"} column={table.getColumn("Tracker")} options={trackers} />
                 </div>
             </div>
             <TabsContent value={tabValue} className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
