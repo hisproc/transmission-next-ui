@@ -33,7 +33,6 @@ export function FileUpload({ value, onChange, accept, maxSize }: FileUploadProps
 
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault()
-    e.stopPropagation()
     const file = e.dataTransfer.files?.[0]
     if (file) handleFile(file)
   }

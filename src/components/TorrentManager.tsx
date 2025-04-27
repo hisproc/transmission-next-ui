@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo } from "react"
+import { useState, useMemo } from "react"
 import {
     type UniqueIdentifier,
 } from "@dnd-kit/core"
@@ -57,6 +57,7 @@ import { EditDialog } from "./dialog/EditDialog"
 import { AddDialog } from "@/components/dialog/AddDialog.tsx";
 import { STORAGE_KEYS } from "@/constants/storage"
 import { ColumnFilter } from "./table/ColumnFilter"
+import { useDragAndDropUpload } from "@/hooks/useDragAndDropUpload"
 
 const statusTabs = [
     { value: "all", label: "All", filter: [] },
@@ -101,56 +102,11 @@ export function TorrentManager({
 }) {
     const [rowSelection, setRowSelection] = useState({})
     const [file, setFile] = useState<File | null>(null)
-    const [isDragging, setIsDragging] = useState(false)
-    const dragCounter = useRef(0);
     const [globalFilter, setGlobalFilter] = useState("");
     const [dialogType, setDialogType] = useState<DialogType | null>(null);
+    const { isDragging } = useDragAndDropUpload(setFile, setDialogType);
     const [targetRows, setTargetRows] = useState<Row<torrentSchema>[]>([])
 
-
-    useEffect(() => {
-        const handleDragEnter = (e: DragEvent) => {
-            e.preventDefault()
-            dragCounter.current++
-            setIsDragging(true)
-        }
-
-        const handleDragLeave = (e: DragEvent) => {
-            e.preventDefault()
-            dragCounter.current--
-            if (dragCounter.current <= 0) {
-                setIsDragging(false)
-            }
-        }
-
-        const handleDragOver = (e: DragEvent) => {
-            e.preventDefault()
-        }
-
-        const handleDrop = (e: DragEvent) => {
-            e.preventDefault()
-            setIsDragging(false)
-            dragCounter.current = 0
-            const files = e.dataTransfer?.files
-            if (files && files.length > 0) {
-                const file = files[0]
-                setFile(file)
-                setDialogType(DialogType.Add)
-            }
-        }
-
-        window.addEventListener("dragenter", handleDragEnter)
-        window.addEventListener("dragleave", handleDragLeave)
-        window.addEventListener("dragover", handleDragOver)
-        window.addEventListener("drop", handleDrop)
-
-        return () => {
-            window.removeEventListener("dragenter", handleDragEnter)
-            window.removeEventListener("dragleave", handleDragLeave)
-            window.removeEventListener("dragover", handleDragOver)
-            window.removeEventListener("drop", handleDrop)
-        }
-    }, [])
     const [columnVisibility, setColumnVisibility] =
         useState<VisibilityState>({})
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
@@ -330,8 +286,6 @@ export function TorrentManager({
             <AddDialog open={dialogType === DialogType.Add} onOpenChange={(open) => {
                 if (!open) {
                     setDialogType(null)
-                    setIsDragging(false)
-                    dragCounter.current = 0
                 }
             }} file={file} setFile={setFile} directories={downloadDirs} />
         </Tabs>
