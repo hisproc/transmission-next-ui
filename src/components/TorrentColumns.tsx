@@ -18,13 +18,21 @@ import { ActionButton } from "./table/ActionButton"
 import { TFunction } from "i18next";
 import { TorrentStatus } from "@/components/table/TorrentStatus.tsx";
 import { SortableHeader } from "@/components/table/SortableHeader.tsx";
-import { DialogType } from "@/lib/types"
+import { RowAction } from "@/lib/rowAction"
+import React from "react";
+import {TorrentLabel} from "@/lib/torrentLabel.ts";
+import {parseLabel} from "@/lib/utils.ts";
 
 const activeFilter: FilterFn<torrentSchema> = (row) => {
     return row.original.rateDownload > 0 || row.original.rateUpload > 0
 }
 
-export function getColumns({ t, setDialogType, setTargetRows }: { t: TFunction, setDialogType: (type: DialogType) => void, setTargetRows: (rows: Row<torrentSchema>[]) => void }): ColumnDef<torrentSchema>[] {
+interface getColumnsProps {
+    t: TFunction;
+    setRowAction: React.Dispatch<React.SetStateAction<RowAction | null>>;
+}
+
+export function getColumns({ t, setRowAction }: getColumnsProps): ColumnDef<torrentSchema>[] {
     return [
         {
             id: "select",
@@ -222,13 +230,38 @@ export function getColumns({ t, setDialogType, setTargetRows }: { t: TFunction, 
             ),
         },
         {
+            id : "Labels",
+            accessorKey: "labels",
+            accessorFn: (row) => row.labels.map((label) => parseLabel(label)).filter((label) => label !== null),
+            header: ({ column }) => <SortableHeader column={column} title={t("Labels")} className="w-full justify-start" />,
+            cell: ({ row }) => {
+                const labels = row.getValue("Labels") as TorrentLabel[];
+                return (
+                    <div className="flex flex-row gap-1">
+                        {labels.map((label, index) => (
+                            <span
+                                key={index}
+                                className="bg-muted text-sm px-2 py-0.5 rounded-full border border-border"
+                            >
+                                {label.text}
+                            </span>
+                        ))}
+                    </div>
+                )
+            },
+            filterFn: (row, columnId, filterValue: string[]) => {
+                const labels = row.getValue(columnId) as TorrentLabel[];
+                return labels.some((label) => filterValue.includes(label.text));
+            }
+        },
+        {
             id: "actions",
             cell: ({ row }: {
                 row: Row<torrentSchema>;
                 table: Table<torrentSchema>;
             }) => {
                 return (
-                    <ActionButton row={row} setDialogType={setDialogType} setTargetRows={setTargetRows} />
+                    <ActionButton row={row} setRowAction={setRowAction} />
                 )
             },
         },

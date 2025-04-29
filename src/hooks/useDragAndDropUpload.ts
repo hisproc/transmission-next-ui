@@ -1,7 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { DialogType } from "@/lib/types";
+import { RowAction } from "@/lib/rowAction";
 
-export function useDragAndDropUpload(setFile: (file: File) => void, setDialogType: (type: DialogType) => void) {
+interface UseDragAndDropUploadProps {
+    setFile: (file: File) => void;
+    setRowAction: React.Dispatch<React.SetStateAction<RowAction | null>>;
+}
+export function useDragAndDropUpload({ setFile, setRowAction }: UseDragAndDropUploadProps) {
     const [isDragging, setIsDragging] = useState(false);
     const dragCounter = useRef(0);
 
@@ -33,7 +38,10 @@ export function useDragAndDropUpload(setFile: (file: File) => void, setDialogTyp
             if (files && files.length > 0) {
                 const file = files[0];
                 setFile(file);
-                setDialogType(DialogType.Add);
+                setRowAction({
+                    dialogType: DialogType.Add,
+                    targetRows: [],
+                });
             }
         };
 
@@ -48,7 +56,7 @@ export function useDragAndDropUpload(setFile: (file: File) => void, setDialogTyp
             window.removeEventListener("dragover", handleDragOver);
             window.removeEventListener("drop", handleDrop);
         };
-    }, [setFile, setDialogType]);
+    }, [setFile, setRowAction]);
 
     return { isDragging, dragCounter };
 }

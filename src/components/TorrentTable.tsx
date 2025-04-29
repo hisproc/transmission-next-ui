@@ -1,4 +1,4 @@
-import { flexRender, Table as ReactTable, Row } from "@tanstack/react-table"
+import { flexRender, Table as ReactTable } from "@tanstack/react-table"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from "./ui/context-menu"
 import { IconChevronLeft, IconChevronRight, IconChevronsLeft, IconChevronsRight, IconEdit, IconPlayerPlay, IconPlayerStop, IconTrash } from "@tabler/icons-react"
@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next"
 import { DialogType } from "@/lib/types"
 import { torrentSchema } from "@/schemas/torrentSchema.ts";
 import { STORAGE_KEYS } from "@/constants/storage"
+import { RowAction } from "@/lib/rowAction"
 
 const pageSizeOption = [
     { "label": "10", "value": 10 },
@@ -20,7 +21,11 @@ const pageSizeOption = [
     { "label": "All", "value": 100000 }
 ]
 
-export function TorrentTable({ table, setDialogType, setTargetRows }: { table: ReactTable<torrentSchema>, setDialogType: (type: DialogType) => void, setTargetRows: (rows: Row<torrentSchema>[]) => void }) {
+interface TorrentTableProps {
+    table: ReactTable<torrentSchema>;
+    setRowAction: React.Dispatch<React.SetStateAction<RowAction | null>>;
+}
+export function TorrentTable({ table, setRowAction }: TorrentTableProps) {
 
     const startTorrent = useStartTorrent();
     const stopTorrent = useStopTorrent();
@@ -63,8 +68,10 @@ export function TorrentTable({ table, setDialogType, setTargetRows }: { table: R
                                 </ContextMenuTrigger>
                                 <ContextMenuContent>
                                     <DialogTrigger asChild onClick={() => {
-                                        setDialogType(DialogType.Edit)
-                                        setTargetRows([row])
+                                        setRowAction({
+                                            dialogType: DialogType.Edit,
+                                            targetRows: [row],
+                                        })
                                     }}>
                                         <ContextMenuItem>
                                             <IconEdit className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -84,8 +91,10 @@ export function TorrentTable({ table, setDialogType, setTargetRows }: { table: R
                                         </ContextMenuItem>
                                     )}
                                     <DialogTrigger asChild onClick={() => {
-                                        setTargetRows([row])
-                                        setDialogType(DialogType.Delete)
+                                        setRowAction({
+                                            dialogType: DialogType.Delete,
+                                            targetRows: [row],
+                                        })
                                     }}>
                                         <ContextMenuItem>
                                             <IconTrash className="mr-2 h-4 w-4 text-red-500" /> {t("Delete")}
@@ -104,8 +113,10 @@ export function TorrentTable({ table, setDialogType, setTargetRows }: { table: R
                                                     {t("Stop Selected Torrents")}
                                                 </ContextMenuItem>
                                                 <DialogTrigger asChild onClick={() => {
-                                                    setTargetRows(table.getSelectedRowModel().rows)
-                                                    setDialogType(DialogType.Delete)
+                                                    setRowAction({
+                                                        dialogType: DialogType.Delete,
+                                                        targetRows: table.getSelectedRowModel().rows
+                                                    })
                                                 }}>
                                                     <ContextMenuItem>
                                                         <IconTrash className="mr-2 h-4 w-4 text-red-500" />

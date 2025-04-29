@@ -1,6 +1,16 @@
 import axios from 'axios';
 
-import { AddTorrentOptions, DeleteTorrentOptions, GetTorrentsOptions, NewLocationOptions, PortTestOptions, RenamePathOptions, StopTorrentOptions, TransmissionSession } from '@/lib/types';
+import {
+    AddTorrentOptions,
+    DeleteTorrentOptions,
+    GetTorrentsOptions,
+    NewLocationOptions,
+    PortTestOptions,
+    RenamePathOptions,
+    SetTorrentOptions,
+    StopTorrentOptions,
+    TransmissionSession
+} from '@/lib/types';
 
 const transmission = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -36,9 +46,9 @@ transmission.interceptors.response.use(
     }
 );
 
-export const allTorrentFields = ["id", "name", "status", "hashString", "totalSize", "percentDone", "addedDate", "trackerStats", "leftUntilDone", "rateDownload", "rateUpload", "recheckProgress", "rateDownload", "rateUpload", "peersGettingFromUs", "peersSendingToUs", "uploadRatio", "uploadedEver", "downloadedEver", "downloadDir", "error", "errorString", "doneDate", "queuePosition", "activityDate", "eta"];
+export const allTorrentFields = ["id", "name", "status", "hashString", "totalSize", "percentDone", "addedDate", "trackerStats", "leftUntilDone", "rateDownload", "rateUpload", "recheckProgress", "rateDownload", "rateUpload", "peersGettingFromUs", "peersSendingToUs", "uploadRatio", "uploadedEver", "downloadedEver", "downloadDir", "error", "errorString", "doneDate", "queuePosition", "activityDate", "eta", "labels"];
 
-export const singleTorrentFields = ["fileStats", "trackerStats", "peers", "leftUntilDone", "status", "rateDownload", "rateUpload", "uploadedEver", "uploadRatio", "error", "errorString", "pieces", "pieceCount", "pieceSize", "files", "trackers", "comment", "dateCreated", "creator", "downloadDir", "hashString", "addedDate"];
+export const singleTorrentFields = ["fileStats", "trackerStats", "peers", "leftUntilDone", "status", "rateDownload", "rateUpload", "uploadedEver", "uploadRatio", "error", "errorString", "pieces", "pieceCount", "pieceSize", "files", "trackers", "comment", "dateCreated", "creator", "downloadDir", "hashString", "addedDate", "label"];
 
 
 export const getTorrents = async (options: GetTorrentsOptions) => {
@@ -78,6 +88,15 @@ export const deleteTorrent = async (options: DeleteTorrentOptions) => {
     const response = await transmission.post('', payload);
     return response.data.arguments;
 };
+
+export const setTorrent = async (options: SetTorrentOptions) => {
+    const payload = {
+        method: 'torrent-set',
+        arguments: options
+    }
+    const response = await transmission.post('', payload);
+    return response.data.arguments;
+}
 
 export const stopTorrent = async (options: StopTorrentOptions) => {
     const payload = {

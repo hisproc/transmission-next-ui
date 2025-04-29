@@ -1,24 +1,24 @@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "../ui/button";
-import { Check, PlusCircle, XCircle } from "lucide-react";
+import { PlusCircle, XCircle } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { Badge } from "../ui/badge";
 import { Column } from "@tanstack/react-table";
 import { torrentSchema } from "@/schemas/torrentSchema";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList, CommandSeparator } from "../ui/command";
-import { cn } from "@/lib/utils";
 import React from "react";
+import {Checkbox} from "@/components/ui/checkbox.tsx";
+import {useTranslation} from "react-i18next";
 
-export function ColumnFilter({
-    title,
-    column,
-    options,
-}: {
-    title: string,
-    column?: Column<torrentSchema>,
-    options: { value: string; label: string }[]
-}) {
+interface ColumnFilterProps {
+    title: string;
+    column?: Column<torrentSchema>;
+    options: { value: string; label: string }[];
+}
 
+export function ColumnFilter({title, column, options}: ColumnFilterProps) {
+
+    const {t} = useTranslation();
     const columnFilterValue = column?.getFilterValue();
     const selectedValues = new Set(
         Array.isArray(columnFilterValue) ? columnFilterValue : [],
@@ -103,9 +103,8 @@ export function ColumnFilter({
                     )}
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="max-w-64 p-0" align="start">
+            <PopoverContent className="w-auto max-w-64 p-0" align="start">
                 <Command>
-                    {/* <CommandInput placeholder={title} /> */}
                     <CommandList className="max-h-full">
                         <CommandEmpty>No results found.</CommandEmpty>
                         <CommandGroup className="max-h-[18.75rem] overflow-y-auto overflow-x-hidden">
@@ -116,16 +115,7 @@ export function ColumnFilter({
                                         key={option.value}
                                         onSelect={() => onItemSelect(option, isSelected)}
                                     >
-                                        <div
-                                            className={cn(
-                                                "flex size-4 items-center justify-center rounded-sm border border-primary",
-                                                isSelected
-                                                    ? "bg-primary"
-                                                    : "opacity-50 [&_svg]:invisible",
-                                            )}
-                                        >
-                                            <Check />
-                                        </div>
+                                        <Checkbox checked={isSelected} />
                                         <span className="truncate">{option.label}</span>
                                     </CommandItem>
                                 );
@@ -139,7 +129,7 @@ export function ColumnFilter({
                                         onSelect={() => onReset()}
                                         className="justify-center text-center"
                                     >
-                                        Clear filters
+                                        {t("Clear filters")}
                                     </CommandItem>
                                 </CommandGroup>
                             </>
