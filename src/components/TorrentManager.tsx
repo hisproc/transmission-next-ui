@@ -165,7 +165,7 @@ export function TorrentManager({
                 </div>
             </div>
             <div className="flex flex-wrap items-center w-full gap-2 px-4 lg:px-6">
-                <div className="flex min-w-[150px] flex-1 sm:flex-none sm:w-1/3">
+                <div className="flex min-w-[150px] w-full sm:flex-none sm:w-1/3">
                     <Input
                         type="text"
                         placeholder={t("Search ...")}
@@ -173,7 +173,7 @@ export function TorrentManager({
                         onChange={(e) => table.getColumn("Name")?.setFilterValue(e.target.value)}
                     />
                 </div>
-                <div className="flex shrink-0 items-center gap-2 ml-auto sm:ml-0">
+                <div className="flex shrink-0 items-center gap-2 sm:ml-0">
                     <ColumnFilter title={"Tracker"} column={table.getColumn("Tracker")} options={trackers} />
                     <ColumnFilter title={"Labels"} column={table.getColumn("Labels")} options={labels} />
                 </div>
