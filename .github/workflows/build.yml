@@ -22,7 +22,7 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        run: npm install && npm install @tailwindcss/oxide-linux-x64-gnu
+        run: npm install
 
       - name: Build Project
         env:
