@@ -5,20 +5,20 @@ import {
     Table
 } from "@tanstack/react-table"
 
-import { torrentSchema } from "../schemas/torrentSchema"
-import { Checkbox } from "./ui/checkbox"
-import { TorrentDrawer } from "@/components/TorrentDrawer"
+import { torrentSchema } from "@/schemas/torrentSchema.ts"
+import { Checkbox } from "../ui/checkbox.tsx"
+import { TorrentDrawer } from "@/components/TorrentDrawer.tsx"
 import { filesize } from "filesize"
-import { Progress } from "./ui/progress"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip"
-import { Badge } from "./ui/badge"
+import { Progress } from "../ui/progress.tsx"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip.tsx"
+import { Badge } from "../ui/badge.tsx"
 
-import dayjs, { formatEta } from "@/lib/dayjs"
-import { ActionButton } from "./table/ActionButton"
+import dayjs, { formatEta } from "@/lib/dayjs.ts"
+import { ActionButton } from "./ActionButton.tsx"
 import { TFunction } from "i18next";
 import { TorrentStatus } from "@/components/table/TorrentStatus.tsx";
 import { SortableHeader } from "@/components/table/SortableHeader.tsx";
-import { RowAction } from "@/lib/rowAction"
+import { RowAction } from "@/lib/rowAction.ts"
 import React from "react";
 import {TorrentLabel} from "@/lib/torrentLabel.ts";
 import {parseLabel} from "@/lib/utils.ts";

@@ -26,7 +26,7 @@ export function LabelEdit({labels, setLabels}: LabelEditProps) {
                     {label.text}
                     <button
                         type="button"
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                         onClick={() => {
                             const newLabels = [...labels];
                             newLabels.splice(index, 1);

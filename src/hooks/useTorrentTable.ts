@@ -1,4 +1,4 @@
-import { getColumns } from "@/components/TorrentColumns";
+import { getColumns } from "@/components/table/TorrentColumns.tsx";
 import { STORAGE_KEYS } from "@/constants/storage";
 import { RowAction } from "@/lib/rowAction";
 import { torrentSchema } from "@/schemas/torrentSchema";
