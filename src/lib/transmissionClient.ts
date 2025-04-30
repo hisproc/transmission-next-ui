@@ -85,6 +85,9 @@ export const deleteTorrent = async (options: DeleteTorrentOptions) => {
         method: 'torrent-remove',
         arguments: options
     }
+    if (options.ids.length === 0) {
+        throw new Error('No torrents selected');
+    }
     const response = await transmission.post('', payload);
     return response.data.arguments;
 };
