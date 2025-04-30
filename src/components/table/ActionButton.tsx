@@ -51,7 +51,7 @@ export function ActionButton({ row, setRowAction }: ActionButtonProps) {
                         </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem variant="destructive">
+                    <DropdownMenuItem variant="destructive" onSelect={() => {setRowAction({ dialogType: DialogType.Delete, targetRows: [row] })}}>
                         <IconTrash className="mr-2 h-4 w-4 text-red-500" />
                         {t("Delete")}
                     </DropdownMenuItem>
