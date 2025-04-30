@@ -29,8 +29,13 @@ export interface PortTestResponse {
 }
 
 export interface DeleteTorrentOptions {
-    ids: number[];              // 要删除的 torrent ID 列表
-    "delete-local-data"?: boolean;       // 是否连同数据一并删除（可选）
+    ids: number[];
+    "delete-local-data"?: boolean;
+}
+
+export interface SetTorrentOptions {
+    ids: number[];
+    labels?: string[];
 }
 
 export interface StopTorrentOptions {

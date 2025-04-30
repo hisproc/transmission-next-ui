@@ -1,8 +1,19 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import {TorrentLabel} from "@/lib/torrentLabel.ts";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
+}
+
+export function parseLabel(label: string) : TorrentLabel | null {
+  try {
+    return JSON.parse(label) as TorrentLabel
+  }
+  catch (error) {
+    console.error("Error parsing labels:", error);
+    return null;
+  }
 }
 
 export const fileToBase64 = (file: File): Promise<string> => {

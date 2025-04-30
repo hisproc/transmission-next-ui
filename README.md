@@ -20,6 +20,8 @@ A third-party modern web-based frontend for [Transmission](https://github.com/tr
 - [x] Configuration Settings
 - [x] Drag-and-Drop/Paste to Add Torrents
 - [x] Dark Mode Support
+- [x] Tracker Filter
+- [x] Torrent Label Support
 
 ⚠️**Notice**: This is an early version of the project. It has not been fully tested yet. Please verify its functionality before using it in production.
 

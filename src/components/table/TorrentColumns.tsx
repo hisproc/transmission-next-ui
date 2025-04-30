@@ -5,26 +5,34 @@ import {
     Table
 } from "@tanstack/react-table"
 
-import { torrentSchema } from "../schemas/torrentSchema"
-import { Checkbox } from "./ui/checkbox"
-import { TorrentDrawer } from "@/components/TorrentDrawer"
+import { torrentSchema } from "@/schemas/torrentSchema.ts"
+import { Checkbox } from "../ui/checkbox.tsx"
+import { TorrentDrawer } from "@/components/TorrentDrawer.tsx"
 import { filesize } from "filesize"
-import { Progress } from "./ui/progress"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip"
-import { Badge } from "./ui/badge"
+import { Progress } from "../ui/progress.tsx"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip.tsx"
+import { Badge } from "../ui/badge.tsx"
 
-import dayjs, { formatEta } from "@/lib/dayjs"
-import { ActionButton } from "./table/ActionButton"
+import dayjs, { formatEta } from "@/lib/dayjs.ts"
+import { ActionButton } from "./ActionButton.tsx"
 import { TFunction } from "i18next";
 import { TorrentStatus } from "@/components/table/TorrentStatus.tsx";
 import { SortableHeader } from "@/components/table/SortableHeader.tsx";
-import { DialogType } from "@/lib/types"
+import { RowAction } from "@/lib/rowAction.ts"
+import React from "react";
+import {TorrentLabel} from "@/lib/torrentLabel.ts";
+import {parseLabel} from "@/lib/utils.ts";
 
 const activeFilter: FilterFn<torrentSchema> = (row) => {
     return row.original.rateDownload > 0 || row.original.rateUpload > 0
 }
 
-export function getColumns({ t, setDialogType, setTargetRows }: { t: TFunction, setDialogType: (type: DialogType) => void, setTargetRows: (rows: Row<torrentSchema>[]) => void }): ColumnDef<torrentSchema>[] {
+interface getColumnsProps {
+    t: TFunction;
+    setRowAction: React.Dispatch<React.SetStateAction<RowAction | null>>;
+}
+
+export function getColumns({ t, setRowAction }: getColumnsProps): ColumnDef<torrentSchema>[] {
     return [
         {
             id: "select",
@@ -185,6 +193,33 @@ export function getColumns({ t, setDialogType, setTargetRows }: { t: TFunction, 
             ),
         },
         {
+            id: "Tracker",
+            accessorKey: "trackerStats",
+            header: ({ column }) => <SortableHeader column={column} title={t("Tracker")} className="w-full justify-start" />,
+            cell: ({ row }) => {
+                return (
+                    <div className="flex flex-col">
+                        {row.original.trackerStats.map((tracker, index) => (
+                            <div key={index} className="text-left">
+                                {tracker.host}
+                            </div>
+                        ))}
+                    </div>
+                )
+            },
+            sortingFn: (rowA, rowB, columnId) => {
+                const a = rowA.getValue(columnId) as { host: string }[] || [];
+                const b = rowB.getValue(columnId) as { host: string }[] || [];
+                const hostA = a[0]?.host || "";
+                const hostB = b[0]?.host || "";
+                return hostA.localeCompare(hostB);
+            },
+            filterFn: (row, columnId, filterValue: string[]) => {
+                const trackers = row.getValue(columnId) as { host: string }[] || [];
+                return trackers.some(tracker => filterValue.includes(tracker.host));
+            },
+        },
+        {
             id: "Added Date",
             accessorKey: "addedDate",
             header: ({ column }) => <SortableHeader column={column} title={t("Added Date")} className="w-full justify-end" />,
@@ -195,13 +230,38 @@ export function getColumns({ t, setDialogType, setTargetRows }: { t: TFunction, 
             ),
         },
         {
+            id : "Labels",
+            accessorKey: "labels",
+            accessorFn: (row) => row.labels.map((label) => parseLabel(label)).filter((label) => label !== null),
+            header: ({ column }) => <SortableHeader column={column} title={t("Labels")} className="w-full justify-start" />,
+            cell: ({ row }) => {
+                const labels = row.getValue("Labels") as TorrentLabel[];
+                return (
+                    <div className="flex flex-row gap-1">
+                        {labels.map((label, index) => (
+                            <span
+                                key={index}
+                                className="bg-muted text-sm px-2 py-0.5 rounded-full border border-border"
+                            >
+                                {label.text}
+                            </span>
+                        ))}
+                    </div>
+                )
+            },
+            filterFn: (row, columnId, filterValue: string[]) => {
+                const labels = row.getValue(columnId) as TorrentLabel[];
+                return labels.some((label) => filterValue.includes(label.text));
+            }
+        },
+        {
             id: "actions",
             cell: ({ row }: {
                 row: Row<torrentSchema>;
                 table: Table<torrentSchema>;
             }) => {
                 return (
-                    <ActionButton row={row} setDialogType={setDialogType} setTargetRows={setTargetRows} />
+                    <ActionButton row={row} setRowAction={setRowAction} />
                 )
             },
         },

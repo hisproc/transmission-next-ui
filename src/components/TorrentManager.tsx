@@ -1,36 +1,12 @@
-import { useEffect, useState, useRef, useMemo } from "react"
-import {
-    type UniqueIdentifier,
-} from "@dnd-kit/core"
+import { useState, useMemo } from "react"
 
 import {
-    IconChevronDown,
-    IconLayoutColumns,
     IconPlus,
 } from "@tabler/icons-react"
-import {
-    ColumnFiltersState,
-    Row,
-    SortingState,
-    VisibilityState,
-    getCoreRowModel,
-    getFacetedRowModel,
-    getFacetedUniqueValues,
-    getFilteredRowModel,
-    getPaginationRowModel,
-    getSortedRowModel,
-    useReactTable,
-} from "@tanstack/react-table"
 import { z } from "zod"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Label } from "@/components/ui/label"
 import {
     Select,
@@ -46,7 +22,6 @@ import {
     TabsTrigger,
 } from "@/components/ui/tabs"
 
-import { getColumns } from "@/components/TorrentColumns"
 import { schema, torrentSchema } from "../schemas/torrentSchema"
 import { TorrentTable } from "./TorrentTable"
 import { DialogType, TransmissionSession } from "@/lib/types"
@@ -55,7 +30,13 @@ import { Input } from "./ui/input"
 import { DeleteDialog } from "./dialog/DeleteDialog"
 import { EditDialog } from "./dialog/EditDialog"
 import { AddDialog } from "@/components/dialog/AddDialog.tsx";
-import { STORAGE_KEYS } from "@/constants/storage"
+import { ColumnFilter } from "./table/ColumnFilter"
+import { useDragAndDropUpload } from "@/hooks/useDragAndDropUpload"
+import { useTorrentTable } from "@/hooks/useTorrentTable"
+import { RowAction } from "@/lib/rowAction"
+import {ColumnView} from "@/components/table/ColumnView.tsx";
+import {TorrentLabel} from "@/lib/torrentLabel.ts";
+import {parseLabel} from "@/lib/utils.ts";
 
 const statusTabs = [
     { value: "all", label: "All", filter: [] },
@@ -65,24 +46,23 @@ const statusTabs = [
     { value: "stopped", label: "Stopped", filter: [{ id: "Status", value: 0 }] },
 ]
 
-function getFilterCount(data: torrentSchema[], filter: { id: string, value: number }[], globalFilter: string) {
+function getFilterCount(data: torrentSchema[], filter: { id: string, value: any }[]) {
     const filteredData = data.filter((item) => {
-        const isFiltered = filter.every((f) => {
+        return filter.every((f) => {
             if (f.id === "Status") {
                 return item.status === f.value;
             } else if (f.id === "Download Speed") {
                 return item.rateDownload > f.value || item.rateUpload > f.value;
             }
-            return true;
-        });
-
-        if (isFiltered) {
-            if (globalFilter !== "") {
-                return item.name.toLowerCase().includes(globalFilter.toLowerCase());
+            else if (f.id === "Tracker") {
+                return item.trackerStats.some(tracker => (f.value as string[]).includes(tracker.host));
+            }
+            else if (f.id === "Labels") {
+                const itemLabels = item.labels.map(label => parseLabel(label)).filter(label => label !== null).map(label => (label as TorrentLabel).text);
+                return itemLabels.some(label => (f.value as string[]).includes(label));
             }
             return true;
-        }
-        return false;
+        });
     });
 
     return filteredData.length;
@@ -95,217 +75,122 @@ export function TorrentManager({
     data: z.infer<typeof schema>[],
     session: TransmissionSession
 }) {
-    const [rowSelection, setRowSelection] = useState({})
     const [file, setFile] = useState<File | null>(null)
-    const [isDragging, setIsDragging] = useState(false)
-    const dragCounter = useRef(0);
-    const [globalFilter, setGlobalFilter] = useState("");
-    const [dialogType, setDialogType] = useState<DialogType | null>(null);
-    const [targetRows, setTargetRows] = useState<Row<torrentSchema>[]>([])
-
-
-    useEffect(() => {
-        const handleDragEnter = (e: DragEvent) => {
-            e.preventDefault()
-            dragCounter.current++
-            setIsDragging(true)
-        }
-
-        const handleDragLeave = (e: DragEvent) => {
-            e.preventDefault()
-            dragCounter.current--
-            if (dragCounter.current <= 0) {
-                setIsDragging(false)
-            }
-        }
-
-        const handleDragOver = (e: DragEvent) => {
-            e.preventDefault()
-        }
-
-        const handleDrop = (e: DragEvent) => {
-            e.preventDefault()
-            setIsDragging(false)
-            dragCounter.current = 0
-            const files = e.dataTransfer?.files
-            if (files && files.length > 0) {
-                const file = files[0]
-                setFile(file)
-                setDialogType(DialogType.Add)
-            }
-        }
-
-        window.addEventListener("dragenter", handleDragEnter)
-        window.addEventListener("dragleave", handleDragLeave)
-        window.addEventListener("dragover", handleDragOver)
-        window.addEventListener("drop", handleDrop)
-
-        return () => {
-            window.removeEventListener("dragenter", handleDragEnter)
-            window.removeEventListener("dragleave", handleDragLeave)
-            window.removeEventListener("dragover", handleDragOver)
-            window.removeEventListener("drop", handleDrop)
-        }
-    }, [])
-    const [columnVisibility, setColumnVisibility] =
-        useState<VisibilityState>({})
-    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
-        []
-    )
-    const [sorting, setSorting] = useState<SortingState>([
-        { id: "Added Date", desc: true }
-    ])
-    const [pagination, setPagination] = useState({
-        pageIndex: 0,
-        pageSize: Number(localStorage.getItem(STORAGE_KEYS.PAGE_SIZE)) || 50,
-    })
-    useMemo<UniqueIdentifier[]>(
-        () => initialData?.map(({ id }) => id) || [],
-        [initialData]
-    );
+    const [rowAction, setRowAction] = useState<RowAction | null>(null)
+    const { isDragging } = useDragAndDropUpload({ setFile, setRowAction })
     const downloadDirs = Array.from(new Set([...initialData.map((item) => item.downloadDir), session["download-dir"] || ""]))
+    const trackers = Array.from(new Set(initialData.flatMap((item) => item.trackerStats.map((tracker) => tracker.host)))).map((tracker) => ({
+        label: tracker,
+        value: tracker
+    }))
+    const labelMap = new Map<string, TorrentLabel>();
+    initialData.forEach(item => {
+        item.labels.forEach(rawLabel => {
+            const parsed = parseLabel(rawLabel);
+            if (!parsed) return;
+            labelMap.set(parsed.text, parsed);
+        });
+    });
+    const labels = Array.from(labelMap.values()).map(label => ({
+        label: label.text,
+        value: label.text,
+    }));
+
     const [tabValue, setTabValue] = useState("all")
     const { t } = useTranslation()
-    const table = useReactTable({
-        data: initialData,
-        columns: useMemo(() => getColumns({ t, setDialogType, setTargetRows }), [t]),
-        state: {
-            sorting,
-            columnVisibility,
-            rowSelection,
-            columnFilters,
-            pagination,
-            globalFilter,
-        },
-        getRowId: (row) => row.id.toString(),
-        enableRowSelection: true,
-        onRowSelectionChange: setRowSelection,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
-        onColumnVisibilityChange: setColumnVisibility,
-        onPaginationChange: setPagination,
-        onGlobalFilterChange: setGlobalFilter,
-        getCoreRowModel: getCoreRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFacetedRowModel: getFacetedRowModel(),
-        getFacetedUniqueValues: getFacetedUniqueValues(),
-        autoResetPageIndex: false
+
+    const tabFilterData = useMemo(() => {
+        const tabFilter = statusTabs.find(tab => tab.value === tabValue)?.filter || [];
+        return initialData.filter((item) => tabFilter.every((f) => {
+            if (f.id === "Status") {
+                return item.status === f.value;
+            } else if (f.id === "Download Speed") {
+                return item.rateDownload > f.value || item.rateUpload > f.value;
+            }
+            return true;
+        }))
+    }, [initialData, tabValue]);
+
+    const table = useTorrentTable({
+        tabFilterData, setRowAction
     })
 
+    const handleTabChange = (value: string) => {
+        setTabValue(value)
+        table.setRowSelection({})
+        table.setPagination(prev => ({ ...prev, pageIndex: 0 }))
+    }
+
     return (
-        <Tabs
-            value={tabValue}
-            onValueChange={(value) => {
-                setTabValue(value)
-                table.setRowSelection({})
-                table.setPageIndex(0)
-            }}
-            className="w-full flex-col justify-start gap-6"
-        >
-            {
-                isDragging && dialogType !== DialogType.Add && (
-                    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center text-white text-xl font-semibold pointer-events-none">
-                        Drop .torrent file to upload
-                    </div>
-                )
-            }
-            <div className="flex items-center justify-between px-4 lg:px-6 gap-x-2">
-                <Label htmlFor="view-selector" className="sr-only">
-                    View
-                </Label>
-                <Select value={tabValue} onValueChange={(value) => {
-                    setTabValue(value)
-                    table.setRowSelection({})
-                    table.setColumnFilters(statusTabs.find(tab => tab.value === value)?.filter || [])
-                    table.setPageIndex(0)
-                }}>
-                    <SelectTrigger
-                        className="flex w-fit @4xl/main:hidden"
-                        size="sm"
-                        id="view-selector"
-                    >
-                        <SelectValue placeholder="Select a view" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">{t("All")}</SelectItem>
-                        <SelectItem value="active">{t("Active")}</SelectItem>
-                        <SelectItem value="downloading">{t("Downloading")}</SelectItem>
-                        <SelectItem value="seeding">{t("Seeding")}</SelectItem>
-                        <SelectItem value="stopped">{t("Stopped")}</SelectItem>
-                    </SelectContent>
-                </Select>
-                <TabsList
-                    className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
-                    {statusTabs.map(tab => (
-                        <TabsTrigger key={tab.value} value={tab.value} onClick={() => {
-                            table.setColumnFilters(tab.filter)
-                        }}>
-                            {t(tab.label)} <Badge variant="secondary">
-                                {getFilterCount(initialData, tab.filter, globalFilter)}
-                            </Badge>
-                        </TabsTrigger>
-                    ))}
-                </TabsList>
-                <div className="flex items-center gap-2 w-full">
-                    <Input
-                        type="text"
-                        placeholder={t("Search ...")}
-                        value={globalFilter}
-                        onChange={(e) => setGlobalFilter(e.target.value)}
-                    />
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm">
-                                <IconLayoutColumns />
-                                <span className="hidden lg:inline">{t("Customize Columns")}</span>
-                                <span className="lg:hidden">{t("Columns")}</span>
-                                <IconChevronDown />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56">
-                            {table
-                                .getAllColumns()
-                                .filter(
-                                    (column) =>
-                                        typeof column.accessorFn !== "undefined" &&
-                                        column.getCanHide()
-                                )
-                                .map((column) => {
-                                    return (
-                                        <DropdownMenuCheckboxItem
-                                            key={column.id}
-                                            className="capitalize"
-                                            checked={column.getIsVisible()}
-                                            onCheckedChange={(value) =>
-                                                column.toggleVisibility(value)
-                                            }
-                                        >
-                                            {t(column.id)}
-                                        </DropdownMenuCheckboxItem>
-                                    )
-                                })}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                    <Button variant="outline" size="sm" onClick={() => setDialogType(DialogType.Add)}>
+        <Tabs value={tabValue} onValueChange={handleTabChange} className="w-full flex-col justify-start gap-4">
+            <div className="flex flex-wrap items-center w-full gap-2 px-4 lg:px-6">
+                <div className="flex shrink-0 items-center gap-2">
+                    <Label htmlFor="view-selector" className="sr-only">
+                        View
+                    </Label>
+                    <Select value={tabValue} onValueChange={handleTabChange}>
+                        <SelectTrigger
+                            className="flex w-fit @4xl/main:hidden"
+                            size="sm"
+                            id="view-selector"
+                        >
+                            <SelectValue placeholder="Select a view" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">{t("All")}</SelectItem>
+                            <SelectItem value="active">{t("Active")}</SelectItem>
+                            <SelectItem value="downloading">{t("Downloading")}</SelectItem>
+                            <SelectItem value="seeding">{t("Seeding")}</SelectItem>
+                            <SelectItem value="stopped">{t("Stopped")}</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <TabsList
+                        className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
+                        {statusTabs.map(tab => (
+                            <TabsTrigger key={tab.value} value={tab.value}>
+                                {t(tab.label)} <Badge variant="secondary">
+                                    {getFilterCount(initialData, [...tab.filter, ...table.getState().columnFilters])}
+                                </Badge>
+                            </TabsTrigger>
+                        ))}
+                    </TabsList>
+                </div>
+
+                <div className="flex shrink-0 items-center gap-2 ml-auto">
+                    <ColumnView columns={table.getAllColumns()} />
+                    <Button variant="outline" size="sm" onClick={() => setRowAction({ dialogType: DialogType.Add, targetRows: [] })}>
                         <IconPlus />
                         <span className="hidden lg:inline">{t("Add Torrent")}</span>
                     </Button>
                 </div>
             </div>
+            <div className="flex flex-wrap items-center w-full gap-2 px-4 lg:px-6">
+                <div className="flex min-w-[150px] w-full sm:flex-none sm:w-1/3">
+                    <Input
+                        type="text"
+                        placeholder={t("Search ...")}
+                        value={table.getColumn("Name")?.getFilterValue() as string}
+                        onChange={(e) => table.getColumn("Name")?.setFilterValue(e.target.value)}
+                    />
+                </div>
+                <div className="flex shrink-0 items-center gap-2 sm:ml-0">
+                    <ColumnFilter title={"Tracker"} column={table.getColumn("Tracker")} options={trackers} />
+                    <ColumnFilter title={"Labels"} column={table.getColumn("Labels")} options={labels} />
+                </div>
+            </div>
             <TabsContent value={tabValue} className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
-                <TorrentTable table={table} setDialogType={setDialogType} setTargetRows={setTargetRows} />
+                <TorrentTable table={table} setRowAction={setRowAction} />
             </TabsContent>
-            <DeleteDialog open={dialogType === DialogType.Delete} onOpenChange={(open) => !open && setDialogType(null)} targetRows={targetRows} />
-            <EditDialog open={dialogType === DialogType.Edit} onOpenChange={(open) => !open && setDialogType(null)} targetRows={targetRows} directories={downloadDirs} />
-            <AddDialog open={dialogType === DialogType.Add} onOpenChange={(open) => {
-                if (!open) {
-                    setDialogType(null)
-                    setIsDragging(false)
-                    dragCounter.current = 0
-                }
-            }} file={file} setFile={setFile} directories={downloadDirs} />
+             <DeleteDialog open={rowAction?.dialogType === DialogType.Delete} onOpenChange={(open) => !open && setRowAction(null)} targetRows={rowAction?.targetRows || []} />
+            <EditDialog open={rowAction?.dialogType === DialogType.Edit} onOpenChange={(open) => !open && setRowAction(null)} targetRows={rowAction?.targetRows || []} directories={downloadDirs} />
+            <AddDialog open={rowAction?.dialogType === DialogType.Add} onOpenChange={(open) => !open && setRowAction(null)} file={file} setFile={setFile} directories={downloadDirs} />
+            {
+                isDragging && rowAction?.dialogType !== DialogType.Add && (
+                    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center text-white text-xl font-semibold pointer-events-none">
+                        Drop .torrent file to upload
+                    </div>
+                )
+            }
         </Tabs>
     )
 }
