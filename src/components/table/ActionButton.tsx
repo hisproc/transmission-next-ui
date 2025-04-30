@@ -1,21 +1,25 @@
 import { IconDotsVertical, IconEdit, IconPlayerPlay, IconPlayerStop, IconTrash } from "@tabler/icons-react";
 import { Button } from "../ui/button";
-import { Dialog, DialogTrigger } from "../ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { useTranslation } from "react-i18next";
 import { Row } from "@tanstack/react-table";
 import { useStartTorrent, useStopTorrent } from "@/hooks/useTorrentActions";
-import {torrentSchema} from "@/schemas/torrentSchema";
+import { torrentSchema } from "@/schemas/torrentSchema";
+import { RowAction } from "@/lib/rowAction";
 import { DialogType } from "@/lib/types";
+import React from "react";
 
-export function ActionButton({ row, setDialogType, setTargetRows}: { row: Row<torrentSchema>; setDialogType: (type: DialogType) => void, setTargetRows: (rows: Row<torrentSchema>[]) => void }) {
+interface ActionButtonProps {
+    row: Row<torrentSchema>;
+    setRowAction: React.Dispatch<React.SetStateAction<RowAction | null>>;
+}
+export function ActionButton({ row, setRowAction }: ActionButtonProps) {
 
     const { t } = useTranslation();
     const stopTorrent = useStopTorrent();
     const startTorrent = useStartTorrent();
 
     return (
-        <Dialog key={row.id}>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button
@@ -28,15 +32,12 @@ export function ActionButton({ row, setDialogType, setTargetRows}: { row: Row<to
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-32">
-                    <DialogTrigger asChild onClick={() => {
-                        setDialogType(DialogType.Edit);
-                        setTargetRows([row]);
+                    <DropdownMenuItem onSelect={() => {
+                        setRowAction({ dialogType: DialogType.Edit, targetRows: [row] })
                     }}>
-                        <DropdownMenuItem>
-                            <IconEdit className="mr-2 h-4 w-4 text-muted-foreground" />
-                            {t("Edit")}
-                        </DropdownMenuItem>
-                    </DialogTrigger>
+                        <IconEdit className="mr-2 h-4 w-4 text-muted-foreground" />
+                        {t("Edit")}
+                    </DropdownMenuItem>
                     {row.original.status === 0 && (
                         <DropdownMenuItem onClick={() => startTorrent.mutate([row.original.id])}>
                             <IconPlayerPlay className="mr-2 h-4 w-4 text-green-500" />
@@ -50,17 +51,11 @@ export function ActionButton({ row, setDialogType, setTargetRows}: { row: Row<to
                         </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />
-                    <DialogTrigger asChild onClick={() => {
-                        setDialogType(DialogType.Delete);
-                        setTargetRows([row]);
-                    }}>
-                        <DropdownMenuItem variant="destructive">
-                            <IconTrash className="mr-2 h-4 w-4 text-red-500" />
-                            {t("Delete")}
-                        </DropdownMenuItem>
-                    </DialogTrigger>
+                    <DropdownMenuItem variant="destructive" onSelect={() => {setRowAction({ dialogType: DialogType.Delete, targetRows: [row] })}}>
+                        <IconTrash className="mr-2 h-4 w-4 text-red-500" />
+                        {t("Delete")}
+                    </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
-        </Dialog>
     )
 }

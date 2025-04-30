@@ -1,9 +1,20 @@
-import { addTorrent, startTorrent, stopTorrent, deleteTorrent, renamePath, setLocation, setSession, portTest } from "@/lib/transmissionClient";
+import {
+    addTorrent,
+    startTorrent,
+    stopTorrent,
+    deleteTorrent,
+    renamePath,
+    setLocation,
+    setSession,
+    portTest,
+    setTorrent
+} from "@/lib/transmissionClient";
 import {PortTestOptions, TransmissionSession} from "@/lib/types";
 import { fileToBase64 } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import {TorrentLabel} from "@/lib/torrentLabel.ts";
 
 
 export function useAddTorrent() {
@@ -76,6 +87,31 @@ export function useStartTorrent() {
         onError: (error) => {
             console.error("Error starting torrent:", error);
             toast.error(t("Failed to start torrent"), {
+                "position": "top-right"
+            });
+        }
+    });
+}
+
+export function useSetTorrent() {
+    const queryClient = useQueryClient();
+    const { t } = useTranslation();
+    return useMutation({
+        mutationFn: async ({ ids, labels }: { ids: number[]; labels: TorrentLabel[] }) => {
+            await setTorrent({
+                ids: ids,
+                labels: labels.map((label) => JSON.stringify(label))
+            });
+        },
+        onSuccess: () => {
+            toast.success(t("Torrent set successfully"), {
+                "position": "top-right",
+            });
+            setTimeout(() => { queryClient.refetchQueries({ queryKey: ["torrent"] }); }, 1000);
+        },
+        onError: (error) => {
+            console.error("Error setting torrent label:", error);
+            toast.error(t("Failed to set torrent label"), {
                 "position": "top-right"
             });
         }
