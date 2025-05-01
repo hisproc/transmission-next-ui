@@ -1,8 +1,9 @@
-# Transmission Next UI
+<h1 align="center" style="border-bottom: none;"><img src="public/favicon.svg" width="24" style="vertical-align: middle; margin-right: 8px;" /> Transmission Next UI</h1>
+<h3 align="center"> A third-party modern web-based frontend for Transmission, offering a sleek and responsive UI for managing your torrents with ease, built using shadcn/ui and Vite. </h3>
+
+---
 
 English | [简体中文](README.md)
-
-A third-party modern web-based frontend for [Transmission](https://github.com/transmission/transmission), offering a sleek and responsive UI for managing your torrents with ease, built using shadcn/ui and Vite.
 
 ## Preview
 
