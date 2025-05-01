@@ -3,9 +3,7 @@
 
 <p align="center">
   <img alt="GitHub License" src="https://img.shields.io/github/license/hisproc/transmission-next-ui">
-
-    <img alt="GitHub Release" src="https://img.shields.io/github
-/release/hisproc/transmission-next-ui">
+  <img alt="GitHub Release" src="https://img.shields.io/github/release/hisproc/transmission-next-ui">
 
 </p>
 ---
