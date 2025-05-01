@@ -1,5 +1,7 @@
 <h1 align="center" style="border-bottom: none;"><img src="public/favicon.svg" width="24" style="vertical-align: middle; margin-right: 8px;" /> Transmission Next UI</h1>
-<h3 align="center"> 一个[Transmission](https://github.com/transmission/transmission)的第三方Web UI，使用shadcn/ui和Vite构建。</h3>
+<h3 align="center"> 一个Transmission的第三方Web UI，使用shadcn/ui和Vite构建。</h3>
+
+---
 
 [English](README.md) | 简体中文
 
