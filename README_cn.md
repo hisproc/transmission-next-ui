@@ -4,6 +4,7 @@
 <p align="center">
   <img alt="GitHub License" src="https://img.shields.io/github/license/hisproc/transmission-next-ui">
   <img alt="GitHub Release" src="https://img.shields.io/github/release/hisproc/transmission-next-ui">
+  <img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/hisproc/transmission-next-ui/build.yml">
 
 </p>
 ---
