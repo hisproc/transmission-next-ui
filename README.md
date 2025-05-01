@@ -1,47 +1,55 @@
-# Transmission Next UI
+<h1 align="center" style="border-bottom: none;"><img src="public/favicon.svg" width="24" style="vertical-align: middle; margin-right: 8px;" /> Transmission Next UI</h1>
+<h3 align="center"> 一个Transmission的第三方Web UI，使用shadcn/ui和Vite构建。</h3>
 
-English | [简体中文](README_cn.md)
+<p align="center">
+  <img alt="GitHub License" src="https://img.shields.io/github/license/hisproc/transmission-next-ui">
+  <img alt="GitHub Release" src="https://img.shields.io/github/release/hisproc/transmission-next-ui">
+  <img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/hisproc/transmission-next-ui/build.yml">
+</p>
 
-A third-party modern web-based frontend for [Transmission](https://github.com/transmission/transmission), offering a sleek and responsive UI for managing your torrents with ease, built using shadcn/ui and Vite.
+---
 
-## Preview
+[English](README_EN.md) | 简体中文
 
-![demo.png](pic/demo_en.png)
-![demo_dark.png](pic/demo_dark_en.png)
-![demo2.png](pic/demo2_en.png)
-![demo3.png](pic/demo3_en.png)
 
-## Features
+## 预览
 
-- Modern UI Design
-- Responsive Layout, Perfect for All Devices
-- Fast Loading Experience with Next.js
-- [x] Torrent Management and Information Viewing
-- [x] Configuration Settings
-- [x] Drag-and-Drop/Paste to Add Torrents
-- [x] Dark Mode Support
-- [x] Tracker Filter
-- [x] Torrent Label Support
+![demo.png](pic/demo.png)
+![demo_dark.png](pic/demo_dark.png)
+![demo2.png](pic/demo2.png)
+![demo3.png](pic/demo3.png)
 
-⚠️**Notice**: This is an early version of the project. It has not been fully tested yet. Please verify its functionality before using it in production.
+## 功能
 
-## Quick Start
+- 现代化 UI 设计
+- 响应式布局，适配所有设备
+- 适配 Transmission 4.0+ 版本
+- [x] 种子管理，信息查看
+- [x] 配置设置
+- [x] 拖拽/粘贴添加种子
+- [x] 深色模式支持
+- [x] Tracker 过滤
+- [x] 支持种子标签
 
-You can deploy Transmission Next UI in three different ways:
+⚠️本项目为早期版本，尚未经过完整测试，正式使用前请自行验证其功能是否符合预期。
 
-### 1. Easy Install
+## 快速开始
 
-> Requires: `docker`, `docker-compose`, and `curl`
+可以通过三种方式部署 Transmission Next UI，另外提供对于[群辉](doc/NasInstall.md#群辉)和[飞牛OS](doc/NasInstall.md#飞牛OS)的安装指引:
 
-To install web UI or upgrade to the latest version, run the following command:
+### 1. 一键安装
+
+> 依赖环境：`docker`、`docker-compose` 和 `curl`
+
+初次安装或升级到最新版本，运行以下命令：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/hisproc/transmission-next-ui/main/download.sh | bash
 ```
 
-This will download the latest release and create a `docker-compose.yml` file in your current directory.
+执行后将在当前目录生成一个 `docker-compose.yml` 文件。
 
-You can now modify the `docker-compose.yml` file to set your own **Transmission username**, **password**, and **timezone**:
+编辑该文件来自定义 Transmission 的用户名、密码和时区：
 
 ```yaml
 environment:
@@ -50,23 +58,23 @@ environment:
   - TZ=Asia/Shanghai
 ```
 
-Then use the following commands to start or stop the service:
+然后通过以下命令启动或停止服务：
 
 ```bash
-docker-compose up -d   # start in background
-docker-compose down    # stop and remove the container
+docker-compose up -d   # 后台启动
+docker-compose down    # 停止并移除容器
 ```
 
-By default, the container runs using `network_mode: host` for better connectivity, which is ideal for Linux environments. If you are on **macOS**, `host` mode is not supported — you will need to manually switch to **port mapping** (e.g., `9091:9091`) in the `docker-compose.yml` file. You can adjust this behavior in the `docker-compose.yml` according to your network setup.
+默认情况下容器使用 `network_mode: host` 网络模式，更适合 Linux 系统。  
+**注意：** macOS 不支持 `host` 网络模式，此时请手动改为端口映射（如 `9091:9091`），并在 `docker-compose.yml` 中进行相应修改。
 
-### 2. Manual Install
+### 2. 手动安装
 
-1. Go to the [Releases](https://github.com/hisproc/transmission-next-ui/releases) page
-2. Download the latest or stable release (e.g. `transmission-next-ui-v1.0.0.zip`)
-3. Extract it and copy the contents to your transmission web directory (e.g. transmission/web/src)
+1. 打开 [Releases](https://github.com/hisproc/transmission-next-ui/releases) 页面
+2. 下载最新或稳定版本（如 `transmission-next-ui-v1.0.0.zip`）
+3. 解压并将其中的内容复制到 Transmission 的 Web 目录（如 `transmission/web/src`）
 
-
-### 3. Build from Source
+### 3. 源代码打包
 
 ```bash
 git clone git@github.com:hisproc/transmission-next-ui.git
@@ -75,8 +83,8 @@ npm install
 npm run build
 ```
 
-Then, copy the contents of the `dist/` folder to your transmission web directory.
+构建完成后，将 `dist/` 目录下的所有内容复制到 Transmission 的 Web 目录下即可。
 
-## License
+## 许可证
 
-This project is licensed under the [MIT License](LICENSE).
+本项目采用 [MIT 许可证](LICENSE) 进行授权。
