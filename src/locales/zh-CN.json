@@ -154,5 +154,21 @@
     "Client Network Speed Summary": "本地网速聚合展示",
     "UI Settings updated": "UI 设置已更新",
     "Clear filters" : "清除筛选",
-    "Labels": "标签"
+    "Labels": "标签",
+    "Current": "当前",
+    "Session": "会话",
+    "Total": "总计",
+    "Current Upload Speed": "当前上传速度",
+    "Session Upload": "会话总上传",
+    "Total Upload": "历史总上传",
+    "Real-time upload speed": "实时上传速度",
+    "Data uploaded this session": "本次会话已上传数据",
+    "Total data uploaded ever": "历史总上传数据",
+    "Paused": "暂停",
+    "Free": "剩余",
+    "Used": "已用",
+    "Used Space": "已用空间",
+    "ActiveTorrents": "活跃",
+    "Expand All": "展开所有",
+    "Collapse All": "折叠所有"
 }
