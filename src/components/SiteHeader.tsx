@@ -46,14 +46,14 @@ export function SiteHeader() {
           {location.pathname === "/settings" && t("Settings")}
           {location.pathname === "/about" && t("About")}
         </h1>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-2 px-2 py-1">
           {newVersion && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <a href="https://github.com/hisproc/transmission-next-ui/releases">
-                      <GrUpgrade className="aspect-square text-green-500" />
+                  <Button variant="ghost" size="icon" className="h-8 w-8 focus-visible:ring-0 focus-visible:ring-offset-0">
+                    <a href="https://github.com/hisproc/transmission-next-ui/releases" className="flex items-center justify-center">
+                      <GrUpgrade className="h-4 w-4 text-green-500" />
                     </a>
                   </Button>
                 </TooltipTrigger>
@@ -63,20 +63,20 @@ export function SiteHeader() {
               </Tooltip>
             </TooltipProvider>
           )}
-          <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
+          <Button variant="ghost" asChild size="icon" className="h-8 w-8 hidden sm:flex focus-visible:ring-0 focus-visible:ring-offset-0">
             <a
               href="https://github.com/hisproc/Transmission-next-ui"
               rel="noopener noreferrer"
               target="_blank"
-              className="dark:text-foreground"
+              className="flex items-center justify-center dark:text-foreground"
             >
-              <FaGithub />
+              <FaGithub className="h-4 w-4" />
             </a>
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <IoLanguage className="aspect-square" />
+              <Button variant="ghost" size="icon" className="h-8 w-8 focus-visible:ring-0 focus-visible:ring-offset-0">
+                <IoLanguage className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="end">
