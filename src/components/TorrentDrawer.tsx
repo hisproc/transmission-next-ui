@@ -155,14 +155,14 @@ export function TorrentDrawer({ item }: { item: torrentSchema }) {
                             <p className="text-muted-foreground text-sm">{t("No peer data available.")}</p>
                         )}
                     </TabsContent>
-                    <TabsContent value="trackers">
+                    <TabsContent value="trackers" className="overflow-y-auto flex-1 min-h-0">
                         {torrentData?.torrents?.[0].trackerStats.length ? (
                             <div className="flex flex-col gap-4">
                                 {torrentData.torrents[0].trackerStats.map((tracker) => (
                                     <Card key={tracker.id}>
                                         <CardHeader>
-                                            <CardTitle className="text-base font-semibold">{tracker.host}</CardTitle>
-                                            <CardDescription className="text-sm text-muted-foreground">{tracker.announce}</CardDescription>
+                                            <CardTitle className="text-base font-semibold break-all">{tracker.host}</CardTitle>
+                                            <CardDescription className="text-sm text-muted-foreground break-all">{tracker.announce}</CardDescription>
                                         </CardHeader>
                                         <CardContent className="space-y-2 text-sm text-muted-foreground">
                                             <div className="flex justify-between">
