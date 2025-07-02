@@ -156,5 +156,21 @@
     "Client Network Speed Summary": "Client Network Speed Summary",
     "UI Settings updated": "UI Settings updated",
     "Clear filters": "Clear filters",
-    "Labels": "Labels"
+    "Labels": "Labels",
+    "Current": "Current",
+    "Session": "Session",
+    "Total": "Total",
+    "Current Upload Speed": "Current Upload Speed",
+    "Session Upload": "Session Upload",
+    "Total Upload": "Total Upload",
+    "Real-time upload speed": "Real-time upload speed",
+    "Data uploaded this session": "Data uploaded this session",
+    "Total data uploaded ever": "Total data uploaded ever",
+    "Paused": "Paused",
+    "Free": "Free",
+    "Used": "Used",
+    "Used Space": "Used Space",
+    "ActiveTorrents": "Active",
+    "Expand All": "Expand All",
+    "Collapse All": "Collapse All"
 }
