@@ -12,6 +12,7 @@ import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-quer
 import { SessionSetting } from './components/settings/SessionSetting'
 import About from './components/About'
 import { ThemeProvider } from './components/ThemeProvider.tsx'
+import { schema } from './schemas/torrentSchema.ts'
 
 const client = new QueryClient()
 function Main() {
@@ -20,7 +21,7 @@ function Main() {
         queryKey: ['torrent'],
         queryFn: () => getTorrents({ fields: allTorrentFields }),
         refetchInterval: 5000,
-        select: (data) => data.torrents
+        select: (data) => data.torrents.map((torrent: any) => schema.parse(torrent))
     })
 
     const { data: sessionStats } = useQuery({
