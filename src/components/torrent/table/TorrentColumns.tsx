@@ -20,8 +20,8 @@ import { TorrentStatus } from "@/components/torrent/table/TorrentStatus.tsx";
 import { SortableHeader } from "@/components/torrent/table/SortableHeader.tsx";
 import { RowAction } from "@/lib/utils/rowAction.ts"
 import React from "react";
-import {TorrentLabel} from "@/lib/utils/torrentLabel.ts";
-import {parseLabel} from "@/lib/utils/utils.ts";
+import { TorrentLabel } from "@/lib/utils/torrentLabel.ts";
+import { parseLabel } from "@/lib/utils/utils.ts";
 
 const activeFilter: FilterFn<torrentSchema> = (row) => {
     return row.original.rateDownload > 0 || row.original.rateUpload > 0
@@ -197,13 +197,36 @@ export function getColumns({ t, setRowAction }: getColumnsProps): ColumnDef<torr
             accessorKey: "trackerStats",
             header: ({ column }) => <SortableHeader column={column} title={t("Tracker")} className="w-full justify-start" />,
             cell: ({ row }) => {
+                const trackers = row.original.trackerStats;
+                const hasMultiple = trackers.length > 1;
                 return (
-                    <div className="flex flex-col">
-                        {row.original.trackerStats.map((tracker, index) => (
-                            <div key={index} className="text-left">
-                                {tracker.host}
-                            </div>
-                        ))}
+                    <div className="flex items-center gap-2">
+                        <div className="text-left">
+                            {trackers[0]?.host || ''}
+                        </div>
+                        {hasMultiple && (
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Badge
+                                            variant="secondary"
+                                            className="rounded-sm px-1 font-normal"
+                                        >
+                                            +{trackers.length - 1}
+                                        </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top" align="center" sideOffset={5}>
+                                        <div className="flex flex-col gap-1">
+                                            {trackers.slice(1).map((tracker, index) => (
+                                                <div key={index} className="text-sm">
+                                                    {tracker.host}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
                     </div>
                 )
             },
@@ -230,7 +253,7 @@ export function getColumns({ t, setRowAction }: getColumnsProps): ColumnDef<torr
             ),
         },
         {
-            id : "Labels",
+            id: "Labels",
             accessorKey: "labels",
             accessorFn: (row) => row.labels.map((label) => parseLabel(label)).filter((label) => label !== null),
             header: ({ column }) => <SortableHeader column={column} title={t("Labels")} className="w-full justify-start" />,
