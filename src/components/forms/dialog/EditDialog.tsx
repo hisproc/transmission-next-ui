@@ -20,7 +20,7 @@ export function EditDialog({ open, onOpenChange, targetRows, directories }: { op
     const setLocationTorrent = useSetLocationTorrent();
     const setTorrent = useSetTorrent();
     const row = targetRows?.[0];
-    const [oldPathname, oldLocation] = [row?.original.name, row?.original.downloadDir, row?.original.labels]
+    const [oldPathname, oldLocation, oldLabels] = [row?.original.name, row?.original.downloadDir, row?.getValue("Labels") || []]
     const [location, setLocation] = useState(row?.original.downloadDir)
     const [moveData, setMoveData] = useState(false)
     const [pathname, setPathname] = useState(row?.original.name)
@@ -94,7 +94,7 @@ export function EditDialog({ open, onOpenChange, targetRows, directories }: { op
                             if (location != oldLocation) {
                                 setLocationTorrent.mutate({ ids: [row.original.id], location: location, move: moveData })
                             }
-                            if (labels.length > 0) {
+                            if (JSON.stringify(labels) !== JSON.stringify(oldLabels)) {
                                 setTorrent.mutate({ ids: [row.original.id], labels: labels })
                             }
                         }}>{t("Submit")}</Button>
