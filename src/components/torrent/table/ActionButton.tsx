@@ -1,6 +1,6 @@
 import { IconDotsVertical, IconEdit, IconPlayerPlay, IconPlayerStop, IconTrash } from "@tabler/icons-react";
-import { Button } from "../../ui/button.tsx";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../../ui/dropdown-menu.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu.tsx";
 import { useTranslation } from "react-i18next";
 import { Row } from "@tanstack/react-table";
 import { useStartTorrent, useStopTorrent } from "@/hooks/useTorrentActions.ts";

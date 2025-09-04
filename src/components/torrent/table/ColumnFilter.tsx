@@ -1,11 +1,11 @@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover.tsx";
-import { Button } from "../../ui/button.tsx";
+import { Button } from "@/components/ui/button.tsx";
 import { PlusCircle, XCircle } from "lucide-react";
-import { Separator } from "../../ui/separator.tsx";
-import { Badge } from "../../ui/badge.tsx";
+import { Separator } from "@/components/ui/separator.tsx";
+import { Badge } from "@/components/ui/badge.tsx";
 import { Column } from "@tanstack/react-table";
 import { torrentSchema } from "@/schemas/torrentSchema.ts";
-import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList, CommandSeparator } from "../../ui/command.tsx";
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command.tsx";
 import React from "react";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {useTranslation} from "react-i18next";

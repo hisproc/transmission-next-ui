@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../ui/dialog.tsx"
-import { Button } from "../../ui/button.tsx";
-import { Checkbox } from "../../ui/checkbox.tsx";
-import { Label } from "../../ui/label.tsx";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog.tsx"
+import { Button } from "@/components/ui/button.tsx";
+import { Checkbox } from "@/components/ui/checkbox.tsx";
+import { Label } from "@/components/ui/label.tsx";
 import { Row } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { useDeleteTorrent } from "@/hooks/useTorrentActions.ts";

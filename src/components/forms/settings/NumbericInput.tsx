@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Input } from "../../ui/input.tsx";
+import { Input } from "@/components/ui/input.tsx";
 
 type NumericInputProps = {
     value: number;

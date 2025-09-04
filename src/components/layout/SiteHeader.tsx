@@ -7,11 +7,11 @@ import { IoLanguage } from "react-icons/io5";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu.tsx";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu.tsx";
 import axios from "axios";
-import { Tooltip, TooltipContent, TooltipProvider } from "../ui/tooltip.tsx";
+import { Tooltip, TooltipContent, TooltipProvider } from "@/components/ui/tooltip.tsx";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
-import { ModeToggle } from "../shared/ModeToggle.tsx";
+import { ModeToggle } from "@/components/shared/ModeToggle.tsx";
 
 export function SiteHeader() {
   const location = useLocation();

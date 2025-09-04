@@ -1,12 +1,12 @@
 import { IconPlus, IconChevronDown, IconClipboardCheck } from "@tabler/icons-react";
 import { Label } from "recharts";
-import { FileUpload } from "../shared/FileUpload.tsx";
-import { useAddTorrent } from "../../hooks/useTorrentActions.ts";
-import { Button } from "../ui/button.tsx";
-import { DialogHeader, DialogFooter, Dialog, DialogTrigger, DialogContent, DialogTitle, DialogClose } from "../ui/dialog.tsx";
-import { Input } from "../ui/input.tsx";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu.tsx";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip.tsx";
+import { FileUpload } from "@/components/shared/FileUpload.tsx";
+import { useAddTorrent } from "@/hooks/useTorrentActions.ts";
+import { Button } from "@/components/ui/button.tsx";
+import { DialogHeader, DialogFooter, Dialog, DialogTrigger, DialogContent, DialogTitle, DialogClose } from "@/components/ui/dialog.tsx";
+import { Input } from "@/components/ui/input.tsx";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu.tsx";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip.tsx";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 

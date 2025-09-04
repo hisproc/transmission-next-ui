@@ -1,13 +1,13 @@
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../ui/dialog.tsx"
-import { Button } from "../../ui/button.tsx";
-import { Checkbox } from "../../ui/checkbox.tsx";
-import { Label } from "../../ui/label.tsx";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog.tsx"
+import { Button } from "@/components/ui/button.tsx";
+import { Checkbox } from "@/components/ui/checkbox.tsx";
+import { Label } from "@/components/ui/label.tsx";
 import { Row } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
-import { Input } from "../../ui/input.tsx";
+import { Input } from "@/components/ui/input.tsx";
 import {useRenamePathTorrent, useSetLocationTorrent, useSetTorrent} from "@/hooks/useTorrentActions.ts";
 import { useEffect, useState } from "react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../ui/dropdown-menu.tsx";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu.tsx";
 import { IconChevronDown } from "@tabler/icons-react";
 import { torrentSchema } from "@/schemas/torrentSchema.ts";
 import {TorrentLabel} from "@/lib/utils/torrentLabel.ts";

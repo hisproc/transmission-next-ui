@@ -22,11 +22,11 @@ import {
     TabsTrigger,
 } from "@/components/ui/tabs.tsx"
 
-import { schema, torrentSchema } from "../../schemas/torrentSchema.ts"
+import { schema, torrentSchema } from "@/schemas/torrentSchema.ts"
 import { TorrentTable } from "./TorrentTable.tsx"
 import { DialogType, TransmissionSession } from "@/lib/api/types.ts"
 import { useTranslation } from "react-i18next"
-import { Input } from "../ui/input.tsx"
+import { Input } from "@/components/ui/input.tsx"
 import { DeleteDialog } from "@/components/forms/dialog/DeleteDialog.tsx"
 import { EditDialog } from "@/components/forms/dialog/EditDialog.tsx"
 import { AddDialog } from "@/components/forms/dialog/AddDialog.tsx";

@@ -6,12 +6,12 @@ import {
 } from "@tanstack/react-table"
 
 import { torrentSchema } from "@/schemas/torrentSchema.ts"
-import { Checkbox } from "../../ui/checkbox.tsx"
+import { Checkbox } from "@/components/ui/checkbox.tsx"
 import { TorrentDrawer } from "@/components/torrent/TorrentDrawer.tsx"
 import { filesize } from "filesize"
-import { Progress } from "../../ui/progress.tsx"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../ui/tooltip.tsx"
-import { Badge } from "../../ui/badge.tsx"
+import { Progress } from "@/components/ui/progress.tsx"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip.tsx"
+import { Badge } from "@/components/ui/badge.tsx"
 
 import dayjs, { formatEta } from "@/lib/utils/dayjs.ts"
 import { ActionButton } from "./ActionButton.tsx"

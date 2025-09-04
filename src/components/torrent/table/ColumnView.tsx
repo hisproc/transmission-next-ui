@@ -1,5 +1,5 @@
 import {DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger} from "@/components/ui/dropdown-menu.tsx";
-import { Button } from "../../ui/button.tsx";
+import { Button } from "@/components/ui/button.tsx";
 import {IconChevronDown, IconLayoutColumns } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 import {torrentSchema} from "@/schemas/torrentSchema.ts";

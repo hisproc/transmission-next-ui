@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button.tsx";
-import { Card, CardContent, CardFooter } from "../../ui/card.tsx";
+import { Card, CardContent, CardFooter } from "@/components/ui/card.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs.tsx";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs.tsx";
 import { useLocation } from "react-router-dom";
 import { getSession } from "@/lib/api/transmissionClient.ts";
 import { TransmissionSession } from "@/lib/api/types.ts";
 import { NumericInput } from "@/components/forms/settings/NumbericInput.tsx";
 import { usePortTest, useSetSession } from "@/hooks/useTorrentActions.ts";
-import { Switch } from "../../ui/switch.tsx";
+import { Switch } from "@/components/ui/switch.tsx";
 import { useTranslation } from "react-i18next";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../ui/select.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
 import { STORAGE_KEYS } from "@/constants/storage.ts";
 import { toast } from "sonner";
 
