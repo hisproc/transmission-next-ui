@@ -1,17 +1,18 @@
 import './App.css'
-import { AppSidebar } from "@/components/AppSidebar"
-import { TorrentManager } from "@/components/TorrentManager"
-import { SectionCards } from "@/components/SectionCards"
-import { SiteHeader } from "@/components/SiteHeader"
+import { AppSidebar } from "@/components/layout/AppSidebar.tsx"
+import { TorrentManager } from "@/components/torrent/TorrentManager.tsx"
+import { SectionCards } from "@/components/stats/SectionCards.tsx"
+import { SiteHeader } from "@/components/layout/SiteHeader.tsx"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { Routes, Route } from 'react-router-dom';
 
-import { allTorrentFields, getFreeSpace, getSession, getSessionStats, getTorrents } from './lib/transmissionClient'
+import { allTorrentFields, getFreeSpace, getSession, getSessionStats, getTorrents } from './lib/api/transmissionClient.ts'
 import { Toaster } from '@/components/ui/sonner'
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
-import { SessionSetting } from './components/settings/SessionSetting'
-import About from './components/About'
-import { ThemeProvider } from './components/ThemeProvider.tsx'
+import { SessionSetting } from '@/components/forms/settings/SessionSetting'
+import About from './components/shared/About.tsx'
+import { ThemeProvider } from './components/layout/ThemeProvider.tsx'
+import { schema } from './schemas/torrentSchema.ts'
 
 const client = new QueryClient()
 function Main() {
@@ -20,7 +21,7 @@ function Main() {
         queryKey: ['torrent'],
         queryFn: () => getTorrents({ fields: allTorrentFields }),
         refetchInterval: 5000,
-        select: (data) => data.torrents
+        select: (data) => data.torrents.map((torrent: any) => schema.parse(torrent))
     })
 
     const { data: sessionStats } = useQuery({

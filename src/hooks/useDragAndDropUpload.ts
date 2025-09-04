@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { DialogType } from "@/lib/types";
-import { RowAction } from "@/lib/rowAction";
+import { DialogType } from "@/lib/api/types.ts";
+import { RowAction } from "@/lib/utils/rowAction.ts";
 
 interface UseDragAndDropUploadProps {
     setFile: (file: File) => void;

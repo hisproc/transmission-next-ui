@@ -1,6 +1,6 @@
-import { getColumns } from "@/components/table/TorrentColumns.tsx";
+import { getColumns } from "@/components/torrent/table/TorrentColumns.tsx";
 import { STORAGE_KEYS } from "@/constants/storage";
-import { RowAction } from "@/lib/rowAction";
+import { RowAction } from "@/lib/utils/rowAction.ts";
 import { torrentSchema } from "@/schemas/torrentSchema";
 import { ColumnFiltersState, getCoreRowModel, getFacetedRowModel, getFacetedUniqueValues, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
 import React, { useMemo, useState } from "react";
