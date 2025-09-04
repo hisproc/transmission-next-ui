@@ -8,13 +8,13 @@ import {
     setSession,
     portTest,
     setTorrent
-} from "@/lib/transmissionClient";
-import {PortTestOptions, TransmissionSession} from "@/lib/types";
-import { fileToBase64 } from "@/lib/utils";
+} from "@/lib/api/transmissionClient.ts";
+import {PortTestOptions, TransmissionSession} from "@/lib/api/types.ts";
+import { fileToBase64 } from "@/lib/utils/utils.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import {TorrentLabel} from "@/lib/torrentLabel.ts";
+import {TorrentLabel} from "@/lib/utils/torrentLabel.ts";
 
 
 export function useAddTorrent() {
