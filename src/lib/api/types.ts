@@ -17,6 +17,7 @@ export enum DialogType {
     Edit = "edit",
     Delete = "delete",
     Add = "add",
+    ReplaceTracker = "replaceTracker",
 }
 
 export interface PortTestOptions {

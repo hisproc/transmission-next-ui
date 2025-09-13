@@ -172,5 +172,16 @@
     "Used Space": "Used Space",
     "ActiveTorrents": "Active",
     "Expand All": "Expand All",
-    "Collapse All": "Collapse All"
+    "Collapse All": "Collapse All",
+    "Replace Tracker": "Batch Replace Tracker",
+    "Search Tracker": "Search Tracker",
+    "Enter tracker URL to search": "Enter tracker URL to search",
+    "Matched Torrents": "Matched Torrents",
+    "No torrents found with this tracker": "No torrents found with this tracker",
+    "New Tracker": "New Tracker",
+    "Enter the new tracker URL": "Enter the new tracker URL",
+    "Replace {{count}} Torrents": "Replace {{count}} Torrents",
+    "Enter the tracker URL to search and replace across torrents": "Enter the tracker URL to search and replace across torrents",
+    "常用工具": "Common Tools",
+    "Torrent set successfully": "Torrent set successfully"
 }
