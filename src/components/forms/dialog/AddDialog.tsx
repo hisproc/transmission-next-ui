@@ -7,21 +7,15 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { IconChevronDown, IconClipboardCheck } from "@tabler/icons-react";
-import { Label } from "recharts";
+import { IconClipboardCheck } from "@tabler/icons-react";
 import { Input } from "@/components/ui/input.tsx";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu.tsx";
 import { FileUpload } from "@/components/shared/FileUpload.tsx";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip.tsx";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAddTorrent } from "@/hooks/useTorrentActions.ts";
+import { InputWithDropdown } from "@/components/ui/input-with-dropdown";
 
 export function AddDialog({ open, onOpenChange, file, setFile, directories }: { open: boolean, onOpenChange: (open: boolean) => void, file: File | null, setFile: (file: File | null) => void, directories: string[] }) {
 
@@ -51,33 +45,14 @@ export function AddDialog({ open, onOpenChange, file, setFile, directories }: { 
                 </DialogDescription>
                 <div className="grid gap-4 py-4">
                     <div className="space-y-2">
-                        <Label>{t("Save Directory")}</Label>
-                        <div className="relative">
-                            <Input
+                        <div className="space-y-2">
+                            <InputWithDropdown
                                 id="directory"
                                 value={directory}
-                                onChange={(e) => setDirectory(e.target.value)}
+                                onChange={setDirectory}
+                                options={directories}
                                 placeholder={t("Enter or select a directory")}
-                                className="pr-10"
                             />
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        className="absolute right-0 top-1/2 -translate-y-1/2"
-                                        size="icon"
-                                    >
-                                        <IconChevronDown />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-full">
-                                    {directories.map((dir) => (
-                                        <DropdownMenuItem key={dir} onClick={() => setDirectory(dir)}>
-                                            {dir}
-                                        </DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
                         </div>
                     </div>
                     <div className="max-w-full overflow-hidden truncate">

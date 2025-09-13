@@ -36,6 +36,7 @@ export interface DeleteTorrentOptions {
 export interface SetTorrentOptions {
     ids: number[];
     labels?: string[];
+    trackerList?: string;
 }
 
 export interface StopTorrentOptions {

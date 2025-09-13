@@ -93,7 +93,7 @@ export function useStartTorrent() {
     });
 }
 
-export function useSetTorrent() {
+export function useSetTorrentLabel() {
     const queryClient = useQueryClient();
     const { t } = useTranslation();
     return useMutation({
@@ -117,6 +117,32 @@ export function useSetTorrent() {
         }
     });
 }
+
+export function useSetTorrentTracker() {
+    const queryClient = useQueryClient();
+    const { t } = useTranslation();
+    return useMutation({
+        mutationFn: async ({ ids, trackerList }: { ids: number[]; trackerList: string[] }) => {
+            await setTorrent({
+                ids: ids,
+                trackerList: trackerList.join('\n')
+            });
+        },
+        onSuccess: () => {
+            toast.success(t("Torrent set successfully"), {
+                "position": "top-right",
+            });
+            setTimeout(() => { queryClient.refetchQueries({ queryKey: ["torrent"] }); }, 1000);
+        },
+        onError: (error) => {
+            console.error("Error setting torrent tracker:", error);
+            toast.error(t("Failed to set torrent tracker"), {
+                "position": "top-right"
+            });
+        }
+    });
+}
+
 
 export function useStopTorrent() {
     const queryClient = useQueryClient();
