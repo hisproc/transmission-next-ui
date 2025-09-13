@@ -84,11 +84,11 @@ export function TorrentManager({
     const [rowAction, setRowAction] = useState<RowAction | null>(null)
     const { isDragging } = useDragAndDropUpload({ setFile, setRowAction })
     const downloadDirs = Array.from(new Set([...initialData.map((item) => item.downloadDir), session["download-dir"] || ""]))
-    const trackers = Array.from(new Set(initialData.flatMap((item) => item.trackerStats.map((tracker) => ({
-        label: tracker.host,
-        announce: tracker.announce,
-        value: tracker.host
-    })))));
+    const trackers = Array.from(new Set(initialData.flatMap((item) => item.trackerStats.map((tracker) => tracker.host)))).map((tracker) => ({
+        label: tracker,
+        value: tracker
+    }))
+    const announces = Array.from(new Set(initialData.flatMap((item) => item.trackerStats.map((tracker) => tracker.announce))));
     const labelMap = new Map<string, TorrentLabel>();
     initialData.forEach(item => {
         item.labels.forEach(rawLabel => {
@@ -212,7 +212,7 @@ export function TorrentManager({
                 open={rowAction?.dialogType === DialogType.ReplaceTracker}
                 onOpenChange={(open) => !open && setRowAction(null)}
                 targetRows={table.getRowModel().rows || []}
-                trackers={trackers.map(t => t.announce)}
+                trackers={announces}
             />
             {
                 isDragging && rowAction?.dialogType !== DialogType.Add && (
