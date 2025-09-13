@@ -7,8 +7,8 @@ import { Column } from "@tanstack/react-table";
 import { torrentSchema } from "@/schemas/torrentSchema.ts";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command.tsx";
 import React from "react";
-import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {useTranslation} from "react-i18next";
+import { Checkbox } from "@/components/ui/checkbox.tsx";
+import { useTranslation } from "react-i18next";
 
 interface ColumnFilterProps {
     title: string;
@@ -16,9 +16,9 @@ interface ColumnFilterProps {
     options: { value: string; label: string }[];
 }
 
-export function ColumnFilter({title, column, options}: ColumnFilterProps) {
+export function ColumnFilter({ title, column, options }: ColumnFilterProps) {
 
-    const {t} = useTranslation();
+    const { t } = useTranslation();
     const columnFilterValue = column?.getFilterValue();
     const selectedValues = new Set(
         Array.isArray(columnFilterValue) ? columnFilterValue : [],
@@ -105,22 +105,26 @@ export function ColumnFilter({title, column, options}: ColumnFilterProps) {
             </PopoverTrigger>
             <PopoverContent className="w-auto max-w-64 p-0" align="start">
                 <Command>
-                    <CommandList className="max-h-full">
+                    <CommandList>
                         <CommandEmpty>No results found.</CommandEmpty>
-                        <CommandGroup className="max-h-[18.75rem] overflow-y-auto overflow-x-hidden">
-                            {options.map((option) => {
-                                const isSelected = selectedValues.has(option.value);
-                                return (
-                                    <CommandItem
-                                        key={option.value}
-                                        onSelect={() => onItemSelect(option, isSelected)}
-                                    >
-                                        <Checkbox checked={isSelected} />
-                                        <span className="truncate">{option.label}</span>
-                                    </CommandItem>
-                                );
-                            })}
-                        </CommandGroup>
+                        {
+                            options.length > 0 && (
+                                <CommandGroup>
+                                    {options.map((option) => {
+                                        const isSelected = selectedValues.has(option.value);
+                                        return (
+                                            <CommandItem
+                                                key={option.value}
+                                                onSelect={() => onItemSelect(option, isSelected)}
+                                            >
+                                                <Checkbox checked={isSelected} />
+                                                <span className="truncate">{option.label}</span>
+                                            </CommandItem>
+                                        );
+                                    })}
+                                </CommandGroup>
+                            )
+                        }
                         {selectedValues.size > 0 && (
                             <>
                                 <CommandSeparator />
