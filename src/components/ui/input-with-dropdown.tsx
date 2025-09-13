@@ -36,18 +36,32 @@ export function InputWithDropdown({
             />
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button
-                        variant="ghost"
-                        className="absolute right-0 top-1/2 -translate-y-1/2"
-                        size="icon"
-                        type="button"
-                    >
-                        <IconChevronDown />
-                    </Button>
+                    <div className="absolute inset-0 pointer-events-none">
+                        <Button
+                            variant="ghost"
+                            className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-auto"
+                            size="icon"
+                            type="button"
+                        >
+                            <IconChevronDown />
+                        </Button>
+                    </div>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-full min-w-[200px]">
+                <DropdownMenuContent 
+                    align="start" 
+                    side="bottom"
+                    className="max-h-60 overflow-y-auto"
+                    style={{ 
+                        width: 'var(--radix-dropdown-menu-trigger-width)',
+                        minWidth: 'var(--radix-dropdown-menu-trigger-width)'
+                    }}
+                >
                     {options.map((option) => (
-                        <DropdownMenuItem key={option} onClick={() => onChange(option)}>
+                        <DropdownMenuItem 
+                            key={option} 
+                            onClick={() => onChange(option)}
+                            className="break-all whitespace-normal !flex-col !items-start"
+                        >
                             {option}
                         </DropdownMenuItem>
                     ))}
