@@ -15,7 +15,6 @@ export function ColumnView({ columns }: { columns: Column<torrentSchema>[] }) {
                 <Button variant="outline" size="sm">
                     <IconLayoutColumns />
                     <span className="hidden lg:inline">{t("Customize Columns")}</span>
-                    <span className="lg:hidden">{t("Columns")}</span>
                     <IconChevronDown />
                 </Button>
             </DropdownMenuTrigger>
