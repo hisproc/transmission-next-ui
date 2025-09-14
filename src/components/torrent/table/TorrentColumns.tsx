@@ -115,7 +115,7 @@ export function getColumns({ t, setRowAction }: getColumnsProps): ColumnDef<torr
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Badge variant="outline" className="min-w-[120px] justify-start text-muted-foreground px-1.5">
+                            <Badge variant="outline" className="min-w-[120px] justify-start text-muted-foreground px-1.5 text-sm">
                                 <TorrentStatus error={row.original.error} status={row.original.status} />
                             </Badge>
                         </TooltipTrigger>

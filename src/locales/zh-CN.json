@@ -181,5 +181,9 @@
     "Replace {{count}} Torrents": "替换 {{count}} 个种子",
     "Enter the tracker URL to search and replace across torrents": "输入要搜索和替换的 Tracker 地址",
     "常用工具": "常用工具",
-    "Torrent set successfully": "种子数据更新成功"
+    "Torrent set successfully": "种子数据更新成功",
+    "Copy": "复制",
+    "Copied": "已复制",
+    "Copied to clipboard": "已复制到剪贴板",
+    "Failed to copy": "复制失败"
 }
