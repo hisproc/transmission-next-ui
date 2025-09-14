@@ -23,6 +23,7 @@ English | [简体中文](README.md)
 - [x] Dark Mode Support
 - [x] Tracker Filter
 - [x] Torrent Label Support
+- [x] Batch Replace Trackers
 
 ⚠️**Notice**: This is an early version of the project. It has not been fully tested yet. Please verify its functionality before using it in production.
 

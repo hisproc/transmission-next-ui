@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label.tsx";
 import { Row } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input.tsx";
-import {useRenamePathTorrent, useSetLocationTorrent, useSetTorrent} from "@/hooks/useTorrentActions.ts";
+import {useRenamePathTorrent, useSetLocationTorrent, useSetTorrentLabel} from "@/hooks/useTorrentActions.ts";
 import { useEffect, useState } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu.tsx";
 import { IconChevronDown } from "@tabler/icons-react";
@@ -18,7 +18,7 @@ export function EditDialog({ open, onOpenChange, targetRows, directories }: { op
 
     const renamePathTorrent = useRenamePathTorrent();
     const setLocationTorrent = useSetLocationTorrent();
-    const setTorrent = useSetTorrent();
+    const setTorrent = useSetTorrentLabel();
     const row = targetRows?.[0];
     const [oldPathname, oldLocation, oldLabels] = [row?.original.name, row?.original.downloadDir, row?.getValue("Labels") || []]
     const [location, setLocation] = useState(row?.original.downloadDir)

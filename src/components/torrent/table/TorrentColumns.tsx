@@ -112,20 +112,12 @@ export function getColumns({ t, setRowAction }: getColumnsProps): ColumnDef<torr
             accessorKey: "status",
             header: ({ column }) => <SortableHeader column={column} title={t("Status")} />,
             cell: ({ row }) => (
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Badge variant="outline" className="min-w-[120px] justify-start text-muted-foreground px-1.5">
-                                <TorrentStatus error={row.original.error} status={row.original.status} />
-                            </Badge>
-                        </TooltipTrigger>
-                        {row.original.error !== 0 && (
-                            <TooltipContent side="top" align="center" sideOffset={5}>
-                                <p>{row.original.errorString}</p>
-                            </TooltipContent>
-                        )}
-                    </Tooltip>
-                </TooltipProvider>
+                <TorrentStatus 
+                    error={row.original.error} 
+                    status={row.original.status}
+                    trackerStats={row.original.trackerStats}
+                    errorString={row.original.errorString}
+                />
             ),
             filterFn: 'equals',
         },

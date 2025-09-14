@@ -2,12 +2,16 @@ import { useState, useMemo } from "react"
 
 import {
     IconPlus,
+    IconRefresh,
+    IconTool,
+    IconChevronDown,
 } from "@tabler/icons-react"
 import { z } from "zod"
 
 import { Badge } from "@/components/ui/badge.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import { Label } from "@/components/ui/label.tsx"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu.tsx"
 import {
     Select,
     SelectContent,
@@ -34,9 +38,10 @@ import { ColumnFilter } from "@/components/torrent/table/ColumnFilter.tsx"
 import { useDragAndDropUpload } from "@/hooks/useDragAndDropUpload.ts"
 import { useTorrentTable } from "@/hooks/useTorrentTable.ts"
 import { RowAction } from "@/lib/utils/rowAction.ts"
-import {ColumnView} from "@/components/torrent/table/ColumnView.tsx";
-import {TorrentLabel} from "@/lib/utils/torrentLabel.ts";
-import {parseLabel} from "@/lib/utils/utils.ts";
+import { ColumnView } from "@/components/torrent/table/ColumnView.tsx";
+import { TorrentLabel } from "@/lib/utils/torrentLabel.ts";
+import { parseLabel } from "@/lib/utils/utils.ts";
+import { ReplaceTrackerDialog } from "../forms/dialog/ReplaceTrackerDialog.tsx"
 
 const statusTabs = [
     { value: "all", label: "All", filter: [] },
@@ -83,6 +88,7 @@ export function TorrentManager({
         label: tracker,
         value: tracker
     }))
+    const announces = Array.from(new Set(initialData.flatMap((item) => item.trackerStats.map((tracker) => tracker.announce))));
     const labelMap = new Map<string, TorrentLabel>();
     initialData.forEach(item => {
         item.labels.forEach(rawLabel => {
@@ -162,6 +168,24 @@ export function TorrentManager({
                         <IconPlus />
                         <span className="hidden lg:inline">{t("Add Torrent")}</span>
                     </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm">
+                                <IconTool />
+                                <span className="hidden lg:inline">{t("Common Tools")}</span>
+                                <IconChevronDown className="ml-1 h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => setRowAction({
+                                dialogType: DialogType.ReplaceTracker,
+                                targetRows: table.getRowModel().rows
+                            })}>
+                                <IconRefresh className="mr-2 h-4 w-4" />
+                                {t("Replace Tracker")}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </div>
             <div className="flex flex-wrap items-center w-full gap-2 px-4 lg:px-6">
@@ -181,9 +205,15 @@ export function TorrentManager({
             <TabsContent value={tabValue} className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
                 <TorrentTable table={table} setRowAction={setRowAction} />
             </TabsContent>
-             <DeleteDialog open={rowAction?.dialogType === DialogType.Delete} onOpenChange={(open) => !open && setRowAction(null)} targetRows={rowAction?.targetRows || []} />
+            <DeleteDialog open={rowAction?.dialogType === DialogType.Delete} onOpenChange={(open) => !open && setRowAction(null)} targetRows={rowAction?.targetRows || []} />
             <EditDialog open={rowAction?.dialogType === DialogType.Edit} onOpenChange={(open) => !open && setRowAction(null)} targetRows={rowAction?.targetRows || []} directories={downloadDirs} />
             <AddDialog open={rowAction?.dialogType === DialogType.Add} onOpenChange={(open) => !open && setRowAction(null)} file={file} setFile={setFile} directories={downloadDirs} />
+            <ReplaceTrackerDialog
+                open={rowAction?.dialogType === DialogType.ReplaceTracker}
+                onOpenChange={(open) => !open && setRowAction(null)}
+                targetRows={table.getRowModel().rows || []}
+                trackers={announces}
+            />
             {
                 isDragging && rowAction?.dialogType !== DialogType.Add && (
                     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center text-white text-xl font-semibold pointer-events-none">

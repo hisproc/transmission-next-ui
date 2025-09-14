@@ -17,6 +17,7 @@ export enum DialogType {
     Edit = "edit",
     Delete = "delete",
     Add = "add",
+    ReplaceTracker = "replaceTracker",
 }
 
 export interface PortTestOptions {
@@ -36,6 +37,7 @@ export interface DeleteTorrentOptions {
 export interface SetTorrentOptions {
     ids: number[];
     labels?: string[];
+    trackerList?: string;
 }
 
 export interface StopTorrentOptions {
