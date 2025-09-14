@@ -23,6 +23,8 @@ export const schema = z.object({
         announce: z.string(),
         seederCount: z.number(),
         leecherCount: z.number(),
+        lastAnnounceSucceeded: z.boolean(),
+        lastAnnounceResult: z.string()
     })),
 })
 

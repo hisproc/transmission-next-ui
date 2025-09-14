@@ -182,10 +182,12 @@
     "Enter the new tracker URL": "Enter the new tracker URL",
     "Replace {{count}} Torrents": "Replace {{count}} Torrents",
     "Enter the tracker URL to search and replace across torrents": "Enter the tracker URL to search and replace across torrents",
-    "常用工具": "Common Tools",
+    "Common Tools": "Common Tools",
     "Torrent set successfully": "Torrent set successfully",
     "Copy": "Copy",
     "Copied": "Copied",
     "Copied to clipboard": "Copied to clipboard",
-    "Failed to copy": "Failed to copy"
+    "Failed to copy": "Failed to copy",
+    "Warning": "Warning",
+    "Queued" : "Queued"
 }
