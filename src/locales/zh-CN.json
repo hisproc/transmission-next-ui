@@ -170,5 +170,22 @@
     "Used Space": "已用空间",
     "ActiveTorrents": "活跃",
     "Expand All": "展开所有",
-    "Collapse All": "折叠所有"
+    "Collapse All": "折叠所有",
+    "Replace Tracker": "批量替换 Tracker",
+    "Search Tracker": "搜索 Tracker",
+    "Enter tracker URL to search": "输入要搜索的 Tracker 地址",
+    "Matched Torrents": "匹配的种子",
+    "No torrents found with this tracker": "未找到包含此 Tracker 的种子",
+    "New Tracker": "新 Tracker",
+    "Enter the new tracker URL": "输入新的 Tracker 地址",
+    "Replace {{count}} Torrents": "替换 {{count}} 个种子",
+    "Enter the tracker URL to search and replace across torrents": "输入要搜索和替换的 Tracker 地址",
+    "Common Tools": "常用工具",
+    "Torrent set successfully": "种子数据更新成功",
+    "Copy": "复制",
+    "Copied": "已复制",
+    "Copied to clipboard": "已复制到剪贴板",
+    "Failed to copy": "复制失败",
+    "Warning": "警告",
+    "Queued": "队列中"
 }

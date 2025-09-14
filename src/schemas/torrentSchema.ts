@@ -20,8 +20,11 @@ export const schema = z.object({
     labels: z.array(z.string()).default([]),
     trackerStats: z.array(z.object({
         host: z.string(),
+        announce: z.string(),
         seederCount: z.number(),
         leecherCount: z.number(),
+        lastAnnounceSucceeded: z.boolean(),
+        lastAnnounceResult: z.string()
     })),
 })
 
