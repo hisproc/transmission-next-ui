@@ -101,7 +101,8 @@ export function ReplaceTrackerDialog({
                                     <div className="space-y-1">
                                         {matchedTorrents.map((row, index) => (
                                             <div key={row.original.id} className="text-sm">
-                                                <span className="font-medium">{index + 1}.</span> {row.original.name}
+                                                <span className="font-medium">{index + 1}.</span>
+                                                <span className="break-all">{row.original.name}</span>
                                             </div>
                                         ))}
                                     </div>
