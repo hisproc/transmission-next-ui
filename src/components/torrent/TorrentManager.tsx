@@ -172,7 +172,7 @@ export function TorrentManager({
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm">
                                 <IconTool />
-                                <span className="hidden lg:inline">{t("常用工具")}</span>
+                                <span className="hidden lg:inline">{t("Common Tools")}</span>
                                 <IconChevronDown className="ml-1 h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
