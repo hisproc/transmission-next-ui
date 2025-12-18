@@ -13,6 +13,7 @@ import { filesize } from "filesize"
 import { cn } from "@/lib/utils/utils.ts"
 import { useQuery } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
+import { CopyButton } from "@/components/shared/CopyButton.tsx"
 
 function ButtonSquare({ active = false }: { active?: boolean }) {
     return (
@@ -162,7 +163,13 @@ export function TorrentDrawer({ item }: { item: torrentSchema }) {
                                     <Card key={tracker.id}>
                                         <CardHeader>
                                             <CardTitle className="text-base font-semibold break-all">{tracker.host}</CardTitle>
-                                            <CardDescription className="text-sm text-muted-foreground break-all">{tracker.announce}</CardDescription>
+                                            <CardDescription className="text-sm text-muted-foreground break-all flex items-center gap-2">
+                                                <span className="flex-1">{tracker.announce}</span>
+                                                <CopyButton 
+                                                    text={tracker.announce}
+                                                    id={tracker.id.toString()}
+                                                />
+                                            </CardDescription>
                                         </CardHeader>
                                         <CardContent className="space-y-2 text-sm text-muted-foreground">
                                             <div className="flex justify-between">

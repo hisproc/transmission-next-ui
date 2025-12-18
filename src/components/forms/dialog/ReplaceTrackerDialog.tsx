@@ -28,7 +28,7 @@ export function ReplaceTrackerDialog({
 
     const allTrackers = Array.from(new Set(
         targetRows.flatMap(row =>
-            row.original.trackerStats.map(tracker => tracker.host)
+            row.original.trackerStats.map(tracker => tracker.announce)
         )
     ));
 
@@ -37,7 +37,7 @@ export function ReplaceTrackerDialog({
 
         return targetRows.filter(row =>
             row.original.trackerStats.some(tracker =>
-                tracker.host.toLowerCase() === oldTracker.toLowerCase()
+                tracker.announce.toLowerCase() === oldTracker.toLowerCase()
             )
         );
     }, [oldTracker, targetRows]);
@@ -53,7 +53,7 @@ export function ReplaceTrackerDialog({
         if (!oldTracker || !newTracker || matchedTorrents.length === 0) return;
 
         matchedTorrents.forEach(row => {
-            const currentTrackers = row.original.trackerStats.map(tracker => tracker.host);
+            const currentTrackers = row.original.trackerStats.map(tracker => tracker.announce);
             const updatedTrackers = currentTrackers.map(tracker =>
                 tracker.toLowerCase() === oldTracker.toLowerCase() ? newTracker : tracker
             );
@@ -88,7 +88,6 @@ export function ReplaceTrackerDialog({
                         />
                     </div>
 
-                    {/* 预览匹配的 torrents */}
                     {oldTracker.trim() && (
                         <div className="space-y-2">
                             <Label>
@@ -102,7 +101,8 @@ export function ReplaceTrackerDialog({
                                     <div className="space-y-1">
                                         {matchedTorrents.map((row, index) => (
                                             <div key={row.original.id} className="text-sm">
-                                                <span className="font-medium">{index + 1}.</span> {row.original.name}
+                                                <span className="font-medium">{index + 1}.</span>
+                                                <span className="break-all">{row.original.name}</span>
                                             </div>
                                         ))}
                                     </div>

@@ -88,6 +88,7 @@ export function TorrentManager({
         label: tracker,
         value: tracker
     }))
+    const announces = Array.from(new Set(initialData.flatMap((item) => item.trackerStats.map((tracker) => tracker.announce))));
     const labelMap = new Map<string, TorrentLabel>();
     initialData.forEach(item => {
         item.labels.forEach(rawLabel => {
@@ -171,7 +172,7 @@ export function TorrentManager({
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm">
                                 <IconTool />
-                                <span className="hidden lg:inline">{t("常用工具")}</span>
+                                <span className="hidden lg:inline">{t("Common Tools")}</span>
                                 <IconChevronDown className="ml-1 h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
@@ -211,7 +212,7 @@ export function TorrentManager({
                 open={rowAction?.dialogType === DialogType.ReplaceTracker}
                 onOpenChange={(open) => !open && setRowAction(null)}
                 targetRows={table.getRowModel().rows || []}
-                trackers={trackers.map(t => t.value)}
+                trackers={announces}
             />
             {
                 isDragging && rowAction?.dialogType !== DialogType.Add && (
