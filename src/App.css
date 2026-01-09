@@ -1,7 +1,7 @@
 #root {
   margin: 0 auto;
   text-align: left;
-  font-family: 'MapleMono-NF-CN-Regular', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  font-family: var(--app-font-family, 'MapleMono-NF-CN-Regular', 'Microsoft YaHei', 'PingFang SC', sans-serif);
 }
 
 body {

@@ -5,7 +5,7 @@ import { SectionCards } from "@/components/stats/SectionCards.tsx"
 import { SiteHeader } from "@/components/layout/SiteHeader.tsx"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { Routes, Route } from 'react-router-dom';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { allTorrentFields, getFreeSpace, getSession, getSessionStats, getTorrents } from './lib/api/transmissionClient.ts'
 import { Toaster } from '@/components/ui/sonner'
@@ -22,6 +22,14 @@ function Main() {
         const saved = localStorage.getItem(STORAGE_KEYS.REFETCH_INTERVAL);
         return saved ? JSON.parse(saved) : 5000;
     });
+
+    // Initialize font settings
+    useEffect(() => {
+        const savedFont = localStorage.getItem(STORAGE_KEYS.UI_FONT_FAMILY);
+        if (savedFont) {
+            document.documentElement.style.setProperty('--app-font-family', savedFont);
+        }
+    }, []);
 
     const { data: torrentData } = useQuery({
         queryKey: ['torrent'],

@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
 import { Checkbox } from "@/components/ui/checkbox.tsx";
 import { STORAGE_KEYS } from "@/constants/storage.ts";
+import { isFontAvailable } from "@/lib/utils/utils.ts";
 import { toast } from "sonner";
 
 export function SessionSetting() {
@@ -44,6 +45,22 @@ export function SessionSetting() {
     const [idleSeedingLimit, setIdleSeedingLimit] = useState(0);
     const [idleSeedingLimitEnabled, setIdleSeedingLimitEnabled] = useState(false);
     const [clientNetworkSpeedSummary, setClientNetworkSpeedSummary] = useState(localStorage.getItem(STORAGE_KEYS.CLIENT_NETWORK_SPEED_SUMMARY) === "true");
+    const CUSTOM_FONT_VALUE = "__custom__";
+
+    const [uiFontFamily, setUiFontFamily] = useState<string>(() => {
+        const saved = localStorage.getItem(STORAGE_KEYS.UI_FONT_FAMILY) || "";
+        if (saved) {
+            return CUSTOM_FONT_VALUE;
+        }
+        return "";
+    });
+    const [customFont, setCustomFont] = useState<string>(() => {
+        const saved = localStorage.getItem(STORAGE_KEYS.UI_FONT_FAMILY) || "";
+        if (saved) {
+            return saved;
+        }
+        return "";
+    });
     const [altSpeedDown, setAltSpeedDown] = useState(0);
     const [altSpeedUp, setAltSpeedUp] = useState(0);
     const [altSpeedEnabled, setAltSpeedEnabled] = useState(false);
@@ -626,15 +643,100 @@ export function SessionSetting() {
                                     onCheckedChange={(checked) => setClientNetworkSpeedSummary(!!checked)}
                                 />
                             </div>
-                            < hr />
+                            <div className="flex items-center space-x-4 xl:w-1/2">
+                                <Label htmlFor="ui-font-family" className="whitespace-nowrap w-66">
+                                    {t("UI Font")}
+                                </Label>
+                                <Select
+                                    value={uiFontFamily || "default"}
+                                    onValueChange={(value) => {
+                                        if (value === "default") {
+                                            setUiFontFamily("");
+                                        } else if (value === CUSTOM_FONT_VALUE) {
+                                            setUiFontFamily(CUSTOM_FONT_VALUE);
+                                        } else {
+                                            setUiFontFamily(value);
+                                        }
+                                    }}
+                                >
+                                    <SelectTrigger id="ui-font-family" className="w-[260px]">
+                                        <SelectValue placeholder={t("Select UI Font")} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="default">default</SelectItem>
+                                        <SelectItem value={CUSTOM_FONT_VALUE}>
+                                            {customFont ? `Custom: ${customFont}` : t("Custom Font Family")}
+                                        </SelectItem>
+                                        <div
+                                            className="px-2 py-2 border-t border-border"
+                                            onPointerDown={(event) => {
+                                                event.preventDefault();
+                                            }}
+                                        >
+                                            <Label htmlFor="ui-font-custom" className="text-xs font-medium text-muted-foreground">
+                                                {t("Custom Font Family")}
+                                            </Label>
+                                            <Input
+                                                id="ui-font-custom"
+                                                className="mt-2 h-8"
+                                                placeholder="e.g. MiSans, system-ui, sans-serif"
+                                                value={customFont}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    setCustomFont(value);
+                                                }}
+                                                onKeyDown={(event) => {
+                                                    event.stopPropagation();
+                                                }}
+                                                onPointerDown={(event) => {
+                                                    event.stopPropagation();
+                                                }}
+                                            />
+                                        </div>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <hr />
                         </CardContent>
                         <CardFooter>
                             <Button onClick={
                                 () => {
                                     localStorage.setItem(STORAGE_KEYS.CLIENT_NETWORK_SPEED_SUMMARY, clientNetworkSpeedSummary ? "true" : "false");
-                                    toast.success(t("UI Settings updated"), {
-                                        "position": "top-right"
-                                    });
+
+                                    let finalFont = "";
+                                    let usedCustomFallback = false;
+
+                                    const trimmedCustom = customFont.trim();
+
+                                    if (uiFontFamily === CUSTOM_FONT_VALUE && trimmedCustom) {
+                                        const primaryName = trimmedCustom.split(",")[0].trim().replace(/^['"]|['"]$/g, "");
+                                        if (primaryName && isFontAvailable(primaryName)) {
+                                            finalFont = `'${primaryName}'`;
+                                        } else {
+                                            finalFont = "";
+                                            usedCustomFallback = true;
+                                        }
+                                    } else if (uiFontFamily && uiFontFamily !== CUSTOM_FONT_VALUE) {
+                                        finalFont = uiFontFamily;
+                                    }
+
+                                    if (finalFont) {
+                                        localStorage.setItem(STORAGE_KEYS.UI_FONT_FAMILY, finalFont);
+                                        document.documentElement.style.setProperty("--app-font-family", finalFont);
+                                    } else {
+                                        localStorage.removeItem(STORAGE_KEYS.UI_FONT_FAMILY);
+                                        document.documentElement.style.removeProperty("--app-font-family");
+                                    }
+
+                                    if (usedCustomFallback) {
+                                        toast.error(t("Custom font not available, fallback to default"), {
+                                            position: "top-right",
+                                        });
+                                    } else {
+                                        toast.success(t("UI Settings updated"), {
+                                            position: "top-right",
+                                        });
+                                    }
                                 }
                             }>{t("Save changes")}</Button>
                         </CardFooter>
