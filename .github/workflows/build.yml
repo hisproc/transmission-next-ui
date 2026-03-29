@@ -13,21 +13,26 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
           node-version: '23.11.0'
-          cache: 'npm'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v5
+        with:
+          version: 10
 
       - name: Install Dependencies
-        run: npm install
+        run: pnpm install
 
       - name: Build Project
         env:
           VITE_APP_VERSION: ${{ github.ref_name }}
-        run: npm run build
+        run: pnpm build
 
       - name: Zip release folder
         run: cd dist && zip -r ../release.zip .

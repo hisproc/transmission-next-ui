@@ -9,15 +9,30 @@
 
 ---
 
+## 技术栈
+
+- **前端框架**: [React 19](https://react.dev/) + [Vite 7](https://vite.dev/)
+- **CSS 框架**: [Tailwind CSS 4.0](https://tailwindcss.com/)
+- **组件库**: [shadcn/ui](https://ui.shadcn.com/)
+- **图标库**: [Lucide React](https://lucide.dev/)
+- **路由管理**: [React Router 7](https://reactrouter.com/)
+
+---
+
 简体中文 | [English](README_EN.md)
 
 
 ## 预览
 
-![demo.png](pic/demo.png)
-![demo_dark.png](pic/demo_dark.png)
-![demo2.png](pic/demo2.png)
-![demo3.png](pic/demo3.png)
+[**在线演示 (Live Demo)**](https://transmission-next-ui-demo.pages.dev)
+
+| Light Mode | Dark Mode |
+| :---: | :---: |
+| ![dashboard_light.png](pic/dashboard_light.png) | ![dashboard_dark.png](pic/dashboard_dark.png) |
+
+| Torrent Details | Settings |
+| :---: | :---: |
+| ![torrent_details.png](pic/torrent_details.png) | ![settings.png](pic/settings.png) |
 
 ## 功能
 
@@ -80,8 +95,8 @@ docker-compose down    # 停止并移除容器
 ```bash
 git clone git@github.com:hisproc/transmission-next-ui.git
 cd transmission-next-ui
-npm install
-npm run build
+pnpm install
+pnpm build
 ```
 
 构建完成后，将 `dist/` 目录下的所有内容复制到 Transmission 的 Web 目录下即可。

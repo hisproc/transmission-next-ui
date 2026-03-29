@@ -1,22 +1,35 @@
 <h1 align="center" style="border-bottom: none;"><img src="public/favicon.svg" width="24" style="vertical-align: middle; margin-right: 8px;" /> Transmission Next UI</h1>
 <h3 align="center"> A third-party modern web-based frontend for Transmission, offering a sleek and responsive UI for managing your torrents with ease, built using shadcn/ui and Vite. </h3>
 
+## Tech Stack
+
+- **Framework**: [React 19](https://react.dev/) + [Vite 7](https://vite.dev/)
+- **Styling**: [Tailwind CSS 4.0](https://tailwindcss.com/)
+- **Components**: [shadcn/ui](https://ui.shadcn.com/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Routing**: [React Router 7](https://reactrouter.com/)
+
 ---
 
 English | [简体中文](README.md)
 
 ## Preview
 
-![demo.png](pic/demo_en.png)
-![demo_dark.png](pic/demo_dark_en.png)
-![demo2.png](pic/demo2_en.png)
-![demo3.png](pic/demo3_en.png)
+[**Live Demo**](https://transmission-next-ui-demo.pages.dev)
+
+| Light Mode | Dark Mode |
+| :---: | :---: |
+| ![dashboard_light_en.png](pic/dashboard_light_en.png) | ![dashboard_dark_en.png](pic/dashboard_dark_en.png) |
+
+| Torrent Details | Settings |
+| :---: | :---: |
+| ![torrent_details_en.png](pic/torrent_details_en.png) | ![settings_en.png](pic/settings_en.png) |
 
 ## Features
 
 - Modern UI Design
 - Responsive Layout, Perfect for All Devices
-- Fast Loading Experience with Next.js
+- Powered by Vite and Tailwind CSS 4.0
 - [x] Torrent Management and Information Viewing
 - [x] Configuration Settings
 - [x] Drag-and-Drop/Paste to Add Torrents
@@ -73,8 +86,8 @@ By default, the container runs using `network_mode: host` for better connectivit
 ```bash
 git clone git@github.com:hisproc/transmission-next-ui.git
 cd transmission-next-ui
-npm install
-npm run build
+pnpm install
+pnpm build
 ```
 
 Then, copy the contents of the `dist/` folder to your transmission web directory.
