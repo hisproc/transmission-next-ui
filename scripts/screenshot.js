@@ -16,7 +16,7 @@ if (!fs.existsSync(OUTPUT_DIR)) {
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 
 async function takeScreenshots() {
-  console.log('🚀 Starting multi-language screenshot task...');
+  console.log('🚀 Starting multi-language screenshot task (Descriptive Names)...');
   const browser = await puppeteer.launch({
     headless: "new",
     args: ['--no-sandbox', '--disable-setuid-sandbox']
@@ -24,56 +24,57 @@ async function takeScreenshots() {
   const page = await browser.newPage();
   await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 2 });
 
-  // --- Locale: ZH ---
-  console.log('🌐 Locale: zh');
-  await page.goto(DEMO_URL, { waitUntil: 'domcontentloaded' });
-  await page.evaluate(() => localStorage.setItem('transmission-locale', 'zh'));
-  await page.goto(DEMO_URL, { waitUntil: 'domcontentloaded' });
-  await sleep(2000);
+  // Helper to force light mode
+  const setLightMode = async () => {
+    await page.evaluate(() => document.documentElement.classList.remove('dark'));
+    await sleep(500);
+  };
+  
+  // Helper to force dark mode
+  const setDarkMode = async () => {
+    await page.evaluate(() => document.documentElement.classList.add('dark'));
+    await sleep(500);
+  };
 
-  console.log('📸 Dashboard (Light, ZH)');
-  await page.evaluate(() => document.documentElement.classList.remove('dark'));
-  await sleep(500);
-  await page.screenshot({ path: path.join(OUTPUT_DIR, 'demo.png') });
+  const capture = async (locale) => {
+    console.log(`🌐 Locale: ${locale}`);
+    await page.goto(DEMO_URL, { waitUntil: 'domcontentloaded' });
+    await page.evaluate((l) => localStorage.setItem('transmission-locale', l), locale);
+    await page.goto(DEMO_URL, { waitUntil: 'domcontentloaded' });
+    await sleep(3000);
 
-  console.log('📸 Dashboard (Dark, ZH)');
-  await page.evaluate(() => document.documentElement.classList.add('dark'));
-  await sleep(500);
-  await page.screenshot({ path: path.join(OUTPUT_DIR, 'demo_dark.png') });
+    const suffix = locale === 'zh' ? '' : `_${locale}`;
 
-  console.log('📸 Details (ZH)');
-  await page.goto(`${DEMO_URL}/#/torrents/detail?id=1`, { waitUntil: 'domcontentloaded' });
-  await sleep(2000);
-  await page.screenshot({ path: path.join(OUTPUT_DIR, 'demo2.png') });
+    // Dashboard - Light
+    console.log(`📸 Dashboard (Light, ${locale})`);
+    await setLightMode();
+    await page.screenshot({ path: path.join(OUTPUT_DIR, `dashboard_light${suffix}.png`) });
 
-  // --- Locale: EN ---
-  console.log('🌐 Locale: en');
-  await page.goto(DEMO_URL, { waitUntil: 'domcontentloaded' });
-  await page.evaluate(() => localStorage.setItem('transmission-locale', 'en'));
-  await page.goto(DEMO_URL, { waitUntil: 'domcontentloaded' });
-  await sleep(2000);
+    // Dashboard - Dark
+    console.log(`📸 Dashboard (Dark, ${locale})`);
+    await setDarkMode();
+    await page.screenshot({ path: path.join(OUTPUT_DIR, `dashboard_dark${suffix}.png`) });
 
-  console.log('📸 Dashboard (Light, EN)');
-  await page.evaluate(() => document.documentElement.classList.remove('dark'));
-  await sleep(500);
-  await page.screenshot({ path: path.join(OUTPUT_DIR, 'demo_en.png') });
+    // Torrent Details (Light)
+    console.log(`📸 Details (Light, ${locale})`);
+    await page.goto(`${DEMO_URL}/#/torrents/detail?id=1`, { waitUntil: 'domcontentloaded' });
+    await setLightMode();
+    await sleep(2000);
+    await page.screenshot({ path: path.join(OUTPUT_DIR, `torrent_details${suffix}.png`) });
 
-  console.log('📸 Dashboard (Dark, EN)');
-  await page.evaluate(() => document.documentElement.classList.add('dark'));
-  await sleep(500);
-  await page.screenshot({ path: path.join(OUTPUT_DIR, 'demo_dark_en.png') });
+    // Settings (Light)
+    console.log(`📸 Settings (Light, ${locale})`);
+    await page.goto(`${DEMO_URL}/#/settings`, { waitUntil: 'domcontentloaded' });
+    await setLightMode();
+    await sleep(1000);
+    await page.screenshot({ path: path.join(OUTPUT_DIR, `settings${suffix}.png`) });
+  };
 
-  console.log('📸 Details (EN)');
-  await page.goto(`${DEMO_URL}/#/torrents/detail?id=1`, { waitUntil: 'domcontentloaded' });
-  await sleep(2000);
-  await page.screenshot({ path: path.join(OUTPUT_DIR, 'demo2_en.png') });
+  // Run for both locales
+  await capture('zh');
+  await capture('en');
 
-  console.log('📸 Settings (EN)');
-  await page.goto(`${DEMO_URL}/#/settings`, { waitUntil: 'domcontentloaded' });
-  await sleep(1000);
-  await page.screenshot({ path: path.join(OUTPUT_DIR, 'demo3_en.png') });
-
-  console.log(`✅ All screenshots saved to: ${OUTPUT_DIR}`);
+  console.log(`✅ All descriptive screenshots saved to: ${OUTPUT_DIR}`);
   await browser.close();
 }
 

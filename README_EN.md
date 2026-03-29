@@ -19,11 +19,11 @@ English | [简体中文](README.md)
 
 | Light Mode | Dark Mode |
 | :---: | :---: |
-| ![demo.png](pic/demo.png) | ![demo_dark.png](pic/demo_dark.png) |
+| ![dashboard_light_en.png](pic/dashboard_light_en.png) | ![dashboard_dark_en.png](pic/dashboard_dark_en.png) |
 
 | Torrent Details | Settings |
 | :---: | :---: |
-| ![demo2.png](pic/demo2.png) | ![demo3.png](pic/demo3.png) |
+| ![torrent_details_en.png](pic/torrent_details_en.png) | ![settings_en.png](pic/settings_en.png) |
 
 ## Features
 

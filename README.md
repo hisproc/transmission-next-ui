@@ -28,11 +28,11 @@
 
 | Light Mode | Dark Mode |
 | :---: | :---: |
-| ![demo.png](pic/demo.png) | ![demo_dark.png](pic/demo_dark.png) |
+| ![dashboard_light.png](pic/dashboard_light.png) | ![dashboard_dark.png](pic/dashboard_dark.png) |
 
 | Torrent Details | Settings |
 | :---: | :---: |
-| ![demo2.png](pic/demo2.png) | ![demo3.png](pic/demo3.png) |
+| ![torrent_details.png](pic/torrent_details.png) | ![settings.png](pic/settings.png) |
 
 ## 功能
 
