@@ -1013,34 +1013,37 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
 
       {/* Floating Action Bar */}
       {selectedIds.length > 0 && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-8 duration-300">
-          <div className="bg-background/80 backdrop-blur-xl border border-primary/20 shadow-[0_8px_32px_rgba(var(--primary),0.2)] rounded-2xl px-6 py-4 flex items-center gap-6 min-w-[400px]">
-            <div className="flex items-center gap-2 border-r pr-6 mr-2">
-              <div className="bg-primary text-primary-foreground text-xs font-medium h-6 w-6 rounded-lg flex items-center justify-center">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-8 duration-300 w-full max-w-[calc(100%-2rem)] md:max-w-fit px-2 sm:px-0">
+          <div className="bg-background/80 backdrop-blur-xl border border-primary/20 shadow-[0_8px_40px_rgba(var(--primary),0.15)] rounded-[2.5rem] px-3 py-2.5 md:px-6 md:py-4 flex items-center gap-2 md:gap-6 min-w-0 md:min-w-[400px] justify-between md:justify-start">
+            <div className="flex items-center gap-2 border-r pr-3 md:pr-6 mr-1 md:mr-2 shrink-0">
+              <div className="bg-primary text-primary-foreground text-[10px] md:text-xs font-bold h-5 w-5 md:h-6 md:w-6 rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
                 {selectedIds.length}
               </div>
-              <span className="text-sm font-medium">{t('common.selected')}</span>
+              <span className="text-sm font-bold tracking-tight hidden sm:inline">{t('common.selected')}</span>
             </div>
             
-            <div className="flex items-center gap-3 flex-1">
-              <Button size="sm" className="rounded-xl font-medium gap-2" onClick={() => handleBatchAction("start")}>
-                <Play className="h-4 w-4" /> {t('common.resume')}
+            <div className="flex items-center gap-1.5 md:gap-3 flex-1 min-w-0 overflow-x-auto no-scrollbar justify-center md:justify-start">
+              <Button size="sm" className="h-9 md:h-10 rounded-2xl md:rounded-xl font-bold gap-2 px-3 md:px-4" onClick={() => handleBatchAction("start")}>
+                <Play className="h-4 w-4" /> 
+                <span className="hidden md:inline">{t('common.resume')}</span>
               </Button>
-              <Button size="sm" variant="secondary" className="rounded-xl font-medium gap-2" onClick={() => handleBatchAction("stop")}>
-                <Pause className="h-4 w-4" /> {t('common.pause')}
+              <Button size="sm" variant="secondary" className="h-9 md:h-10 rounded-2xl md:rounded-xl font-bold gap-2 px-3 md:px-4" onClick={() => handleBatchAction("stop")}>
+                <Pause className="h-4 w-4" /> 
+                <span className="hidden md:inline">{t('common.pause')}</span>
               </Button>
-              <Button size="sm" variant="ghost" className="rounded-xl font-medium gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleBatchAction("remove")}>
-                <Trash2 className="h-4 w-4" /> {t('common.remove')}
+              <Button size="sm" variant="ghost" className="h-9 md:h-10 rounded-2xl md:rounded-xl font-bold gap-2 px-3 md:px-4 text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleBatchAction("remove")}>
+                <Trash2 className="h-4 w-4" /> 
+                <span className="hidden md:inline">{t('common.remove')}</span>
               </Button>
             </div>
-
+ 
             <Button 
               size="icon" 
               variant="ghost" 
-              className="h-8 w-8 rounded-full"
+              className="h-8 w-8 md:h-9 md:w-9 rounded-full shrink-0 hover:bg-muted/50"
               onClick={() => setSelectedIds([])}
             >
-              <X className="h-4 w-4" />
+              <X className="h-4 w-4 opacity-50" />
             </Button>
           </div>
         </div>
