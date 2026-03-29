@@ -25,9 +25,20 @@ import {
   Tag
 } from "lucide-react"
 
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogFooter, 
+  DialogHeader, 
+  DialogTitle 
+} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+
+import { cn } from "@/lib/utils"
+import { RemoveTorrentDialog } from "@/components/remove-torrent-dialog"
 
 import { rpc } from "@/lib/rpc-client"
 import { useI18n } from "@/lib/i18n-context"
@@ -43,6 +54,7 @@ function TorrentDetailsContent() {
   const [activeTab, setActiveTab] = useState("general")
   const [torrent, setTorrent] = useState<Torrent | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   const fetchData = useCallback(async () => {
     if (!idValue) return
@@ -121,9 +133,17 @@ function TorrentDetailsContent() {
   }
 
   const handleRemove = async () => {
-    if (confirm(t('common.confirm_remove', 'Are you sure you want to remove this torrent?'))) {
-      await rpc.removeTorrents([tor.id])
+    setIsDeleteDialogOpen(true)
+  }
+
+  const confirmDelete = async (deleteLocalData: boolean) => {
+    if (!tor) return
+    try {
+      await rpc.removeTorrents([tor.id], deleteLocalData)
+      setIsDeleteDialogOpen(false)
       navigate("/")
+    } catch (err) {
+      console.error("Failed to remove torrent:", err)
     }
   }
 
@@ -453,6 +473,13 @@ function TorrentDetailsContent() {
           </CardContent>
         </Card>
       </div>
+
+      <RemoveTorrentDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={confirmDelete}
+        count={1}
+      />
     </div>
   )
 }

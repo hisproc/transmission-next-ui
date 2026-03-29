@@ -59,6 +59,7 @@ import { EditTorrentDialog } from "@/components/edit-torrent-dialog"
 import { BatchReplaceTrackerDialog } from "@/components/batch-replace-tracker-dialog"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
+import { RemoveTorrentDialog } from "@/components/remove-torrent-dialog"
 
 import { useI18n } from "@/lib/i18n-context"
 import { useSearch } from "@/lib/search-context"
@@ -85,11 +86,9 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
   const [trackerFilter, setTrackerFilter] = useState<string[]>([])
   const [dirFilter, setDirFilter] = useState<string[]>([])
   const [labelFilter, setLabelFilter] = useState<string[]>([])
-  const [isStatsCollapsed, setIsStatsCollapsed] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isBatchReplaceOpen, setIsBatchReplaceOpen] = useState(false)
   const [idsToDelete, setIdsToDelete] = useState<number[]>([])
-  const [deleteLocalData, setDeleteLocalData] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem('isStatsCollapsed')
@@ -103,6 +102,8 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
     setIsStatsCollapsed(newVal)
     localStorage.setItem('isStatsCollapsed', String(newVal))
   }
+
+  const [isStatsCollapsed, setIsStatsCollapsed] = useState(false)
 
   const trackers = useMemo(() => {
     const hosts = new Set<string>()
@@ -196,7 +197,6 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
         })
       } else if (action === "remove") {
         setIdsToDelete(selectedIds)
-        setDeleteLocalData(false)
         setIsDeleteDialogOpen(true)
         return // Handle in confirmDelete
       }
@@ -208,7 +208,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
     }
   }
 
-  const confirmDelete = async () => {
+  const confirmDelete = async (deleteLocalData: boolean) => {
     try {
       await rpc.removeTorrents(idsToDelete, deleteLocalData)
       toast.success(t('common.remove_success', 'Removed'), {
@@ -221,7 +221,6 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
       }
       setIsDeleteDialogOpen(false)
       setIdsToDelete([])
-      setDeleteLocalData(false)
       fetchData()
     } catch (err) {
       toast.error(t('common.action_failed', 'Action Failed'))
@@ -238,7 +237,6 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
         toast.info(t('common.pause_success', 'Stopped'))
       } else if (action === "remove") {
         setIdsToDelete([id])
-        setDeleteLocalData(false)
         setIsDeleteDialogOpen(true)
         return // Handle in confirmDelete
       }
@@ -1049,74 +1047,12 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
         </div>
       )}
 
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[460px] rounded-3xl border-none bg-background/95 backdrop-blur-xl shadow-2xl overflow-hidden flex flex-col">
-          <DialogHeader className="gap-2 shrink-0">
-            <DialogTitle className="text-2xl font-medium tracking-tight flex items-center gap-3 text-destructive">
-              <div className="h-10 w-10 rounded-full bg-destructive/10 flex items-center justify-center shrink-0">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
-              </div>
-              {idsToDelete.length > 1 ? t('common.remove', 'Remove Torrents') : t('common.remove', 'Remove Torrent')}
-            </DialogTitle>
-            <DialogDescription className="text-base font-medium opacity-70">
-              {idsToDelete.length > 1 
-                ? t('common.confirm_remove_all', `Are you sure you want to remove ${idsToDelete.length} torrents?`)
-                : t('common.confirm_remove', 'Are you sure you want to remove this torrent from the list?')}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="flex flex-col gap-5 py-4">
-             <div 
-               className="flex items-center gap-3 p-4 rounded-2xl bg-muted/30 border border-muted/50 cursor-pointer group hover:bg-destructive/5 hover:border-destructive/20 transition-all"
-               onClick={() => setDeleteLocalData(!deleteLocalData)}
-             >
-                <div className={cn(
-                  "h-5 w-5 rounded flex items-center justify-center transition-all shrink-0",
-                  deleteLocalData ? "bg-destructive border-destructive text-destructive-foreground shadow-lg shadow-destructive/20" : "border-2 border-muted-foreground/30 group-hover:border-destructive/50"
-                )}>
-                  {deleteLocalData && (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-check"><path d="M20 6 9 17l-5-5"/></svg>
-                  )}
-                </div>
-                <div className="flex flex-col">
-                  <span className={cn(
-                    "text-sm font-medium transition-colors",
-                    deleteLocalData ? "text-destructive" : "text-foreground group-hover:text-destructive"
-                  )}>
-                    {t('common.move_data', 'Delete local data')}
-                  </span>
-                  <span className="text-xs text-muted-foreground opacity-60">
-                    {t('common.remove_desc', 'This will permanently delete the downloaded files.')}
-                  </span>
-                </div>
-             </div>
-             
-             <div className="p-4 rounded-xl bg-destructive/5 border border-destructive/10 flex items-start gap-3">
-               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-alert-triangle text-destructive shrink-0 mt-0.5"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
-               <span className="text-[11px] font-medium text-destructive/80 leading-relaxed">
-                 {t('common.action_warning', 'Warning: This action is permanent and cannot be undone.')}
-               </span>
-             </div>
-          </div>
-
-          <DialogFooter className="pt-4 border-t border-muted/20">
-            <Button 
-              variant="ghost" 
-              className="rounded-xl font-medium"
-              onClick={() => setIsDeleteDialogOpen(false)}
-            >
-              {t('common.cancel', 'Cancel')}
-            </Button>
-            <Button 
-              variant="destructive" 
-              className="rounded-xl font-medium px-8 shadow-lg shadow-destructive/20 active:scale-[0.98] transition-all"
-              onClick={confirmDelete}
-            >
-              {idsToDelete.length > 1 ? t('common.remove', 'Delete All') : t('common.remove', 'Delete')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <RemoveTorrentDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={confirmDelete}
+        count={idsToDelete.length}
+      />
       
       <BatchReplaceTrackerDialog 
         open={isBatchReplaceOpen} 
