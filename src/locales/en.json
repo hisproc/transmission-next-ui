@@ -48,7 +48,7 @@
     "no_matching_torrents": "No matching torrents found",
     "replacing": "Replacing...",
     "replace_success": "Successfully replaced tracker for {count} torrents",
-    "tools": "Common Tools",
+    "tools": "Tools",
     "all_trackers": "All Trackers",
     "edit_success": "Torrent updated successfully",
     "edit_failed": "Failed to update torrent",

@@ -504,8 +504,8 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
       )}
 
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-2 md:gap-4 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-2 md:gap-4 flex-wrap pb-1 sm:pb-0">
             <h2 className="text-xl font-bold tracking-tight whitespace-nowrap mr-2">{t('common.torrents')}</h2>
             
             <div className="flex items-center bg-muted/60 p-1 rounded-xl shrink-0">
@@ -695,31 +695,32 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
               </DropdownMenu>
             </div>
           </div>
-          <div className="flex gap-2 w-full sm:w-auto overflow-x-auto no-scrollbar justify-start sm:justify-end pb-1 sm:pb-0">
+          <div className="flex gap-2 w-full lg:w-auto flex-wrap justify-start lg:justify-end pb-1 sm:pb-0">
             <div className="flex items-center bg-muted/60 p-1 rounded-xl shrink-0">
                <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 px-3.5 rounded-lg font-medium bg-background/60 hover:bg-background hover:shadow-sm transition-all text-xs text-muted-foreground hover:text-primary flex items-center gap-1.5 border-none">
+                  <Button variant="ghost" className="h-8 px-2 md:px-3.5 rounded-lg font-medium bg-background/60 hover:bg-background hover:shadow-sm transition-all text-xs text-muted-foreground hover:text-primary flex items-center gap-1.5 border-none">
                     <Wrench className="h-3.5 w-3.5" />
-                    <span>{t('common.tools')}</span>
-                    <ChevronDown className="h-3 w-3 opacity-50" />
+                    <span className="hidden md:inline">{t('common.tools')}</span>
+                    <ChevronDown className="h-3 w-3 opacity-50 hidden md:inline" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-[200px] rounded-2xl border border-muted/50 bg-card/95 backdrop-blur-xl shadow-2xl p-1 mt-2 overflow-hidden">
+                <DropdownMenuContent align="end" className="w-auto min-w-[200px] rounded-2xl border border-muted/50 bg-card/95 backdrop-blur-xl shadow-2xl p-1 mt-2 overflow-hidden">
                   <DropdownMenuItem 
                     className="rounded-xl py-2.5 px-3 focus:bg-muted cursor-pointer transition-colors"
                     onClick={() => setIsBatchReplaceOpen(true)}
                   >
                     <RefreshCw className="h-4 w-4 mr-3 text-primary opacity-70" />
-                    <span className="text-sm font-medium">{t('common.batch_replace_tracker')}</span>
+                    <span className="text-sm font-medium whitespace-nowrap">{t('common.batch_replace_tracker')}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
             <div className="flex items-center bg-muted/60 p-1 rounded-xl shrink-0">
               <AddTorrentDialog onSuccess={fetchData}>
-                <Button variant="default" className="h-8 px-4 rounded-lg font-medium gap-2 shadow-md shadow-primary/10 text-xs border-none">
-                  <Plus className="h-3.5 w-3.5" /> {t('common.add_torrent')}
+                <Button variant="default" className="h-8 px-2 md:px-4 rounded-lg font-medium gap-2 shadow-md shadow-primary/10 text-xs border-none">
+                  <Plus className="h-3.5 w-3.5" />
+                  <span className="hidden md:inline">{t('common.add_torrent')}</span>
                 </Button>
               </AddTorrentDialog>
             </div>
