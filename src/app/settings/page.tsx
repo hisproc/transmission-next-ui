@@ -526,37 +526,59 @@ export default function SettingsPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-5 pt-0 space-y-8">
-                    <div className="flex items-start justify-between gap-4">
-                       <div className="space-y-0.5">
-                          <p className="text-sm font-bold">{t('settings.page.auto_refresh')}</p>
-                          <p className="text-[11px] text-muted-foreground/60 italic leading-relaxed">
-                            {t('settings.page.auto_refresh_desc')}
-                          </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                       <button 
+                         onClick={() => setPendingAutoRefresh(!getAutoRefresh())}
+                         className={cn(
+                           "p-5 rounded-2xl border transition-all text-left flex flex-col gap-3 group relative overflow-hidden",
+                           getAutoRefresh() 
+                             ? "bg-primary/10 border-primary shadow-sm" 
+                             : "bg-muted/30 border-transparent hover:bg-muted/50"
+                         )}
+                       >
+                         <div className="flex items-center justify-between w-full">
+                           <div className={cn(
+                             "h-10 w-10 rounded-xl flex items-center justify-center transition-colors",
+                             getAutoRefresh() ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                           )}>
+                             <RefreshCw className={cn("h-5 w-5", getAutoRefresh() && "animate-spin-slow")} />
+                           </div>
+                           <Toggle localValue={getAutoRefresh()} setLocalValue={setPendingAutoRefresh} />
+                         </div>
+                         <div>
+                           <p className="text-sm font-bold tracking-tight">{t('settings.page.auto_refresh')}</p>
+                           <p className="text-[10px] text-muted-foreground/60 italic leading-relaxed mt-1">
+                             {t('settings.page.auto_refresh_desc')}
+                           </p>
+                         </div>
+                       </button>
+
+                       <div className={cn(
+                         "p-5 rounded-2xl border transition-all flex flex-col gap-4",
+                         !getAutoRefresh() ? "opacity-40 grayscale pointer-events-none bg-muted/10 border-transparent" : "bg-muted/30 border-transparent"
+                       )}>
+                         <div className="flex items-center gap-2 text-muted-foreground">
+                           <Zap className="h-4 w-4" />
+                           <p className="text-[10px] font-black uppercase tracking-widest">{t('settings.page.refresh_title')}</p>
+                         </div>
+                         <div className="flex items-center gap-3">
+                           <Input 
+                             type="number" 
+                             min={0.5}
+                             step={0.5}
+                             disabled={!getAutoRefresh()}
+                             value={getRefreshInterval() / 1000} 
+                             onChange={(e) => setPendingRefreshInterval(Math.round(parseFloat(e.target.value) * 1000) || 0)}
+                             className="h-11 rounded-xl bg-background/50 border-none text-numeric flex-1 font-bold text-lg" 
+                           />
+                           <div className="bg-background/50 h-11 px-4 rounded-xl flex items-center justify-center font-bold text-xs text-muted-foreground uppercase">
+                             {t('settings.page.refresh_unit')}
+                           </div>
+                         </div>
+                         <p className="text-[10px] text-muted-foreground/60 italic leading-snug">
+                           {t('settings.page.refresh_desc')}
+                         </p>
                        </div>
-                       <Toggle localValue={getAutoRefresh()} setLocalValue={setPendingAutoRefresh} />
-                    </div>
-
-                    <Separator className="bg-muted/30" />
-
-                    <div className={cn("space-y-4 transition-all duration-300", !getAutoRefresh() && "opacity-40 grayscale pointer-events-none")}>
-                      <div className="flex justify-between items-center">
-                        <label className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground/70">{t('settings.page.refresh_title')}</label>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <Input 
-                          type="number" 
-                          min={0.5}
-                          step={0.5}
-                          disabled={!getAutoRefresh()}
-                          value={getRefreshInterval() / 1000} 
-                          onChange={(e) => setPendingRefreshInterval(Math.round(parseFloat(e.target.value) * 1000) || 0)}
-                          className="h-11 md:h-12 rounded-xl bg-muted/40 border-none text-numeric flex-1" 
-                        />
-                        <span className="text-xs font-bold text-muted-foreground uppercase">{t('settings.page.refresh_unit')}</span>
-                      </div>
-                      <p className="text-[10px] text-muted-foreground/60 italic leading-relaxed">
-                        {t('settings.page.refresh_desc')}
-                      </p>
                     </div>
                   </CardContent>
                 </Card>
