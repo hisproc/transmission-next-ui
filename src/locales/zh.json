@@ -106,7 +106,12 @@
     "mode_global": "使用全局设置",
     "mode_single": "独立设置",
     "mode_unlimited": "不限制",
-    "tracker_list_hint": "每行输入一个地址。使用空行分隔不同的 Tracker 层级。"
+    "tracker_list_hint": "每行输入一个地址。使用空行分隔不同的 Tracker 层级。",
+    "showing": "正在显示",
+    "of": "/",
+    "torrents_total": "个种子",
+    "page_size": "分页大小",
+    "all": "全部"
   },
   "details": {
     "general": "常规",

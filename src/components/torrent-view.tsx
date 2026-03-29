@@ -5,10 +5,10 @@ import { Link } from "react-router-dom"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardAction } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuLabel,
@@ -26,16 +26,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { 
-  ArrowDown, 
-  ArrowUp, 
-  Activity, 
-  Database, 
-  Clock, 
-  Play, 
-  Pause, 
-  Trash2, 
-  LayoutGrid, 
+import {
+  ArrowDown,
+  ArrowUp,
+  Activity,
+  Database,
+  Clock,
+  Play,
+  Pause,
+  Trash2,
+  LayoutGrid,
   List,
   Check,
   CheckSquare,
@@ -52,7 +52,13 @@ import {
   History,
   Tag,
   RefreshCw,
-  Wrench
+  Wrench,
+  Search,
+  MoreVertical,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight
 } from "lucide-react"
 import { AddTorrentDialog } from "@/components/add-torrent-dialog"
 import { EditTorrentDialog } from "@/components/edit-torrent-dialog"
@@ -98,7 +104,16 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
   const [isBatchReplaceOpen, setIsBatchReplaceOpen] = useState(false)
   const [idsToDelete, setIdsToDelete] = useState<number[]>([])
   const [clickedCard, setClickedCard] = useState<string | null>(null)
+  const [pageSize, setPageSize] = useState<number>(() => {
+    const saved = localStorage.getItem('torrent-page-size')
+    return saved ? parseInt(saved, 10) : 100
+  })
+  const [currentPage, setCurrentPage] = useState(1)
   const isMobile = useIsMobile()
+
+  useEffect(() => {
+    localStorage.setItem('torrent-page-size', pageSize.toString())
+  }, [pageSize])
 
   useEffect(() => {
     const saved = localStorage.getItem('isStatsCollapsed')
@@ -149,33 +164,33 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
     return Array.from(labelSet).sort()
   }, [torrents])
 
-  const totalDownloadSpeed = useMemo(() => 
+  const totalDownloadSpeed = useMemo(() =>
     torrents.reduce((acc, tor) => acc + (tor.rateDownload || 0), 0)
-  , [torrents])
+    , [torrents])
 
-  const totalUploadSpeed = useMemo(() => 
+  const totalUploadSpeed = useMemo(() =>
     torrents.reduce((acc, tor) => acc + (tor.rateUpload || 0), 0)
-  , [torrents])
-  
+    , [torrents])
+
   const fetchData = useCallback(async () => {
     try {
       const torrentFields = [
-        "id", "name", "status", "totalSize", "percentDone", 
-        "rateDownload", "rateUpload", "eta", "error", 
-        "errorString", "downloadDir", "uploadedEver", 
+        "id", "name", "status", "totalSize", "percentDone",
+        "rateDownload", "rateUpload", "eta", "error",
+        "errorString", "downloadDir", "uploadedEver",
         "downloadedEver", "uploadRatio", "trackerStats", "labels"
       ]
-      
+
       const torrentsData = await rpc.getTorrents(torrentFields)
       setTorrents(torrentsData.torrents)
-      
+
       if (showStats) {
         const [statsData, sessionData] = await Promise.all([
           rpc.getStats(),
           rpc.getSession()
         ])
         setStats(statsData)
-        
+
         if (sessionData["download-dir"]) {
           try {
             const freeData = await rpc.freeSpace(sessionData["download-dir"])
@@ -192,7 +207,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
 
   const handleBatchAction = async (action: "start" | "stop" | "remove") => {
     if (selectedIds.length === 0) return
-    
+
     const count = selectedIds.length
     try {
       if (action === "start") {
@@ -210,7 +225,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
         setIsDeleteDialogOpen(true)
         return // Handle in confirmDelete
       }
-      
+
       setSelectedIds([])
       fetchData()
     } catch (err) {
@@ -261,14 +276,14 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
   useEffect(() => {
     fetchData()
     if (!autoRefresh) return
-    
+
     const timer = setInterval(fetchData, refreshInterval)
     return () => clearInterval(timer)
   }, [fetchData, refreshInterval, autoRefresh])
 
   const handleSort = (key: string) => {
     let direction: 'asc' | 'desc' | null = 'asc';
-    
+
     if (sortConfig && sortConfig.key === key) {
       if (sortConfig.direction === 'asc') {
         direction = 'desc';
@@ -276,7 +291,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
         direction = null;
       }
     }
-    
+
     if (direction === null) {
       setSortConfig(null);
     } else {
@@ -285,54 +300,54 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
   }
 
   const toggleTracker = (host: string) => {
-    setTrackerFilter(prev => 
-      prev.includes(host) 
-        ? prev.filter(h => h !== host) 
+    setTrackerFilter(prev =>
+      prev.includes(host)
+        ? prev.filter(h => h !== host)
         : [...prev, host]
     )
   }
 
   const toggleDir = (path: string) => {
-    setDirFilter(prev => 
-      prev.includes(path) 
-        ? prev.filter(p => p !== path) 
+    setDirFilter(prev =>
+      prev.includes(path)
+        ? prev.filter(p => p !== path)
         : [...prev, path]
     )
   }
 
   const toggleLabel = (label: string) => {
-    setLabelFilter(prev => 
-      prev.includes(label) 
-        ? prev.filter(l => l !== label) 
+    setLabelFilter(prev =>
+      prev.includes(label)
+        ? prev.filter(l => l !== label)
         : [...prev, label]
     )
   }
 
-  const statusFiltered = statusFilter 
+  const statusFiltered = statusFilter
     ? torrents.filter(tor => {
-        const filter = statusFilter.toLowerCase()
-        if (filter === 'active') {
-          return tor.rateDownload > 0 || tor.rateUpload > 0
-        }
-        if (filter === 'downloading') {
-          return tor.status === 4 || tor.status === 3 || tor.status === 2 || tor.status === 1
-        }
-        if (filter === 'seeding') {
-          return tor.status === 6 || tor.status === 5
-        }
-        if (filter === 'stopped' || filter === 'paused') {
-          return tor.status === 0
-        }
-        // Fallback to text matching
-        const statusText = t(getStatusLabel(tor.status)).toLowerCase()
-        return statusText.includes(filter)
-      })
+      const filter = statusFilter.toLowerCase()
+      if (filter === 'active') {
+        return tor.rateDownload > 0 || tor.rateUpload > 0
+      }
+      if (filter === 'downloading') {
+        return tor.status === 4 || tor.status === 3 || tor.status === 2 || tor.status === 1
+      }
+      if (filter === 'seeding') {
+        return tor.status === 6 || tor.status === 5
+      }
+      if (filter === 'stopped' || filter === 'paused') {
+        return tor.status === 0
+      }
+      // Fallback to text matching
+      const statusText = t(getStatusLabel(tor.status)).toLowerCase()
+      return statusText.includes(filter)
+    })
     : torrents;
 
   const trackerFiltered = trackerFilter.length > 0
-    ? statusFiltered.filter(tor => 
-        tor.trackerStats?.some(ts => trackerFilter.includes(ts.host))
-      )
+    ? statusFiltered.filter(tor =>
+      tor.trackerStats?.some(ts => trackerFilter.includes(ts.host))
+    )
     : statusFiltered;
 
   const dirFiltered = dirFilter.length > 0
@@ -340,34 +355,47 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
     : trackerFiltered;
 
   const labelFiltered = labelFilter.length > 0
-    ? dirFiltered.filter(tor => 
-        tor.labels?.some(l => {
-          try {
-            const parsed = JSON.parse(l);
-            const text = typeof parsed === 'object' && parsed !== null && 'text' in parsed ? parsed.text : l;
-            return labelFilter.includes(text)
-          } catch {
-            return labelFilter.includes(l)
-          }
-        })
-      )
+    ? dirFiltered.filter(tor =>
+      tor.labels?.some(l => {
+        try {
+          const parsed = JSON.parse(l);
+          const text = typeof parsed === 'object' && parsed !== null && 'text' in parsed ? parsed.text : l;
+          return labelFilter.includes(text)
+        } catch {
+          return labelFilter.includes(l)
+        }
+      })
+    )
     : dirFiltered;
 
   const filteredTorrents = searchQuery
     ? labelFiltered.filter(tor => tor.name.toLowerCase().includes(searchQuery.toLowerCase()))
     : labelFiltered;
 
-  const sortedTorrents = [...filteredTorrents].sort((a: any, b: any) => {
-    if (!sortConfig) return 0;
-    const { key, direction } = sortConfig;
-    
-    let valA = a[key];
-    let valB = b[key];
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [statusFilter, searchQuery, trackerFilter, dirFilter, labelFilter, sortConfig])
 
-    if (valA < valB) return direction === 'asc' ? -1 : 1;
-    if (valA > valB) return direction === 'asc' ? 1 : -1;
-    return 0;
-  });
+  const sortedTorrents = useMemo(() => {
+    return [...filteredTorrents].sort((a: any, b: any) => {
+      if (!sortConfig) return 0;
+      const { key, direction } = sortConfig;
+
+      let valA = a[key];
+      let valB = b[key];
+
+      if (valA < valB) return direction === 'asc' ? -1 : 1;
+      if (valA > valB) return direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [filteredTorrents, sortConfig]);
+
+  const totalPages = Math.ceil(sortedTorrents.length / pageSize)
+  const paginatedTorrents = useMemo(() => {
+    if (totalPages <= 1) return sortedTorrents
+    const start = (currentPage - 1) * pageSize
+    return sortedTorrents.slice(start, start + pageSize)
+  }, [sortedTorrents, currentPage, pageSize, totalPages])
 
   const toggleSelectAll = () => {
     if (selectedIds.length === filteredTorrents.length) {
@@ -378,17 +406,17 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
   }
 
   const toggleSelect = (id: number) => {
-    setSelectedIds(prev => 
-      prev.includes(id) 
-        ? prev.filter(i => i !== id) 
+    setSelectedIds(prev =>
+      prev.includes(id)
+        ? prev.filter(i => i !== id)
         : [...prev, id]
     )
   }
 
   const SortIcon = ({ column }: { column: string }) => {
     if (sortConfig?.key !== column) return <ArrowDownCircle className="ml-1 h-3 w-3 opacity-20" />;
-    return sortConfig.direction === 'asc' 
-      ? <ArrowUpCircle className="ml-1 h-3 w-3 text-primary" /> 
+    return sortConfig.direction === 'asc'
+      ? <ArrowUpCircle className="ml-1 h-3 w-3 text-primary" />
       : <ArrowDownCircle className="ml-1 h-3 w-3 text-primary" />;
   }
 
@@ -413,7 +441,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
         <div className="p-2 md:p-2.5 bg-muted/20 backdrop-blur-xl rounded-[2.5rem] border border-muted/30 shadow-sm animate-in slide-in-from-top-4 duration-500 ease-out mb-2">
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
             {/* Download Speed */}
-            <div 
+            <div
               className="flex items-center gap-3 p-4 rounded-[2rem] bg-background/40 border border-muted/5 hover:bg-background/60 transition-all group shrink-0 overflow-hidden shadow-none cursor-pointer md:cursor-default"
               onClick={() => setClickedCard(clickedCard === "download" ? null : "download")}
             >
@@ -437,7 +465,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                         {t('stats.session_badge')}: {formatSize(stats["current-stats"].downloadedBytes)}
                       </span>
                       <span className="text-[11px] text-green-500/80 font-bold whitespace-nowrap h-4 flex items-center justify-end gap-1 translate-y-0">
-                         {t('stats.history_badge')}: {formatSize(stats["cumulative-stats"].downloadedBytes)}
+                        {t('stats.history_badge')}: {formatSize(stats["cumulative-stats"].downloadedBytes)}
                       </span>
                     </div>
                   </div>
@@ -446,7 +474,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
             </div>
 
             {/* Upload Speed */}
-            <div 
+            <div
               className="flex items-center gap-3 p-4 rounded-[2rem] bg-background/40 border border-muted/5 hover:bg-background/60 transition-all group shrink-0 overflow-hidden shadow-none cursor-pointer md:cursor-default"
               onClick={() => setClickedCard(clickedCard === "upload" ? null : "upload")}
             >
@@ -469,7 +497,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                         {t('stats.session_badge')}: {formatSize(stats["current-stats"].uploadedBytes)}
                       </span>
                       <span className="text-[11px] text-blue-500/80 font-bold whitespace-nowrap h-4 flex items-center justify-end gap-1">
-                         {t('stats.history_badge')}: {formatSize(stats["cumulative-stats"].uploadedBytes)}
+                        {t('stats.history_badge')}: {formatSize(stats["cumulative-stats"].uploadedBytes)}
                       </span>
                     </div>
                   </div>
@@ -478,7 +506,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
             </div>
 
             {/* Activity */}
-            <div 
+            <div
               className="flex items-center gap-3 p-4 rounded-[2rem] bg-background/40 border border-muted/5 hover:bg-background/60 transition-all group shrink-0 overflow-hidden shadow-none cursor-pointer md:cursor-default"
               onClick={() => setClickedCard(clickedCard === "activity" ? null : "activity")}
             >
@@ -501,7 +529,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                         {t('stats.total_tasks')}: {stats.torrentCount}
                       </span>
                       <span className="text-[11px] text-orange-500/80 font-bold whitespace-nowrap h-4 flex items-center justify-end gap-1">
-                         {t('stats.paused_tasks')}: {stats.pausedTorrentCount}
+                        {t('stats.paused_tasks')}: {stats.pausedTorrentCount}
                       </span>
                     </div>
                   </div>
@@ -510,7 +538,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
             </div>
 
             {/* Space */}
-            <div 
+            <div
               className="flex items-center gap-3 p-4 rounded-[2rem] bg-background/40 border border-muted/5 hover:bg-background/60 transition-all group shrink-0 overflow-hidden shadow-none cursor-pointer md:cursor-default"
               onClick={() => setClickedCard(clickedCard === "space" ? null : "space")}
             >
@@ -536,7 +564,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                       )}
                       {freeSpace && (
                         <span className="text-[11px] text-purple-500/80 font-bold whitespace-nowrap h-4 flex items-center justify-end gap-1 text-right">
-                           {t('stats.total_label')}: {formatSize(freeSpace.total_size)}
+                          {t('stats.total_label')}: {formatSize(freeSpace.total_size)}
                         </span>
                       )}
                     </div>
@@ -552,28 +580,28 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-2 md:gap-4 flex-wrap pb-1 sm:pb-0">
             <h2 className="text-xl font-bold tracking-tight whitespace-nowrap mr-2">{t('common.torrents')}</h2>
-            
+
             <div className="flex items-center bg-muted/60 p-1 rounded-xl shrink-0">
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 className={cn(
                   "h-8 w-8 rounded-lg transition-all duration-200",
-                  viewMode === "list" 
-                    ? "bg-background shadow-sm text-primary" 
+                  viewMode === "list"
+                    ? "bg-background shadow-sm text-primary"
                     : "text-muted-foreground hover:bg-muted"
                 )}
                 onClick={() => setViewMode("list")}
               >
                 <List className="h-4 w-4" />
               </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 className={cn(
                   "h-8 w-8 rounded-lg transition-all duration-200",
-                  viewMode === "grid" 
-                    ? "bg-background shadow-sm text-primary" 
+                  viewMode === "grid"
+                    ? "bg-background shadow-sm text-primary"
                     : "text-muted-foreground hover:bg-muted"
                 )}
                 onClick={() => setViewMode("grid")}
@@ -603,8 +631,8 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                       <div className="flex items-center justify-between">
                         <SheetTitle className="text-xl font-bold tracking-tight">{t('common.filters', 'Filters')}</SheetTitle>
                         {(trackerFilter.length > 0 || dirFilter.length > 0 || labelFilter.length > 0) && (
-                          <Button 
-                            variant="ghost" 
+                          <Button
+                            variant="ghost"
                             size="sm"
                             className="h-8 px-3 text-xs font-bold rounded-xl hover:bg-destructive/10 hover:text-destructive transition-colors text-destructive"
                             onClick={() => {
@@ -618,7 +646,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                         )}
                       </div>
                     </SheetHeader>
-                    
+
                     <div className="flex-1 overflow-y-auto no-scrollbar p-6 space-y-8 pb-12">
                       {/* Trackers */}
                       <div className="space-y-4">
@@ -719,8 +747,8 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                     <div className="px-4 py-3 bg-muted/20 border-b border-muted/50 flex items-center justify-between">
                       <span className="text-xs font-bold tracking-wider text-muted-foreground whitespace-nowrap">{t('common.filters', 'Filters')}</span>
                       {(trackerFilter.length > 0 || dirFilter.length > 0 || labelFilter.length > 0) && (
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           className="h-6 px-2 text-[10px] font-bold rounded-lg hover:bg-destructive/10 hover:text-destructive transition-colors"
                           onClick={() => {
                             setTrackerFilter([])
@@ -732,7 +760,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                         </Button>
                       )}
                     </div>
-                    
+
                     <div className="p-1">
                       <DropdownMenuSub>
                         <DropdownMenuSubTrigger className="rounded-xl py-2.5 px-3 focus:bg-muted data-[state=open]:bg-muted whitespace-nowrap">
@@ -757,8 +785,8 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                                 </div>
                               ) : (
                                 trackers.map(host => (
-                                  <DropdownMenuCheckboxItem 
-                                    key={host} 
+                                  <DropdownMenuCheckboxItem
+                                    key={host}
                                     className="rounded-xl py-2 border-none cursor-pointer transition-colors focus:bg-muted"
                                     checked={trackerFilter.includes(host)}
                                     onCheckedChange={() => toggleTracker(host)}
@@ -796,8 +824,8 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                                 </div>
                               ) : (
                                 downloadDirs.map(path => (
-                                  <DropdownMenuCheckboxItem 
-                                    key={path} 
+                                  <DropdownMenuCheckboxItem
+                                    key={path}
                                     className="rounded-xl py-2 border-none cursor-pointer transition-colors focus:bg-muted"
                                     checked={dirFilter.includes(path)}
                                     onCheckedChange={() => toggleDir(path)}
@@ -838,8 +866,8 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                                 </div>
                               ) : (
                                 availableLabels.map(label => (
-                                  <DropdownMenuCheckboxItem 
-                                    key={label} 
+                                  <DropdownMenuCheckboxItem
+                                    key={label}
                                     className="rounded-xl py-2 border-none cursor-pointer transition-colors focus:bg-muted"
                                     checked={labelFilter.includes(label)}
                                     onCheckedChange={() => toggleLabel(label)}
@@ -861,7 +889,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
           </div>
           <div className="flex gap-2 w-full lg:w-auto flex-wrap justify-start lg:justify-end pb-1 sm:pb-0">
             <div className="flex items-center bg-muted/60 p-1 rounded-xl shrink-0">
-               <DropdownMenu>
+              <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="h-8 px-2 md:px-3.5 rounded-lg font-medium bg-background/60 hover:bg-background hover:shadow-sm transition-all text-xs text-muted-foreground hover:text-primary flex items-center gap-1.5 border-none">
                     <Wrench className="h-3.5 w-3.5" />
@@ -870,7 +898,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-auto min-w-[200px] rounded-2xl border border-muted/50 bg-card/95 backdrop-blur-xl shadow-2xl p-1 mt-2 overflow-hidden">
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     className="rounded-xl py-2.5 px-3 focus:bg-muted cursor-pointer transition-colors"
                     onClick={() => setIsBatchReplaceOpen(true)}
                   >
@@ -889,17 +917,17 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
               </AddTorrentDialog>
             </div>
             <div className="flex items-center bg-muted/60 p-1 rounded-xl gap-1 shrink-0">
-              <Button 
-                variant="ghost" 
-                className="h-8 px-3.5 md:px-3.5 rounded-lg font-medium bg-background/60 hover:bg-background hover:shadow-sm transition-all text-xs text-muted-foreground hover:text-primary flex items-center gap-1.5" 
+              <Button
+                variant="ghost"
+                className="h-8 px-3.5 md:px-3.5 rounded-lg font-medium bg-background/60 hover:bg-background hover:shadow-sm transition-all text-xs text-muted-foreground hover:text-primary flex items-center gap-1.5"
                 onClick={() => handleGlobalAction("start")}
               >
                 <Play className="h-3.5 w-3.5" />
                 <span className="hidden md:inline">{t('common.resume_all')}</span>
               </Button>
-              <Button 
-                variant="ghost" 
-                className="h-8 px-3.5 md:px-3.5 rounded-lg font-medium bg-background/60 hover:bg-background hover:shadow-sm transition-all text-xs text-muted-foreground hover:text-primary flex items-center gap-1.5" 
+              <Button
+                variant="ghost"
+                className="h-8 px-3.5 md:px-3.5 rounded-lg font-medium bg-background/60 hover:bg-background hover:shadow-sm transition-all text-xs text-muted-foreground hover:text-primary flex items-center gap-1.5"
                 onClick={() => handleGlobalAction("stop")}
               >
                 <Pause className="h-3.5 w-3.5" />
@@ -916,7 +944,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                 <TableHeader className="bg-muted/50">
                   <TableRow className="hover:bg-transparent border-none">
                     <TableHead className="w-[50px] pl-6 h-12">
-                      <div 
+                      <div
                         className="cursor-pointer text-muted-foreground hover:text-primary transition-colors"
                         onClick={toggleSelectAll}
                       >
@@ -931,37 +959,37 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                         )}
                       </div>
                     </TableHead>
-                    <TableHead 
+                    <TableHead
                       className="w-[30%] h-12 cursor-pointer hover:text-primary transition-colors"
                       onClick={() => handleSort('name')}
                     >
                       <div className="flex items-center truncate pr-4">{t('common.name')} <SortIcon column="name" /></div>
                     </TableHead>
-                    <TableHead 
+                    <TableHead
                       className="w-[160px] h-12 cursor-pointer hover:text-primary transition-colors"
                       onClick={() => handleSort('status')}
                     >
                       <div className="flex items-center">{t('common.status')} <SortIcon column="status" /></div>
                     </TableHead>
-                    <TableHead 
+                    <TableHead
                       className="w-[150px] h-12 cursor-pointer hover:text-primary transition-colors"
                       onClick={() => handleSort('percentDone')}
                     >
                       <div className="flex items-center">{t('common.progress')} <SortIcon column="progress" /></div>
                     </TableHead>
-                    <TableHead 
+                    <TableHead
                       className="w-[110px] h-12 cursor-pointer hover:text-primary transition-colors text-right"
                       onClick={() => handleSort('rateDownload')}
                     >
                       <div className="flex items-center justify-end">{t('common.down_speed')} <SortIcon column="rateDownload" /></div>
                     </TableHead>
-                    <TableHead 
+                    <TableHead
                       className="w-[110px] h-12 cursor-pointer hover:text-primary transition-colors text-right"
                       onClick={() => handleSort('rateUpload')}
                     >
                       <div className="flex items-center justify-end">{t('common.up_speed')} <SortIcon column="rateUpload" /></div>
                     </TableHead>
-                    <TableHead 
+                    <TableHead
                       className="w-[100px] h-12 cursor-pointer hover:text-primary transition-colors text-right"
                       onClick={() => handleSort('eta')}
                     >
@@ -971,16 +999,16 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sortedTorrents.map((torrent) => (
-                    <TableRow 
-                      key={torrent.id} 
+                  {paginatedTorrents.map((torrent) => (
+                    <TableRow
+                      key={torrent.id}
                       className={cn(
                         "hover:bg-muted/30 transition-colors border-b last:border-0 border-muted/50 group/row",
                         selectedIds.includes(torrent.id) && "bg-primary/5 hover:bg-primary/10"
                       )}
                     >
                       <TableCell className="pl-6">
-                        <div 
+                        <div
                           className="cursor-pointer text-muted-foreground hover:text-primary transition-colors"
                           onClick={() => toggleSelect(torrent.id)}
                         >
@@ -992,8 +1020,8 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                         </div>
                       </TableCell>
                       <TableCell className="text-heading-3 max-w-[350px] lg:max-w-[500px]">
-                        <Link 
-                          to={`/torrents/detail?id=${torrent.id}`} 
+                        <Link
+                          to={`/torrents/detail?id=${torrent.id}`}
                           className="hover:text-primary transition-colors cursor-pointer block truncate"
                         >
                           {torrent.name}
@@ -1002,18 +1030,18 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                       <TableCell>
                         <span className={cn(
                           "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium uppercase tracking-wider transition-colors",
-                          torrent.status === 4 ? "bg-green-100 text-green-800 dark:bg-green-950/30 dark:text-green-400" : 
-                          torrent.status === 6 ? "bg-indigo-100 text-indigo-800 dark:bg-indigo-950/30 dark:text-indigo-400" :
-                          torrent.status === 0 ? "bg-muted text-muted-foreground/70" :
-                          "bg-blue-100 text-blue-800 dark:bg-blue-950/30 dark:text-blue-400"
+                          torrent.status === 4 ? "bg-green-100 text-green-800 dark:bg-green-950/30 dark:text-green-400" :
+                            torrent.status === 6 ? "bg-indigo-100 text-indigo-800 dark:bg-indigo-950/30 dark:text-indigo-400" :
+                              torrent.status === 0 ? "bg-muted text-muted-foreground/70" :
+                                "bg-blue-100 text-blue-800 dark:bg-blue-950/30 dark:text-blue-400"
                         )}>
                           {t(getStatusLabel(torrent.status))}
                         </span>
                       </TableCell>
                       <TableCell>
                         <div className="w-full bg-muted rounded-full h-2 min-w-[100px]">
-                          <div 
-                            className="bg-primary h-2 rounded-full transition-all duration-700 shadow-[0_0_8px_rgba(var(--primary),0.5)]" 
+                          <div
+                            className="bg-primary h-2 rounded-full transition-all duration-700 shadow-[0_0_8px_rgba(var(--primary),0.5)]"
                             style={{ width: `${torrent.percentDone * 100}%` }}
                           ></div>
                         </div>
@@ -1058,9 +1086,9 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
           </Card>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {sortedTorrents.map((torrent) => (
-              <Card 
-                key={torrent.id} 
+            {paginatedTorrents.map((torrent) => (
+              <Card
+                key={torrent.id}
                 className="group relative shadow-md border-none overflow-hidden hover:shadow-xl hover:translate-y-[-4px] transition-all duration-300 bg-sidebar/30 flex flex-col py-0"
               >
                 <CardHeader className="pb-3 pt-4 border-b border-muted/50 bg-background/50">
@@ -1071,12 +1099,12 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                       </CardTitle>
                     </Link>
                     <div className="flex items-center gap-2">
-                       <span className={cn(
+                      <span className={cn(
                         "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium tracking-wide transition-colors",
-                        torrent.status === 4 ? "bg-green-100 text-green-800 dark:bg-green-950/30 dark:text-green-400" : 
-                        torrent.status === 6 ? "bg-indigo-100 text-indigo-800 dark:bg-indigo-950/30 dark:text-indigo-400" :
-                        torrent.status === 0 ? "bg-muted text-muted-foreground/70" :
-                        "bg-blue-100 text-blue-800 dark:bg-blue-950/30 dark:text-blue-400"
+                        torrent.status === 4 ? "bg-green-100 text-green-800 dark:bg-green-950/30 dark:text-green-400" :
+                          torrent.status === 6 ? "bg-indigo-100 text-indigo-800 dark:bg-indigo-950/30 dark:text-indigo-400" :
+                            torrent.status === 0 ? "bg-muted text-muted-foreground/70" :
+                              "bg-blue-100 text-blue-800 dark:bg-blue-950/30 dark:text-blue-400"
                       )}>
                         {t(getStatusLabel(torrent.status))}
                       </span>
@@ -1110,13 +1138,13 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                       <span className="text-primary">{(torrent.percentDone * 100).toFixed(1)}%</span>
                     </div>
                     <div className="w-full bg-muted/50 rounded-full h-2.5 overflow-hidden">
-                      <div 
-                        className="bg-primary h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(var(--primary),0.4)]" 
+                      <div
+                        className="bg-primary h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(var(--primary),0.4)]"
                         style={{ width: `${torrent.percentDone * 100}%` }}
                       ></div>
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
                       <p className="text-label">{t('stats.download_speed')}</p>
@@ -1173,6 +1201,90 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
             ))}
           </div>
         )}
+
+        {/* Pagination UI */}
+        {sortedTorrents.length >= 50 && (
+          <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-6 pb-10">
+            <div className="flex flex-col sm:flex-row items-center gap-4 order-2 sm:order-1">
+              <div className="text-sm font-medium text-muted-foreground">
+                {t('common.showing', 'Showing')} <span className="text-foreground">{(currentPage - 1) * pageSize + 1}</span> - <span className="text-foreground">{Math.min(currentPage * pageSize, sortedTorrents.length)}</span> {t('common.of', 'of')} <span className="text-foreground">{sortedTorrents.length}</span> {t('common.torrents_total', 'torrents')}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">{t('common.page_size', 'Size')}:</span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-7 px-2 text-xs font-bold bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+                      {pageSize >= 9999 ? t('common.all', 'All') : pageSize}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="rounded-xl border border-muted/50 bg-card/95 backdrop-blur-xl p-1 min-w-[70px]">
+                    {[50, 100, 200, 500, 9999].map((size) => (
+                      <DropdownMenuItem
+                        key={size}
+                        className={cn(
+                          "rounded-lg text-xs font-bold py-1.5 px-3 cursor-pointer",
+                          pageSize === size && "bg-primary text-primary-foreground"
+                        )}
+                        onClick={() => setPageSize(size)}
+                      >
+                        {size >= 9999 ? t('common.all', 'All') : size}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+
+            {totalPages > 1 && (
+              <div className="flex items-center gap-1.5 order-1 sm:order-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9 rounded-xl border-muted/20 hover:bg-muted/50 hidden sm:flex"
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronsLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9 rounded-xl border-muted/20 hover:bg-muted/50"
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+
+                <div className="flex items-center gap-1 px-4">
+                  <span className="text-sm font-bold text-primary">{currentPage}</span>
+                  <span className="text-sm font-medium text-muted-foreground">/</span>
+                  <span className="text-sm font-bold text-muted-foreground">{totalPages}</span>
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9 rounded-xl border-muted/20 hover:bg-muted/50"
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9 rounded-xl border-muted/20 hover:bg-muted/50 hidden sm:flex"
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                >
+                  <ChevronsRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Floating Action Bar */}
@@ -1185,25 +1297,25 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
               </div>
               <span className="text-sm font-bold tracking-tight hidden sm:inline">{t('common.selected')}</span>
             </div>
-            
+
             <div className="flex items-center gap-1.5 md:gap-3 flex-1 min-w-0 overflow-x-auto no-scrollbar justify-center md:justify-start">
               <Button size="sm" className="h-9 md:h-10 rounded-2xl md:rounded-xl font-bold gap-2 px-3 md:px-4" onClick={() => handleBatchAction("start")}>
-                <Play className="h-4 w-4" /> 
+                <Play className="h-4 w-4" />
                 <span className="hidden md:inline">{t('common.resume')}</span>
               </Button>
               <Button size="sm" variant="secondary" className="h-9 md:h-10 rounded-2xl md:rounded-xl font-bold gap-2 px-3 md:px-4" onClick={() => handleBatchAction("stop")}>
-                <Pause className="h-4 w-4" /> 
+                <Pause className="h-4 w-4" />
                 <span className="hidden md:inline">{t('common.pause')}</span>
               </Button>
               <Button size="sm" variant="ghost" className="h-9 md:h-10 rounded-2xl md:rounded-xl font-bold gap-2 px-3 md:px-4 text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleBatchAction("remove")}>
-                <Trash2 className="h-4 w-4" /> 
+                <Trash2 className="h-4 w-4" />
                 <span className="hidden md:inline">{t('common.remove')}</span>
               </Button>
             </div>
- 
-            <Button 
-              size="icon" 
-              variant="ghost" 
+
+            <Button
+              size="icon"
+              variant="ghost"
               className="h-8 w-8 md:h-9 md:w-9 rounded-full shrink-0 hover:bg-muted/50"
               onClick={() => setSelectedIds([])}
             >
@@ -1219,11 +1331,11 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
         onConfirm={confirmDelete}
         count={idsToDelete.length}
       />
-      
-      <BatchReplaceTrackerDialog 
-        open={isBatchReplaceOpen} 
-        onOpenChange={setIsBatchReplaceOpen} 
-        onSuccess={fetchData} 
+
+      <BatchReplaceTrackerDialog
+        open={isBatchReplaceOpen}
+        onOpenChange={setIsBatchReplaceOpen}
+        onSuccess={fetchData}
       />
     </div>
   )
