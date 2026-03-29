@@ -93,8 +93,8 @@ docker-compose down    # 停止并移除容器
 ```bash
 git clone git@github.com:hisproc/transmission-next-ui.git
 cd transmission-next-ui
-npm install
-npm run build
+pnpm install
+pnpm build
 ```
 
 构建完成后，将 `dist/` 目录下的所有内容复制到 Transmission 的 Web 目录下即可。

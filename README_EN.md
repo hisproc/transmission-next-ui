@@ -84,8 +84,8 @@ By default, the container runs using `network_mode: host` for better connectivit
 ```bash
 git clone git@github.com:hisproc/transmission-next-ui.git
 cd transmission-next-ui
-npm install
-npm run build
+pnpm install
+pnpm build
 ```
 
 Then, copy the contents of the `dist/` folder to your transmission web directory.

@@ -19,15 +19,32 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '23.11.0'
-          cache: 'npm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install Dependencies
-        run: npm install
+        run: pnpm install
 
       - name: Build Project
         env:
           VITE_APP_VERSION: ${{ github.ref_name }}
-        run: npm run build
+        run: pnpm build
 
       - name: Zip release folder
         run: cd dist && zip -r ../release.zip .
