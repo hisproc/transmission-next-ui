@@ -14,7 +14,7 @@ const I18nContext = React.createContext<{
 } | null>(null)
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = React.useState<Locale>("en")
+  const [locale, setLocaleState] = React.useState<Locale>("zh")
 
   // Load locale from storage on mount
   React.useEffect(() => {
