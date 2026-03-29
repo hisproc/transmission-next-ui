@@ -595,7 +595,7 @@ export default function SettingsPage() {
                       <div className="space-y-4 p-5 md:p-6 bg-primary/5 rounded-3xl border border-primary/10">
                          <div className="flex justify-between items-center text-xs md:text-sm">
                             <span className="font-semibold text-muted-foreground tracking-tight">{t('settings.remote.client_version')}</span>
-                            <span className="text-numeric font-bold">1.0.0-Antigravity</span>
+                            <span className="text-numeric font-bold">v0.1.8</span>
                          </div>
                          <div className="flex justify-between items-center text-xs md:text-sm">
                             <span className="font-semibold text-muted-foreground tracking-tight">{t('settings.remote.rpc_version')}</span>
