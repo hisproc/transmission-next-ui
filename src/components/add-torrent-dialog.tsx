@@ -158,7 +158,7 @@ export function AddTorrentDialog({ children, onSuccess }: AddTorrentDialogProps)
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-6 overflow-y-auto px-1">
+        <div className="flex flex-col gap-6 overflow-y-auto no-scrollbar px-1">
           {magnetLink.trim() === "" && (
             <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
               <div className="flex items-center justify-between">
