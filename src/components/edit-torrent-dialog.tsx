@@ -34,13 +34,12 @@ interface EditTorrentDialogProps {
   onSuccess?: () => void
 }
 
-const COMMON_PATHS = [
+// Fallback paths if RPC fails
+const FALLBACK_PATHS = [
   "/downloads",
   "/downloads/movies",
   "/downloads/tv",
   "/downloads/music",
-  "/downloads/books",
-  "/downloads/apps"
 ]
 
 export function EditTorrentDialog({ torrent, children, onSuccess }: EditTorrentDialogProps) {
@@ -48,6 +47,7 @@ export function EditTorrentDialog({ torrent, children, onSuccess }: EditTorrentD
   const [open, setOpen] = React.useState(false)
   const [name, setName] = React.useState(torrent.name)
   const [location, setLocation] = React.useState(torrent.downloadDir || "/downloads")
+  const [pathOptions, setPathOptions] = React.useState<string[]>([])
   const [moveData, setMoveData] = React.useState(true)
   const [isLoading, setIsLoading] = React.useState(false)
   const [isFetching, setIsFetching] = React.useState(false)
@@ -116,6 +116,32 @@ export function EditTorrentDialog({ torrent, children, onSuccess }: EditTorrentD
       }).finally(() => {
         setIsFetching(false)
       })
+
+      // Fetch path options
+      const fetchPaths = async () => {
+        try {
+          const [session, torrentsData] = await Promise.all([
+            rpc.getSession(),
+            rpc.getTorrents(["downloadDir"])
+          ])
+          
+          const paths = new Set<string>()
+          const defaultDir = session["download-dir"]
+          
+          if (defaultDir) paths.add(defaultDir)
+          
+          torrentsData.torrents.forEach((t: any) => {
+            if (t.downloadDir) paths.add(t.downloadDir)
+          })
+          
+          const combinedPaths = Array.from(paths).sort()
+          setPathOptions(combinedPaths.length > 0 ? combinedPaths : FALLBACK_PATHS)
+        } catch (error) {
+          console.error("Failed to fetch download paths:", error)
+          setPathOptions(FALLBACK_PATHS)
+        }
+      }
+      fetchPaths()
     }
   }, [open, torrent.id, torrent.name, torrent.downloadDir])
 
@@ -225,7 +251,7 @@ export function EditTorrentDialog({ torrent, children, onSuccess }: EditTorrentD
                   alignOffset={0}
                   className="w-[var(--radix-dropdown-menu-trigger-width)] rounded-xl border-muted/50 p-1 bg-card/95 backdrop-blur-xl shadow-2xl z-[60]"
                 >
-                  {COMMON_PATHS.map((path) => (
+                  {pathOptions.map((path) => (
                     <DropdownMenuItem 
                       key={path}
                       className="rounded-lg py-2.5 px-3 text-sm font-medium cursor-pointer"

@@ -31,13 +31,12 @@ interface AddTorrentDialogProps {
   onSuccess?: () => void
 }
 
-const COMMON_PATHS = [
+// Fallback paths if RPC fails
+const FALLBACK_PATHS = [
   "/downloads",
   "/downloads/movies",
   "/downloads/tv",
   "/downloads/music",
-  "/downloads/books",
-  "/downloads/apps"
 ]
 
 const toBase64 = (file: File): Promise<string> => 
@@ -54,12 +53,48 @@ const toBase64 = (file: File): Promise<string> =>
 
 export function AddTorrentDialog({ children, onSuccess }: AddTorrentDialogProps) {
   const [open, setOpen] = React.useState(false)
-  const [location, setLocation] = React.useState("/downloads")
+  const [location, setLocation] = React.useState("")
+  const [pathOptions, setPathOptions] = React.useState<string[]>([])
   const [files, setFiles] = React.useState<File[]>([])
   const [magnetLink, setMagnetLink] = React.useState("")
   const [isDragging, setIsDragging] = React.useState(false)
   const [isAdding, setIsAdding] = React.useState(false)
   const [startImmediately, setStartImmediately] = React.useState(true)
+
+  // Fetch default path and existing paths
+  React.useEffect(() => {
+    if (open) {
+      const fetchPaths = async () => {
+        try {
+          const [session, torrentsData] = await Promise.all([
+            rpc.getSession(),
+            rpc.getTorrents(["downloadDir"])
+          ])
+          
+          const paths = new Set<string>()
+          const defaultDir = session["download-dir"]
+          
+          if (defaultDir) {
+            paths.add(defaultDir)
+            // Default to session download-dir when opening if not already set by user
+            setLocation(prev => prev === "" ? defaultDir : prev)
+          }
+          
+          torrentsData.torrents.forEach((t: any) => {
+            if (t.downloadDir) paths.add(t.downloadDir)
+          })
+          
+          const combinedPaths = Array.from(paths).sort()
+          setPathOptions(combinedPaths.length > 0 ? combinedPaths : FALLBACK_PATHS)
+        } catch (error) {
+          console.error("Failed to fetch download paths:", error)
+          setPathOptions(FALLBACK_PATHS)
+          if (!location) setLocation(FALLBACK_PATHS[0])
+        }
+      }
+      fetchPaths()
+    }
+  }, [open])
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const { t } = useI18n()
 
@@ -136,6 +171,7 @@ export function AddTorrentDialog({ children, onSuccess }: AddTorrentDialogProps)
       setOpen(false)
       setFiles([])
       setMagnetLink("")
+      setLocation("")
       if (onSuccess) onSuccess()
     } catch (err) {
       console.error("Failed to add torrent:", err)
@@ -317,7 +353,7 @@ export function AddTorrentDialog({ children, onSuccess }: AddTorrentDialogProps)
                 alignOffset={0}
                 className="w-[var(--radix-dropdown-menu-trigger-width)] rounded-2xl border-muted/50 p-1 bg-card/95 backdrop-blur-xl shadow-2xl z-[60]"
               >
-                {COMMON_PATHS.map((path) => (
+                {pathOptions.map((path) => (
                   <DropdownMenuItem 
                     key={path}
                     className="rounded-xl py-3 px-4 text-sm font-medium cursor-pointer"
