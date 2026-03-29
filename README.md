@@ -24,6 +24,8 @@
 
 ## 预览
 
+[**在线演示 (Live Demo)**](https://transmission-next-ui-demo.pages.dev)
+
 | Light Mode | Dark Mode |
 | :---: | :---: |
 | ![demo.png](pic/demo.png) | ![demo_dark.png](pic/demo_dark.png) |

@@ -15,6 +15,8 @@ English | [简体中文](README.md)
 
 ## Preview
 
+[**Live Demo**](https://transmission-next-ui-demo.pages.dev)
+
 | Light Mode | Dark Mode |
 | :---: | :---: |
 | ![demo.png](pic/demo.png) | ![demo_dark.png](pic/demo_dark.png) |
