@@ -626,7 +626,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                       )}
                     </Button>
                   </SheetTrigger>
-                  <SheetContent showCloseButton={false} side="bottom" className="rounded-t-[2rem] border-none bg-background/95 backdrop-blur-xl h-[80vh] p-0 overflow-hidden flex flex-col">
+                  <SheetContent showCloseButton={false} side="bottom" className="rounded-t-[2rem] border-none bg-background/95 backdrop-blur-xl max-h-[85dvh] p-0 overflow-hidden flex flex-col">
                     <SheetHeader className="px-6 py-4 border-b border-muted/20 shrink-0">
                       <div className="flex items-center justify-between">
                         <SheetTitle className="text-xl font-bold tracking-tight">{t('common.filters', 'Filters')}</SheetTitle>
@@ -647,7 +647,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
                       </div>
                     </SheetHeader>
 
-                    <div className="flex-1 overflow-y-auto no-scrollbar p-6 space-y-8 pb-12">
+                    <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain no-scrollbar p-6 space-y-8 pb-12">
                       {/* Trackers */}
                       <div className="space-y-4">
                         <div className="flex items-center gap-2 text-muted-foreground">
