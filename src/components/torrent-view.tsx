@@ -89,6 +89,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isBatchReplaceOpen, setIsBatchReplaceOpen] = useState(false)
   const [idsToDelete, setIdsToDelete] = useState<number[]>([])
+  const [clickedCard, setClickedCard] = useState<string | null>(null)
 
   useEffect(() => {
     const saved = localStorage.getItem('isStatsCollapsed')
@@ -403,16 +404,26 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
         <div className="p-2 md:p-2.5 bg-muted/20 backdrop-blur-xl rounded-[2.5rem] border border-muted/30 shadow-sm animate-in slide-in-from-top-4 duration-500 ease-out mb-2">
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
             {/* Download Speed */}
-            <div className="flex items-center gap-3 p-4 rounded-[2rem] bg-background/40 border border-muted/5 hover:bg-background/60 transition-all group shrink-0 overflow-hidden shadow-none cursor-default">
+            <div 
+              className="flex items-center gap-3 p-4 rounded-[2rem] bg-background/40 border border-muted/5 hover:bg-background/60 transition-all group shrink-0 overflow-hidden shadow-none cursor-pointer md:cursor-default"
+              onClick={() => setClickedCard(clickedCard === "download" ? null : "download")}
+            >
               <div className="h-10 w-10 rounded-2xl bg-green-500/10 flex items-center justify-center text-green-500 group-hover:scale-110 group-hover:bg-green-500 group-hover:text-white transition-all duration-300 shrink-0 shadow-sm group-hover:shadow-green-500/20">
                 <ArrowDown className="h-5 w-5" />
               </div>
               <div className="flex flex-col min-w-0 flex-1">
-                <p className="text-[11px] uppercase font-bold tracking-widest text-muted-foreground/50 leading-none mb-1.5 group-hover:text-green-500/80 transition-colors uppercase">{t('stats.download_speed')}</p>
+                <p className={cn(
+                  "text-[11px] uppercase font-bold tracking-widest text-muted-foreground/50 leading-none mb-1.5 transition-colors uppercase",
+                  (clickedCard === "download" || "group-hover") && "group-hover:text-green-500/80",
+                  clickedCard === "download" && "text-green-500/80"
+                )}>{t('stats.download_speed')}</p>
                 <div className="flex items-center justify-between gap-1 overflow-hidden h-7">
                   <span className="text-lg font-extrabold tracking-tight truncate group-hover:scale-[1.02] transition-transform origin-left">{formatSpeed(totalDownloadSpeed)}</span>
                   <div className="block lg:hidden xl:block relative h-4 overflow-hidden flex-1 text-right">
-                    <div className="flex flex-col transition-transform duration-500 ease-out group-hover:-translate-y-4">
+                    <div className={cn(
+                      "flex flex-col transition-transform duration-500 ease-out group-hover:-translate-y-4",
+                      clickedCard === "download" && "-translate-y-4"
+                    )}>
                       <span className="text-[11px] text-muted-foreground/60 font-medium whitespace-nowrap h-4 flex items-center justify-end gap-1">
                         {t('stats.session_badge')}: {formatSize(stats["current-stats"].downloadedBytes)}
                       </span>
@@ -426,16 +437,25 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
             </div>
 
             {/* Upload Speed */}
-            <div className="flex items-center gap-3 p-4 rounded-[2rem] bg-background/40 border border-muted/5 hover:bg-background/60 transition-all group shrink-0 overflow-hidden shadow-none cursor-default">
+            <div 
+              className="flex items-center gap-3 p-4 rounded-[2rem] bg-background/40 border border-muted/5 hover:bg-background/60 transition-all group shrink-0 overflow-hidden shadow-none cursor-pointer md:cursor-default"
+              onClick={() => setClickedCard(clickedCard === "upload" ? null : "upload")}
+            >
               <div className="h-10 w-10 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all duration-300 shrink-0 shadow-sm group-hover:shadow-blue-500/20">
                 <ArrowUp className="h-5 w-5" />
               </div>
               <div className="flex flex-col min-w-0 flex-1">
-                <p className="text-[11px] uppercase font-bold tracking-widest text-muted-foreground/50 leading-none mb-1.5 group-hover:text-blue-500/80 transition-colors uppercase">{t('stats.upload_speed')}</p>
+                <p className={cn(
+                  "text-[11px] uppercase font-bold tracking-widest text-muted-foreground/50 leading-none mb-1.5 transition-colors uppercase",
+                  clickedCard === "upload" ? "text-blue-500/80" : "group-hover:text-blue-500/80"
+                )}>{t('stats.upload_speed')}</p>
                 <div className="flex items-center justify-between gap-1 overflow-hidden h-7">
                   <span className="text-lg font-extrabold tracking-tight truncate group-hover:scale-[1.02] transition-transform origin-left">{formatSpeed(totalUploadSpeed)}</span>
                   <div className="block lg:hidden xl:block relative h-4 overflow-hidden flex-1 text-right">
-                    <div className="flex flex-col transition-transform duration-500 ease-out group-hover:-translate-y-4">
+                    <div className={cn(
+                      "flex flex-col transition-transform duration-500 ease-out group-hover:-translate-y-4",
+                      clickedCard === "upload" && "-translate-y-4"
+                    )}>
                       <span className="text-[11px] text-muted-foreground/60 font-medium whitespace-nowrap h-4 flex items-center justify-end gap-1">
                         {t('stats.session_badge')}: {formatSize(stats["current-stats"].uploadedBytes)}
                       </span>
@@ -449,16 +469,25 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
             </div>
 
             {/* Activity */}
-            <div className="flex items-center gap-3 p-4 rounded-[2rem] bg-background/40 border border-muted/5 hover:bg-background/60 transition-all group shrink-0 overflow-hidden shadow-none cursor-default">
+            <div 
+              className="flex items-center gap-3 p-4 rounded-[2rem] bg-background/40 border border-muted/5 hover:bg-background/60 transition-all group shrink-0 overflow-hidden shadow-none cursor-pointer md:cursor-default"
+              onClick={() => setClickedCard(clickedCard === "activity" ? null : "activity")}
+            >
               <div className="h-10 w-10 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-500 group-hover:scale-110 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300 shrink-0 shadow-sm group-hover:shadow-orange-500/20">
                 <Activity className="h-5 w-5" />
               </div>
               <div className="flex flex-col min-w-0 flex-1">
-                <p className="text-[11px] uppercase font-bold tracking-widest text-muted-foreground/50 leading-none mb-1.5 group-hover:text-orange-500/80 transition-colors uppercase">{t('stats.active_torrents')}</p>
+                <p className={cn(
+                  "text-[11px] uppercase font-bold tracking-widest text-muted-foreground/50 leading-none mb-1.5 transition-colors uppercase",
+                  clickedCard === "activity" ? "text-orange-500/80" : "group-hover:text-orange-500/80"
+                )}>{t('stats.active_torrents')}</p>
                 <div className="flex items-center justify-between gap-1 overflow-hidden h-7">
                   <span className="text-lg font-extrabold tracking-tight truncate group-hover:scale-[1.02] transition-transform origin-left">{stats.activeTorrentCount}</span>
                   <div className="block lg:hidden xl:block relative h-4 overflow-hidden flex-1 text-right">
-                    <div className="flex flex-col transition-transform duration-500 ease-out group-hover:-translate-y-4">
+                    <div className={cn(
+                      "flex flex-col transition-transform duration-500 ease-out group-hover:-translate-y-4",
+                      clickedCard === "activity" && "-translate-y-4"
+                    )}>
                       <span className="text-[11px] text-muted-foreground/60 font-medium whitespace-nowrap h-4 flex items-center justify-end gap-1">
                         {t('stats.total_tasks')}: {stats.torrentCount}
                       </span>
@@ -472,16 +501,25 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
             </div>
 
             {/* Space */}
-            <div className="flex items-center gap-3 p-4 rounded-[2rem] bg-background/40 border border-muted/5 hover:bg-background/60 transition-all group shrink-0 overflow-hidden shadow-none cursor-default">
+            <div 
+              className="flex items-center gap-3 p-4 rounded-[2rem] bg-background/40 border border-muted/5 hover:bg-background/60 transition-all group shrink-0 overflow-hidden shadow-none cursor-pointer md:cursor-default"
+              onClick={() => setClickedCard(clickedCard === "space" ? null : "space")}
+            >
               <div className="h-10 w-10 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500 group-hover:scale-110 group-hover:bg-purple-500 group-hover:text-white transition-all duration-300 shrink-0 shadow-sm group-hover:shadow-purple-500/20">
                 <Database className="h-5 w-5" />
               </div>
               <div className="flex flex-col min-w-0 flex-1">
-                <p className="text-[11px] uppercase font-bold tracking-widest text-muted-foreground/50 leading-none mb-1.5 group-hover:text-purple-500/80 transition-colors uppercase">{t('stats.free_space')}</p>
+                <p className={cn(
+                  "text-[11px] uppercase font-bold tracking-widest text-muted-foreground/50 leading-none mb-1.5 transition-colors uppercase",
+                  clickedCard === "space" ? "text-purple-500/80" : "group-hover:text-purple-500/80"
+                )}>{t('stats.free_space')}</p>
                 <div className="flex items-center justify-between gap-1 overflow-hidden h-7">
                   <span className="text-lg font-extrabold tracking-tight truncate group-hover:scale-[1.02] transition-transform origin-left">{freeSpace ? formatSize(freeSpace["size-bytes"]) : "---"}</span>
                   <div className="block lg:hidden xl:block relative h-4 overflow-hidden flex-1 text-right">
-                    <div className="flex flex-col transition-transform duration-500 ease-out group-hover:-translate-y-4">
+                    <div className={cn(
+                      "flex flex-col transition-transform duration-500 ease-out group-hover:-translate-y-4",
+                      clickedCard === "space" && "-translate-y-4"
+                    )}>
                       {freeSpace && (
                         <span className="text-[11px] text-muted-foreground/60 font-medium whitespace-nowrap h-4 flex items-center justify-end gap-1 text-right">
                           {((freeSpace["size-bytes"] / freeSpace.total_size) * 100).toFixed(0)}% {t('stats.free_unit')}
