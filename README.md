@@ -9,15 +9,28 @@
 
 ---
 
+## 技术栈
+
+- **前端框架**: [React 19](https://react.dev/) + [Vite 7](https://vite.dev/)
+- **CSS 框架**: [Tailwind CSS 4.0](https://tailwindcss.com/)
+- **组件库**: [shadcn/ui](https://ui.shadcn.com/)
+- **图标库**: [Lucide React](https://lucide.dev/)
+- **路由管理**: [React Router 7](https://reactrouter.com/)
+
+---
+
 简体中文 | [English](README_EN.md)
 
 
 ## 预览
 
-![demo.png](pic/demo.png)
-![demo_dark.png](pic/demo_dark.png)
-![demo2.png](pic/demo2.png)
-![demo3.png](pic/demo3.png)
+| Light Mode | Dark Mode |
+| :---: | :---: |
+| ![demo.png](pic/demo.png) | ![demo_dark.png](pic/demo_dark.png) |
+
+| Torrent Details | Settings |
+| :---: | :---: |
+| ![demo2.png](pic/demo2.png) | ![demo3.png](pic/demo3.png) |
 
 ## 功能
 
