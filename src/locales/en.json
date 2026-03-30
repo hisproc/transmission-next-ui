@@ -106,7 +106,14 @@
     "mode_global": "Follow Global",
     "mode_single": "Independent",
     "mode_unlimited": "Unlimited",
-    "tracker_list_hint": "Enter one URL per line. Use a blank line to separate tracker tiers."
+    "tracker_list_hint": "Enter one URL per line. Use a blank line to separate tracker tiers.",
+    "more": "More",
+    "verify": "Verify",
+    "verify_success": "Verifying",
+    "verify_desc": "Selected torrents queued for verification",
+    "reannounce": "Reannounce",
+    "reannounce_success": "Reannounced",
+    "reannounce_desc": "Selected torrents reannounced to trackers"
   },
   "details": {
     "general": "General",

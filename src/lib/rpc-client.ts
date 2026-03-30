@@ -145,6 +145,16 @@ class TransmissionRPC {
   async portTest() {
     return this.request<{ "port-is-open": boolean }>("port-test")
   }
+
+  async verifyTorrents(ids?: (number | string)[]) {
+    const args = ids && ids.length > 0 ? { ids } : {}
+    return this.request("torrent-verify", args)
+  }
+
+  async reannounceTorrents(ids?: (number | string)[]) {
+    const args = ids && ids.length > 0 ? { ids } : {}
+    return this.request("torrent-reannounce", args)
+  }
 }
 
 export const rpc = new TransmissionRPC()
