@@ -25,6 +25,7 @@ import { toast } from "sonner"
 import { rpc } from "@/lib/rpc-client"
 import { useI18n } from "@/lib/i18n-context"
 import { cn } from "@/lib/utils"
+import { LocationInput } from "@/components/location-input"
 
 interface AddTorrentDialogProps {
   children: React.ReactNode
@@ -54,47 +55,12 @@ const toBase64 = (file: File): Promise<string> =>
 export function AddTorrentDialog({ children, onSuccess }: AddTorrentDialogProps) {
   const [open, setOpen] = React.useState(false)
   const [location, setLocation] = React.useState("")
-  const [pathOptions, setPathOptions] = React.useState<string[]>([])
   const [files, setFiles] = React.useState<File[]>([])
   const [magnetLink, setMagnetLink] = React.useState("")
   const [isDragging, setIsDragging] = React.useState(false)
   const [isAdding, setIsAdding] = React.useState(false)
   const [startImmediately, setStartImmediately] = React.useState(true)
 
-  // Fetch default path and existing paths
-  React.useEffect(() => {
-    if (open) {
-      const fetchPaths = async () => {
-        try {
-          const [session, torrentsData] = await Promise.all([
-            rpc.getSession(),
-            rpc.getTorrents(["downloadDir"])
-          ])
-          
-          const paths = new Set<string>()
-          const defaultDir = session["download-dir"]
-          
-          if (defaultDir) {
-            paths.add(defaultDir)
-            // Default to session download-dir when opening if not already set by user
-            setLocation(prev => prev === "" ? defaultDir : prev)
-          }
-          
-          torrentsData.torrents.forEach((t: any) => {
-            if (t.downloadDir) paths.add(t.downloadDir)
-          })
-          
-          const combinedPaths = Array.from(paths).sort()
-          setPathOptions(combinedPaths.length > 0 ? combinedPaths : FALLBACK_PATHS)
-        } catch (error) {
-          console.error("Failed to fetch download paths:", error)
-          setPathOptions(FALLBACK_PATHS)
-          if (!location) setLocation(FALLBACK_PATHS[0])
-        }
-      }
-      fetchPaths()
-    }
-  }, [open])
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const { t } = useI18n()
 
@@ -331,40 +297,12 @@ export function AddTorrentDialog({ children, onSuccess }: AddTorrentDialogProps)
             <div className="flex items-center gap-2 text-sm font-medium uppercase tracking-widest text-muted-foreground/60">
               <FolderOpen className="h-3.5 w-3.5" /> {t('common.save_location', 'Save Location')}
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <div className="relative flex w-full">
-                  <Input
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    className="h-14 rounded-2xl bg-muted/30 border-none transition-all focus-visible:ring-2 focus-visible:ring-primary/20 font-medium text-sm w-full pr-14"
-                  />
-                  <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
-                    <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-muted-foreground">
-                      <ChevronDown className="h-5 w-5" />
-                    </Button>
-                  </div>
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                align="start" 
-                side="bottom"
-                sideOffset={8}
-                alignOffset={0}
-                className="w-[var(--radix-dropdown-menu-trigger-width)] rounded-2xl border-muted/50 p-1 bg-card/95 backdrop-blur-xl shadow-2xl z-[60]"
-              >
-                {pathOptions.map((path) => (
-                  <DropdownMenuItem 
-                    key={path}
-                    className="rounded-xl py-3 px-4 text-sm font-medium cursor-pointer"
-                    onClick={() => setLocation(path)}
-                  >
-                    <FolderOpen className="h-4 w-4 mr-3 opacity-50" />
-                    {path}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <LocationInput 
+              value={location} 
+              onChange={setLocation} 
+              className="h-14 rounded-2xl bg-muted/30 border-none transition-all focus-visible:ring-2 focus-visible:ring-primary/20 font-medium text-sm"
+              menuClassName="w-[300px] sm:w-[400px]"
+            />
           </div>
         </div>
 
