@@ -58,7 +58,9 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
-  ChevronsRight
+  ChevronsRight,
+  ShieldCheck,
+  Radio
 } from "lucide-react"
 import { AddTorrentDialog } from "@/components/add-torrent-dialog"
 import { EditTorrentDialog } from "@/components/edit-torrent-dialog"
@@ -205,7 +207,7 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
     }
   }, [showStats])
 
-  const handleBatchAction = async (action: "start" | "stop" | "remove") => {
+  const handleBatchAction = async (action: "start" | "stop" | "remove" | "verify" | "reannounce") => {
     if (selectedIds.length === 0) return
 
     const count = selectedIds.length
@@ -224,6 +226,16 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
         setIdsToDelete(selectedIds)
         setIsDeleteDialogOpen(true)
         return // Handle in confirmDelete
+      } else if (action === "verify") {
+        await rpc.verifyTorrents(selectedIds)
+        toast.success(t('common.verify_success', 'Verifying'), {
+          description: t('common.verify_desc', 'Selected torrents queued for verification')
+        })
+      } else if (action === "reannounce") {
+        await rpc.reannounceTorrents(selectedIds)
+        toast.success(t('common.reannounce_success', 'Reannounced'), {
+          description: t('common.reannounce_desc', 'Selected torrents reannounced to trackers')
+        })
       }
 
       setSelectedIds([])
@@ -1295,22 +1307,47 @@ export function TorrentView({ title, statusFilter, showStats = true }: TorrentVi
               <div className="bg-primary text-primary-foreground text-[10px] md:text-xs font-bold h-5 w-5 md:h-6 md:w-6 rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
                 {selectedIds.length}
               </div>
-              <span className="text-sm font-bold tracking-tight hidden sm:inline">{t('common.selected')}</span>
+              <span className="text-sm font-bold tracking-tight hidden lg:inline">{t('common.selected')}</span>
             </div>
 
-            <div className="flex items-center gap-1.5 md:gap-3 flex-1 min-w-0 overflow-x-auto no-scrollbar justify-center md:justify-start">
-              <Button size="sm" className="h-9 md:h-10 rounded-2xl md:rounded-xl font-bold gap-2 px-3 md:px-4" onClick={() => handleBatchAction("start")}>
+            <div className="flex items-center gap-1.5 xl:gap-3 flex-1 min-w-0 overflow-x-auto no-scrollbar justify-center md:justify-start">
+              <Button size="sm" className="h-9 md:h-10 rounded-2xl md:rounded-xl font-bold gap-1.5 md:gap-2 px-2.5 md:px-4" onClick={() => handleBatchAction("start")}>
                 <Play className="h-4 w-4" />
-                <span className="hidden md:inline">{t('common.resume')}</span>
+                <span className="hidden xl:inline">{t('common.resume')}</span>
               </Button>
-              <Button size="sm" variant="secondary" className="h-9 md:h-10 rounded-2xl md:rounded-xl font-bold gap-2 px-3 md:px-4" onClick={() => handleBatchAction("stop")}>
+              <Button size="sm" variant="secondary" className="h-9 md:h-10 rounded-2xl md:rounded-xl font-bold gap-1.5 md:gap-2 px-2.5 md:px-4" onClick={() => handleBatchAction("stop")}>
                 <Pause className="h-4 w-4" />
-                <span className="hidden md:inline">{t('common.pause')}</span>
+                <span className="hidden xl:inline">{t('common.pause')}</span>
               </Button>
-              <Button size="sm" variant="ghost" className="h-9 md:h-10 rounded-2xl md:rounded-xl font-bold gap-2 px-3 md:px-4 text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleBatchAction("remove")}>
+              <Button size="sm" variant="ghost" className="h-9 md:h-10 rounded-2xl md:rounded-xl font-bold gap-1.5 md:gap-2 px-2.5 md:px-4 text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleBatchAction("remove")}>
                 <Trash2 className="h-4 w-4" />
-                <span className="hidden md:inline">{t('common.remove')}</span>
+                <span className="hidden xl:inline">{t('common.remove')}</span>
               </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" variant="ghost" className="h-9 md:h-10 rounded-2xl md:rounded-xl font-bold gap-1.5 md:gap-2 px-2.5 md:px-4 bg-muted/50 hover:bg-muted/70">
+                    <MoreVertical className="h-4 w-4" />
+                    <span className="hidden xl:inline">{t('common.more', 'More')}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" sideOffset={12} className="w-[200px] rounded-2xl border border-muted/50 bg-card/95 backdrop-blur-xl shadow-2xl p-1">
+                  <DropdownMenuItem
+                    className="rounded-xl py-2.5 px-3 cursor-pointer gap-3 font-medium focus:bg-muted"
+                    onClick={() => handleBatchAction("verify")}
+                  >
+                    <ShieldCheck className="h-4 w-4 opacity-60" />
+                    {t('common.verify', 'Verify')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="rounded-xl py-2.5 px-3 cursor-pointer gap-3 font-medium focus:bg-muted"
+                    onClick={() => handleBatchAction("reannounce")}
+                  >
+                    <Radio className="h-4 w-4 opacity-60" />
+                    {t('common.reannounce', 'Reannounce')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             <Button

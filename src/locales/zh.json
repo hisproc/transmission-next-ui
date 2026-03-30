@@ -111,7 +111,14 @@
     "of": "/",
     "torrents_total": "个种子",
     "page_size": "分页大小",
-    "all": "全部"
+    "all": "全部",
+    "more": "更多",
+    "verify": "校验",
+    "verify_success": "正在校验",
+    "verify_desc": "选中的种子已加入校验队列",
+    "reannounce": "重新汇报",
+    "reannounce_success": "已重新汇报",
+    "reannounce_desc": "选中的种子已向 Tracker 重新汇报"
   },
   "details": {
     "general": "常规",
