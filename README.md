@@ -57,6 +57,12 @@
 
 > 依赖环境：`docker`、`docker-compose` 和 `curl`
 
+> [!TIP]
+> 建议先创建一个专用目录来存放相关文件，例如：
+> ```bash
+> mkdir -p ~/transmission && cd ~/transmission
+> ```
+
 初次安装或升级到最新版本，运行以下命令：
 
 ```bash
