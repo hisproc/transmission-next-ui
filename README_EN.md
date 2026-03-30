@@ -48,6 +48,12 @@ You can deploy Transmission Next UI in three different ways:
 
 > Requires: `docker`, `docker-compose`, and `curl`
 
+> [!TIP]
+> It's recommended to create a dedicated directory for your files first:
+> ```bash
+> mkdir -p ~/transmission && cd ~/transmission
+> ```
+
 To install web UI or upgrade to the latest version, run the following command:
 
 ```bash
