@@ -12,16 +12,11 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { useI18n } from "@/lib/i18n-context"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { rpc } from "@/lib/rpc-client"
 import { toast } from "sonner"
 import type { Torrent } from "@/lib/rpc-types"
 import { cn } from "@/lib/utils"
+import { LocationInput } from "@/components/location-input"
 
 interface EditTorrentDialogProps {
   torrent: {
@@ -47,7 +42,6 @@ export function EditTorrentDialog({ torrent, children, onSuccess }: EditTorrentD
   const [open, setOpen] = React.useState(false)
   const [name, setName] = React.useState(torrent.name)
   const [location, setLocation] = React.useState(torrent.downloadDir || "/downloads")
-  const [pathOptions, setPathOptions] = React.useState<string[]>([])
   const [moveData, setMoveData] = React.useState(true)
   const [isLoading, setIsLoading] = React.useState(false)
   const [isFetching, setIsFetching] = React.useState(false)
@@ -116,32 +110,6 @@ export function EditTorrentDialog({ torrent, children, onSuccess }: EditTorrentD
       }).finally(() => {
         setIsFetching(false)
       })
-
-      // Fetch path options
-      const fetchPaths = async () => {
-        try {
-          const [session, torrentsData] = await Promise.all([
-            rpc.getSession(),
-            rpc.getTorrents(["downloadDir"])
-          ])
-          
-          const paths = new Set<string>()
-          const defaultDir = session["download-dir"]
-          
-          if (defaultDir) paths.add(defaultDir)
-          
-          torrentsData.torrents.forEach((t: any) => {
-            if (t.downloadDir) paths.add(t.downloadDir)
-          })
-          
-          const combinedPaths = Array.from(paths).sort()
-          setPathOptions(combinedPaths.length > 0 ? combinedPaths : FALLBACK_PATHS)
-        } catch (error) {
-          console.error("Failed to fetch download paths:", error)
-          setPathOptions(FALLBACK_PATHS)
-        }
-      }
-      fetchPaths()
     }
   }, [open, torrent.id, torrent.name, torrent.downloadDir])
 
@@ -227,42 +195,14 @@ export function EditTorrentDialog({ torrent, children, onSuccess }: EditTorrentD
               <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2">
                 <FolderOpen className="h-3.5 w-3.5 text-muted-foreground" /> {t('common.save_location')}
               </label>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild disabled={isLoading}>
-                  <div className="relative flex w-full">
-                    <Input
-                      id="location"
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      className="h-11 rounded-xl bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary pr-12 transition-all cursor-text pointer-events-auto flex-1"
-                      disabled={isLoading}
-                    />
-                    <div className="absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
-                      <Button variant="ghost" size="icon" type="button" className="h-9 w-9 rounded-lg text-muted-foreground" disabled={isLoading}>
-                        <ChevronDown className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent 
-                  align="start" 
-                  side="bottom"
-                  sideOffset={4}
-                  alignOffset={0}
-                  className="w-[var(--radix-dropdown-menu-trigger-width)] rounded-xl border-muted/50 p-1 bg-card/95 backdrop-blur-xl shadow-2xl z-[60]"
-                >
-                  {pathOptions.map((path) => (
-                    <DropdownMenuItem 
-                      key={path}
-                      className="rounded-lg py-2.5 px-3 text-sm font-medium cursor-pointer"
-                      onClick={() => setLocation(path)}
-                    >
-                      <FolderOpen className="h-4 w-4 mr-3 opacity-50" />
-                      {path}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <LocationInput
+                id="location"
+                value={location}
+                onChange={setLocation}
+                className="h-11 rounded-xl bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary transition-all flex-1"
+                disabled={isLoading}
+                menuClassName="w-[280px] sm:w-[350px]"
+              />
             </div>
             <div 
               className={`flex items-center gap-3 p-4 rounded-2xl bg-muted/30 border border-muted/50 transition-colors group ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-muted/50'}`}
