@@ -7,6 +7,14 @@ DOCKER_COMPOSE_URL="https://raw.githubusercontent.com/$REPO/main/docker-compose.
 DEST_DIR="./web/src"
 TMP_ZIP="tmp.zip"
 
+# --- Dependency Check ---
+for cmd in curl unzip grep sed; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        echo "❌ Error: '$cmd' is required but not installed. Please install it." >&2
+        exit 1
+    fi
+done
+
 echo "🔍 Fetching latest versions from $REPO..."
 
 # Fetch last 5 versions using curl and basic regex (no jq dependency)
