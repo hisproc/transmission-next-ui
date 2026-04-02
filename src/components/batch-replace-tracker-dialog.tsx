@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Globe, RefreshCw, CheckCircle2, AlertCircle, Search, ArrowRight, ListCheck, ChevronDown } from "lucide-react"
+import { Globe, RefreshCw, CheckCircle2, AlertCircle, Search, ArrowRight, ListCheck, ChevronDown, RotateCcw, Activity } from "lucide-react"
+import { BatchTorrentList } from "@/components/batch-torrent-list"
 import {
   Dialog,
   DialogContent,
@@ -259,14 +260,7 @@ export function BatchReplaceTrackerDialog({ open, onOpenChange, onSuccess }: Bat
                   <span className="text-sm font-medium uppercase tracking-widest text-muted-foreground/60">{t('common.affected_torrents')}</span>
                   <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">{matchingTorrents.length}</span>
                </div>
-               <div className="max-h-[220px] overflow-y-auto no-scrollbar space-y-2 pr-1">
-                  {matchingTorrents.map((tor) => (
-                    <div key={tor.id} className="p-3.5 rounded-2xl bg-muted/30 border border-muted/20 flex items-center gap-3">
-                      <CheckCircle2 className="h-4.5 w-4.5 text-green-500 shrink-0" />
-                      <span className="text-sm font-medium truncate leading-none">{tor.name}</span>
-                    </div>
-                  ))}
-               </div>
+                <BatchTorrentList torrents={matchingTorrents} />
                
                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 py-4 px-2">
                   <div className="flex flex-col items-center gap-2 min-w-0 w-full sm:flex-1">
