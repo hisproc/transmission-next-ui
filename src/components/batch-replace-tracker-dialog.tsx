@@ -1,8 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { Globe, RefreshCw, CheckCircle2, AlertCircle, Search, ArrowRight, ListCheck, ChevronDown, RotateCcw, Activity } from "lucide-react"
+import { Globe, RefreshCw, AlertCircle, Search, ArrowRight, ListCheck } from "lucide-react"
 import { BatchTorrentList } from "@/components/batch-torrent-list"
+import { BatchInputWithDropdown } from "@/components/batch-input-with-dropdown"
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuPortal,
 } from "@/components/ui/dropdown-menu"
 import { toast } from "sonner"
 import { rpc } from "@/lib/rpc-client"
@@ -56,9 +58,11 @@ export function BatchReplaceTrackerDialog({ open, onOpenChange, onSuccess }: Bat
           const trackerSet = new Set<string>()
           torrents.forEach((tor: any) => {
             tor.trackers?.forEach((tr: any) => {
-              // Strip parameters after '?' if they exist
-              const baseUrl = tr.announce.split('?')[0]
-              trackerSet.add(baseUrl)
+              if (tr.announce) {
+                // Strip parameters after '?' if they exist
+                const baseUrl = tr.announce.split('?')[0]
+                trackerSet.add(baseUrl)
+              }
             })
           })
           setAvailableTrackers(Array.from(trackerSet).sort())
@@ -79,13 +83,16 @@ export function BatchReplaceTrackerDialog({ open, onOpenChange, onSuccess }: Bat
       const matches: MatchingTorrent[] = []
 
       torrents.forEach((tor: any) => {
-        const matchesInTorrent = tor.trackers?.filter((tr: any) => tr.announce.startsWith(oldTracker.trim()))
+        const matchesInTorrent = tor.trackers?.filter((tr: any) => 
+          tr.announce && tr.announce.startsWith(oldTracker.trim())
+        )
+
         if (matchesInTorrent && matchesInTorrent.length > 0) {
-          // If we found a match, we store the torrent and its FULL tracker list
+          // If we found a match, we store the torrent and its trackers
           matches.push({
             id: tor.id,
             name: tor.name,
-            trackers: tor.trackers.map((tr: any) => ({ announce: tr.announce, tier: tr.tier })),
+            trackers: tor.trackers.map((tr: any) => ({ announce: tr.announce, tier: tr.tier || 0 })),
             matchFullUrl: matchesInTorrent[0].announce // Use first match for preview
           })
         }
@@ -187,63 +194,27 @@ export function BatchReplaceTrackerDialog({ open, onOpenChange, onSuccess }: Bat
 
         <div className="p-6">
           {step === "input" ? (
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between ml-1">
-                    <label className="text-sm font-medium uppercase tracking-widest text-muted-foreground/60">{t('common.old_tracker')}</label>
-                  </div>
-                  
-                  <div className="relative group/input">
-                    <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
-                    <Input
-                      placeholder="https://tracker.example.com/announce"
-                      value={oldTracker}
-                      onChange={(e) => setOldTracker(e.target.value)}
-                      className="pl-11 pr-12 h-14 text-sm rounded-2xl bg-muted/30 border-none transition-all focus-visible:ring-2 focus-visible:ring-primary/20 font-medium"
-                    />
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-muted-foreground/50 hover:text-primary transition-colors">
-                            <ChevronDown className="h-5 w-5" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        {availableTrackers.length > 0 && (
-                          <DropdownMenuContent 
-                            align="end" 
-                            side="bottom"
-                            sideOffset={8}
-                            className="w-[var(--radix-dropdown-menu-trigger-width)] sm:w-[400px] rounded-2xl border-muted/50 p-1 bg-card/95 backdrop-blur-xl z-[60] max-h-[300px] overflow-y-auto no-scrollbar"
-                          >
-                            {availableTrackers.map(url => (
-                              <DropdownMenuItem 
-                                key={url} 
-                                className="rounded-xl py-3 px-4 text-sm font-medium cursor-pointer transition-colors"
-                                onClick={() => setOldTracker(url)}
-                              >
-                                <Globe className="h-4 w-4 mr-3 opacity-50 shrink-0" />
-                                <span className="truncate">{url}</span>
-                              </DropdownMenuItem>
-                            ))}
-                          </DropdownMenuContent>
-                        )}
-                      </DropdownMenu>
-                    </div>
-                  </div>
-                </div>
+            <div className="space-y-4">
+              <BatchInputWithDropdown
+                label={t('common.old_tracker')}
+                placeholder="https://tracker.example.com/announce"
+                value={oldTracker}
+                onChange={setOldTracker}
+                options={availableTrackers}
+                icon={Globe}
+                optionIcon={Globe}
+              />
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium uppercase tracking-widest text-muted-foreground/60 ml-1">{t('common.new_tracker')}</label>
-                  <div className="relative group/input">
-                    <RefreshCw className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
-                    <Input
-                      placeholder="https://new-tracker.org/announce"
-                      value={newTracker}
-                      onChange={(e) => setNewTracker(e.target.value)}
-                      className="pl-11 h-14 text-sm rounded-2xl bg-muted/30 border-none transition-all focus-visible:ring-2 focus-visible:ring-primary/20 font-medium"
-                    />
-                  </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium uppercase tracking-widest text-muted-foreground/60 ml-1">{t('common.new_tracker')}</label>
+                <div className="relative group/input">
+                  <ArrowRight className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
+                  <Input
+                    placeholder="https://tracker.new.com/announce"
+                    value={newTracker}
+                    onChange={(e) => setNewTracker(e.target.value)}
+                    className="pl-11 h-14 text-sm rounded-2xl bg-muted/30 border-none transition-all focus-visible:ring-2 focus-visible:ring-primary/20 font-medium"
+                  />
                 </div>
               </div>
 

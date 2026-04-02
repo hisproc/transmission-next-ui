@@ -1,8 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { FolderOpen, ArrowRight, Search, CheckCircle2, AlertCircle, RefreshCw, ChevronDown, ListCheck } from "lucide-react"
+import { FolderOpen, ArrowRight, Search, AlertCircle, RefreshCw, ListCheck } from "lucide-react"
 import { BatchTorrentList } from "@/components/batch-torrent-list"
+import { BatchInputWithDropdown } from "@/components/batch-input-with-dropdown"
 import {
   Dialog,
   DialogContent,
@@ -13,16 +14,9 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { toast } from "sonner"
 import { rpc } from "@/lib/rpc-client"
 import { useI18n } from "@/lib/i18n-context"
-import { cn } from "@/lib/utils"
 
 interface BatchMoveDirectoryDialogProps {
   open: boolean
@@ -148,49 +142,15 @@ export function BatchMoveDirectoryDialog({ open, onOpenChange, onSuccess }: Batc
           {step === "input" ? (
             <div className="space-y-6">
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between ml-1">
-                    <label className="text-sm font-medium uppercase tracking-widest text-muted-foreground/60">{t('common.old_directory')}</label>
-                  </div>
-                  
-                  <div className="relative group/input">
-                    <FolderOpen className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
-                    <Input
-                      placeholder="/downloads/old-path"
-                      value={oldDir}
-                      onChange={(e) => setOldDir(e.target.value)}
-                      className="pl-11 pr-12 h-14 text-sm rounded-2xl bg-muted/30 border-none transition-all focus-visible:ring-2 focus-visible:ring-primary/20 font-medium"
-                    />
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-muted-foreground/50 hover:text-primary transition-colors">
-                            <ChevronDown className="h-5 w-5" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        {availableDirs.length > 0 && (
-                          <DropdownMenuContent 
-                            align="end" 
-                            side="bottom"
-                            sideOffset={8}
-                            className="w-[var(--radix-dropdown-menu-trigger-width)] sm:w-[400px] rounded-2xl border-muted/50 p-1 bg-card/95 backdrop-blur-xl z-[60] max-h-[300px] overflow-y-auto no-scrollbar"
-                          >
-                            {availableDirs.map(dir => (
-                              <DropdownMenuItem 
-                                key={dir} 
-                                className="rounded-xl py-3 px-4 text-sm font-medium cursor-pointer transition-colors"
-                                onClick={() => setOldDir(dir)}
-                              >
-                                <FolderOpen className="h-4 w-4 mr-3 opacity-50 shrink-0" />
-                                <span className="truncate">{dir}</span>
-                              </DropdownMenuItem>
-                            ))}
-                          </DropdownMenuContent>
-                        )}
-                      </DropdownMenu>
-                    </div>
-                  </div>
-                </div>
+                <BatchInputWithDropdown
+                  label={t('common.old_directory')}
+                  placeholder="/downloads/old-path"
+                  value={oldDir}
+                  onChange={setOldDir}
+                  options={availableDirs}
+                  icon={FolderOpen}
+                  optionIcon={FolderOpen}
+                />
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium uppercase tracking-widest text-muted-foreground/60 ml-1">{t('common.new_directory')}</label>
