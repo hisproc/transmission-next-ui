@@ -17,7 +17,7 @@ done
 
 echo "🔍 Fetching latest versions from $REPO..."
 
-# Fetch last 5 versions using curl and basic regex (no jq dependency)
+# Fetch last 5 versions using curl and basic regex
 RELEASES_RAW=$(curl -s "$API_URL")
 TAGS=$(echo "$RELEASES_RAW" | grep '"tag_name":' | sed -E 's/.*"tag_name": "([^"]+)".*/\1/')
 
@@ -26,21 +26,29 @@ if [ -z "$TAGS" ]; then
     TAG_NAME="latest"
     ZIP_URL="https://github.com/$REPO/releases/latest/download/release.zip"
 else
-    # Convert to array
-    TAG_ARRAY=($TAGS)
+    # Convert to positional parameters (POSIX compatible array)
+    set -- $TAGS
+    COUNT=$#
     
     # Check if interactive
     if [ -t 0 ]; then
         echo ""
         echo "🚀 Please select a version to install:"
-        for i in "${!TAG_ARRAY[@]}"; do
-            echo "  $((i+1))) ${TAG_ARRAY[$i]} $( [ $i -eq 0 ] && echo "(latest)" )"
+        i=1
+        for tag in "$@"; do
+            if [ "$i" -eq 1 ]; then
+                echo "  $i) $tag (latest)"
+            else
+                echo "  $i) $tag"
+            fi
+            i=$((i+1))
         done
         echo "  c) Cancel"
         echo ""
-        read -p "Selection [1-${#TAG_ARRAY[@]}]: " choice
+        printf "Selection [1-$COUNT]: "
+        read choice
 
-        if [[ "$choice" == "c" ]]; then
+        if [ "$choice" = "c" ]; then
             echo "Cancelled."
             exit 0
         fi
@@ -48,28 +56,65 @@ else
         # Default to 1 if enter is pressed
         if [ -z "$choice" ]; then choice=1; fi
 
-        # Validate choice
-        if [[ "$choice" =~ ^[1-5]$ ]] && [ "$choice" -le "${#TAG_ARRAY[@]}" ]; then
-            SELECTED_TAG="${TAG_ARRAY[$((choice-1))]}"
-            TAG_NAME="$SELECTED_TAG"
-            ZIP_URL="https://github.com/$REPO/releases/download/$TAG_NAME/release.zip"
-        else
-            echo "⚠️  Invalid choice, using latest version: ${TAG_ARRAY[0]}"
-            TAG_NAME="${TAG_ARRAY[0]}"
-            ZIP_URL="https://github.com/$REPO/releases/download/$TAG_NAME/release.zip"
-        fi
+        # Validate and get tag
+        case "$choice" in
+            1) TAG_NAME="$1" ;;
+            2) TAG_NAME="$2" ;;
+            3) TAG_NAME="$3" ;;
+            4) TAG_NAME="$4" ;;
+            5) TAG_NAME="$5" ;;
+            *) 
+               echo "⚠️  Invalid choice, using latest version: $1"
+               TAG_NAME="$1" 
+               ;;
+        esac
     else
         # Non-interactive mode, use latest
-        TAG_NAME="${TAG_ARRAY[0]}"
-        ZIP_URL="https://github.com/$REPO/releases/download/$TAG_NAME/release.zip"
+        TAG_NAME="$1"
     fi
+    ZIP_URL="https://github.com/$REPO/releases/download/$TAG_NAME/release.zip"
 fi
 
 echo "📦 Selected version: $TAG_NAME"
 echo "📥 Downloading UI assets..."
 
-mkdir -p "$DEST_DIR"
 if curl -L -f -o "$TMP_ZIP" "$ZIP_URL"; then
+    mkdir -p "$DEST_DIR"
+    
+    # --- Backup and Clean ---
+    if [ -d "$DEST_DIR" ] && [ "$(ls -A "$DEST_DIR" 2>/dev/null)" ]; then
+        BACKUP_TS=$(date +%Y%m%d_%H%M%S)
+        BACKUP_ROOT="./web"
+        BACKUP_PATH="$BACKUP_ROOT/backup_$BACKUP_TS"
+        
+        # Remove old backups before creating new one
+        if [ -t 0 ]; then
+            B_COUNT=$(find "$BACKUP_ROOT" -maxdepth 1 -type d -name "backup_*" | grep -c "backup_")
+            if [ "$B_COUNT" -gt 0 ]; then
+                printf "⚠️  Found $B_COUNT old backup(s) in $BACKUP_ROOT. Delete them? [y/N]: "
+                read confirm
+                case "$confirm" in
+                    [Yy]*) 
+                        find "$BACKUP_ROOT" -maxdepth 1 -type d -name "backup_*" -exec rm -rf {} +
+                        echo "🧹 Old backups removed."
+                        ;;
+                    *)
+                        echo "⏭️  Keeping old backups."
+                        ;;
+                esac
+            fi
+        else
+            find "$BACKUP_ROOT" -maxdepth 1 -type d -name "backup_*" -exec rm -rf {} +
+        fi
+        
+        echo "📦 Existing UI detected. Backing up to $BACKUP_PATH..."
+        mkdir -p "$BACKUP_PATH"
+        cp -r "$DEST_DIR"/* "$BACKUP_PATH/" 2>/dev/null
+        
+        echo "🧹 Cleaning $DEST_DIR for a fresh install..."
+        rm -rf "${DEST_DIR:?}"/*
+    fi
+
     echo "📂 Extracting to $DEST_DIR..."
     unzip -q -o "$TMP_ZIP" -d "$DEST_DIR"
     rm "$TMP_ZIP"
