@@ -35,8 +35,6 @@ export function ThemeSwitcher() {
     { name: "system", icon: Monitor, label: "跟随系统" },
   ]
 
-  const ActiveIcon = themes.find((t) => t.name === theme)?.icon || Monitor
-
   return (
     <div className="relative" ref={containerRef}>
       <Button

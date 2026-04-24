@@ -10,6 +10,10 @@ export default defineConfig(() => {
   return {
     base: "./",
     plugins: [react(), tailwindcss()],
+    test: {
+      environment: "jsdom",
+      setupFiles: "./src/test/setup.ts",
+    },
     resolve: {
       alias: [
         // If it's a demo build, replace rpc-client with mock version (specific first)

@@ -2,18 +2,63 @@
  * Transmission RPC Client
  * Based on RPC Specification v17 (Transmission 4.0.0)
  */
-import type { Session, Torrent } from "./rpc-types"
+import type {
+  FreeSpaceResponse,
+  Session,
+  SessionStats,
+  TorrentAddArgs,
+  TorrentAddResponse,
+  TorrentGetResponse,
+  TorrentId,
+  TorrentSetArgs,
+} from "./rpc-types"
 
-export interface RPCRequest {
-  method: string
-  arguments?: any
+export interface RPCRequest<TArguments = undefined> {
+  method: keyof RPCMethodArguments
+  arguments?: TArguments
   tag?: number
 }
 
-export interface RPCResponse<T = any> {
+export interface RPCResponse<TArguments> {
   result: string
-  arguments: T
+  arguments: TArguments
   tag?: number
+}
+
+interface RPCMethodArguments {
+  "torrent-get": { fields: string[]; ids?: TorrentId[] }
+  "session-get": undefined
+  "session-set": Partial<Session>
+  "session-stats": undefined
+  "torrent-start": { ids?: TorrentId[] }
+  "torrent-stop": { ids?: TorrentId[] }
+  "torrent-remove": { ids: TorrentId[]; "delete-local-data": boolean }
+  "torrent-add": TorrentAddArgs
+  "torrent-set": { ids: TorrentId[] } & TorrentSetArgs
+  "torrent-set-location": { ids: number[]; location: string; move: boolean }
+  "torrent-rename-path": { ids: number[]; path: string; name: string }
+  "free-space": { path: string }
+  "port-test": undefined
+  "torrent-verify": { ids?: TorrentId[] }
+  "torrent-reannounce": { ids?: TorrentId[] }
+}
+
+interface RPCMethodResponses {
+  "torrent-get": TorrentGetResponse
+  "session-get": Session
+  "session-set": Record<string, never>
+  "session-stats": SessionStats
+  "torrent-start": Record<string, never>
+  "torrent-stop": Record<string, never>
+  "torrent-remove": Record<string, never>
+  "torrent-add": TorrentAddResponse
+  "torrent-set": Record<string, never>
+  "torrent-set-location": Record<string, never>
+  "torrent-rename-path": Record<string, never>
+  "free-space": FreeSpaceResponse
+  "port-test": { "port-is-open": boolean }
+  "torrent-verify": Record<string, never>
+  "torrent-reannounce": Record<string, never>
 }
 
 class TransmissionRPC {
@@ -31,14 +76,17 @@ class TransmissionRPC {
   /**
    * Execute an RPC call with automatic CSRF token handling
    */
-  async request<T = any>(method: string, args?: any): Promise<T> {
-    const body: RPCRequest = {
+  async request<M extends keyof RPCMethodArguments>(
+    method: M,
+    args?: RPCMethodArguments[M]
+  ): Promise<RPCMethodResponses[M]> {
+    const body: RPCRequest<RPCMethodArguments[M]> = {
       method,
       arguments: args,
       tag: Math.floor(Math.random() * 100000),
     }
 
-    const execute = async (isRetry = false): Promise<any> => {
+    const execute = async (isRetry = false): Promise<RPCMethodResponses[M]> => {
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
       }
@@ -73,7 +121,7 @@ class TransmissionRPC {
         throw new Error(`HTTP Error: ${response.status} ${response.statusText}`)
       }
 
-      const data: RPCResponse<T> = await response.json()
+      const data: RPCResponse<RPCMethodResponses[M]> = await response.json()
 
       if (data.result !== "success") {
         throw new Error(`RPC Error: ${data.result}`)
@@ -87,7 +135,7 @@ class TransmissionRPC {
 
   // Helper methods for common actions
 
-  async getTorrents(fields: string[], ids?: (number | string)[]) {
+  async getTorrents(fields: string[], ids?: TorrentId[]) {
     return this.request("torrent-get", { fields, ids })
   }
 
@@ -103,30 +151,25 @@ class TransmissionRPC {
     return this.request("session-stats")
   }
 
-  async startTorrents(ids?: (number | string)[]) {
+  async startTorrents(ids?: TorrentId[]) {
     const args = ids && ids.length > 0 ? { ids } : {}
     return this.request("torrent-start", args)
   }
 
-  async stopTorrents(ids?: (number | string)[]) {
+  async stopTorrents(ids?: TorrentId[]) {
     const args = ids && ids.length > 0 ? { ids } : {}
     return this.request("torrent-stop", args)
   }
 
-  async removeTorrents(ids: (number | string)[], deleteData = false) {
+  async removeTorrents(ids: TorrentId[], deleteData = false) {
     return this.request("torrent-remove", { ids, "delete-local-data": deleteData })
   }
 
-  async addTorrent(args: { 
-    filename?: string; 
-    metainfo?: string; 
-    "download-dir"?: string; 
-    paused?: boolean 
-  }) {
+  async addTorrent(args: TorrentAddArgs) {
     return this.request("torrent-add", args)
   }
 
-  async setTorrent(ids: (number | string)[], args: any) {
+  async setTorrent(ids: TorrentId[], args: TorrentSetArgs) {
     return this.request("torrent-set", { ids, ...args })
   }
 
@@ -143,15 +186,15 @@ class TransmissionRPC {
   }
   
   async portTest() {
-    return this.request<{ "port-is-open": boolean }>("port-test")
+    return this.request("port-test")
   }
 
-  async verifyTorrents(ids?: (number | string)[]) {
+  async verifyTorrents(ids?: TorrentId[]) {
     const args = ids && ids.length > 0 ? { ids } : {}
     return this.request("torrent-verify", args)
   }
 
-  async reannounceTorrents(ids?: (number | string)[]) {
+  async reannounceTorrents(ids?: TorrentId[]) {
     const args = ids && ids.length > 0 ? { ids } : {}
     return this.request("torrent-reannounce", args)
   }

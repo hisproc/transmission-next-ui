@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Plus, Link, FileUp, PlayCircle, Clipboard, FolderOpen, ChevronDown, X, FileIcon, Trash2 } from "lucide-react"
+import { Plus, Link, FileUp, Clipboard, FolderOpen, FileIcon, Trash2 } from "lucide-react"
 
 import {
   Dialog,
@@ -13,13 +13,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
 import { rpc } from "@/lib/rpc-client"
@@ -31,14 +24,6 @@ interface AddTorrentDialogProps {
   children: React.ReactNode
   onSuccess?: () => void
 }
-
-// Fallback paths if RPC fails
-const FALLBACK_PATHS = [
-  "/downloads",
-  "/downloads/movies",
-  "/downloads/tv",
-  "/downloads/music",
-]
 
 const toBase64 = (file: File): Promise<string> => 
   new Promise((resolve, reject) => {
@@ -152,7 +137,7 @@ export function AddTorrentDialog({ children, onSuccess }: AddTorrentDialogProps)
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-xl p-8 gap-6 border-none bg-background/95 backdrop-blur-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <DialogContent className="sm:max-w-xl p-8 gap-6 border-none bg-background/95 backdrop-blur-xl shadow-2xl overflow-hidden flex flex-col max-h-[calc(100svh-2rem)]">
         <DialogHeader className="gap-2 shrink-0">
           <DialogTitle className="text-2xl font-medium tracking-tight">{t('common.add_torrent', 'Add Torrent')}</DialogTitle>
           <DialogDescription className="text-base font-medium opacity-70">
@@ -160,7 +145,7 @@ export function AddTorrentDialog({ children, onSuccess }: AddTorrentDialogProps)
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-6 overflow-y-auto no-scrollbar px-1">
+        <div className="flex flex-col gap-6 overflow-y-auto no-scrollbar px-1 flex-1">
           {magnetLink.trim() === "" && (
             <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
               <div className="flex items-center justify-between">

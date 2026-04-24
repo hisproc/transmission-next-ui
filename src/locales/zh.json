@@ -77,6 +77,8 @@
     "clear": "清除",
     "no_trackers": "未找到 Tracker",
     "total": "总计",
+    "added_date": "添加日期",
+    "edit_date": "修改日期",
     "torrent_file": "种子文件",
     "release_to_drop": "松开以上传",
     "add_more": "添加更多文件",
@@ -126,7 +128,12 @@
     "verify_desc": "选中的种子已加入校验队列",
     "reannounce": "重新汇报",
     "reannounce_success": "已重新汇报",
-    "reannounce_desc": "选中的种子已向 Tracker 重新汇报"
+    "reannounce_desc": "选中的种子已向 Tracker 重新汇报",
+    "display_columns": "显示列",
+    "reset": "重置",
+    "visible": "显示中",
+    "hidden": "已隐藏",
+    "all_columns_visible": "所有列均已显示"
   },
   "details": {
     "general": "常规",

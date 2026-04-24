@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Globe, RefreshCw, AlertCircle, Search, ArrowRight, ListCheck } from "lucide-react"
-import { BatchTorrentList } from "@/components/batch-torrent-list"
+import { BatchTorrentList } from "@/components/torrents/batch-torrent-list"
 import { BatchInputWithDropdown } from "@/components/batch-input-with-dropdown"
 import {
   Dialog,
@@ -14,17 +14,9 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuPortal,
-} from "@/components/ui/dropdown-menu"
 import { toast } from "sonner"
 import { rpc } from "@/lib/rpc-client"
 import { useI18n } from "@/lib/i18n-context"
-import { cn } from "@/lib/utils"
 
 interface BatchReplaceTrackerDialogProps {
   open: boolean
@@ -56,8 +48,8 @@ export function BatchReplaceTrackerDialog({ open, onOpenChange, onSuccess }: Bat
         try {
           const { torrents } = await rpc.getTorrents(["trackers"])
           const trackerSet = new Set<string>()
-          torrents.forEach((tor: any) => {
-            tor.trackers?.forEach((tr: any) => {
+          torrents.forEach((tor: { trackers?: Array<{ announce: string }> }) => {
+            tor.trackers?.forEach((tr: { announce: string }) => {
               if (tr.announce) {
                 // Strip parameters after '?' if they exist
                 const baseUrl = tr.announce.split('?')[0]
@@ -82,8 +74,8 @@ export function BatchReplaceTrackerDialog({ open, onOpenChange, onSuccess }: Bat
       const { torrents } = await rpc.getTorrents(["id", "name", "trackers"])
       const matches: MatchingTorrent[] = []
 
-      torrents.forEach((tor: any) => {
-        const matchesInTorrent = tor.trackers?.filter((tr: any) => 
+      torrents.forEach((tor: { id: number; name: string; trackers?: Array<{ announce: string; tier?: number }> }) => {
+        const matchesInTorrent = tor.trackers?.filter((tr: { announce: string }) =>
           tr.announce && tr.announce.startsWith(oldTracker.trim())
         )
 
@@ -92,7 +84,7 @@ export function BatchReplaceTrackerDialog({ open, onOpenChange, onSuccess }: Bat
           matches.push({
             id: tor.id,
             name: tor.name,
-            trackers: tor.trackers.map((tr: any) => ({ announce: tr.announce, tier: tr.tier || 0 })),
+            trackers: tor.trackers!.map((tr: { announce: string; tier?: number }) => ({ announce: tr.announce, tier: tr.tier || 0 })),
             matchFullUrl: matchesInTorrent[0].announce // Use first match for preview
           })
         }
@@ -138,7 +130,7 @@ export function BatchReplaceTrackerDialog({ open, onOpenChange, onSuccess }: Bat
           let trackerListString = ""
           let currentTier = -1
           
-          updatedTrackers.forEach((tr, index) => {
+          updatedTrackers.forEach((tr) => {
             if (currentTier !== -1 && tr.tier !== currentTier) {
               trackerListString += "\n" // Blank line between tiers
             }
@@ -182,8 +174,8 @@ export function BatchReplaceTrackerDialog({ open, onOpenChange, onSuccess }: Bat
             }
         }
     }}>
-      <DialogContent className="sm:max-w-[500px] rounded-3xl border-none shadow-2xl bg-card border border-muted/20 p-0 overflow-hidden">
-        <DialogHeader className="px-6 pt-6 pb-4 border-b border-muted/50 bg-muted/20">
+      <DialogContent className="sm:max-w-[500px] rounded-3xl border-none shadow-2xl bg-card border border-muted/20 p-0 overflow-hidden flex flex-col max-h-[calc(100svh-2rem)]">
+        <DialogHeader className="px-6 pt-6 pb-4 border-b border-muted/50 bg-muted/20 shrink-0">
              <div>
                 <DialogTitle className="text-2xl font-medium tracking-tight">{t('common.batch_replace_tracker')}</DialogTitle>
                 <DialogDescription className="text-base font-medium opacity-70">
@@ -192,7 +184,7 @@ export function BatchReplaceTrackerDialog({ open, onOpenChange, onSuccess }: Bat
              </div>
         </DialogHeader>
 
-        <div className="p-6">
+        <div className="p-6 overflow-y-auto flex-1">
           {step === "input" ? (
             <div className="space-y-4">
               <BatchInputWithDropdown
@@ -256,7 +248,7 @@ export function BatchReplaceTrackerDialog({ open, onOpenChange, onSuccess }: Bat
           )}
         </div>
 
-        <DialogFooter className="p-6 bg-muted/10 border-t border-muted/50">
+        <DialogFooter className="p-6 bg-muted/10 border-t border-muted/50 shrink-0">
           {step === "input" ? (
             <Button
               className="w-full h-12 rounded-2xl font-medium tracking-widest uppercase transition-all shadow-lg shadow-primary/20 bg-primary hover:scale-[1.01] active:scale-[0.99] text-xs"

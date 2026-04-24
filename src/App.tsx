@@ -1,13 +1,10 @@
 import { HashRouter, Routes, Route } from "react-router-dom"
 import { Layout } from "@/components/layout"
-import { TorrentView } from "@/components/torrent-view"
+import { TorrentView } from "@/components/torrents/torrent-view"
 import TorrentDetailsPage from "@/app/torrents/detail/page"
 import SettingsPage from "@/app/settings/page"
-import { useI18n } from "@/lib/i18n-context"
 
 function AppRoutes() {
-  const { t } = useI18n()
-  
   return (
     <Routes>
       <Route path="/" element={<TorrentView key="all" />} />

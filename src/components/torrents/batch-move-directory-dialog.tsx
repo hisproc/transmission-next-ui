@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { FolderOpen, ArrowRight, Search, AlertCircle, RefreshCw, ListCheck } from "lucide-react"
-import { BatchTorrentList } from "@/components/batch-torrent-list"
+import { BatchTorrentList } from "@/components/torrents/batch-torrent-list"
 import { BatchInputWithDropdown } from "@/components/batch-input-with-dropdown"
 import {
   Dialog,
@@ -47,7 +47,7 @@ export function BatchMoveDirectoryDialog({ open, onOpenChange, onSuccess }: Batc
         try {
           const { torrents } = await rpc.getTorrents(["downloadDir"])
           const dirSet = new Set<string>()
-          torrents.forEach((tor: any) => {
+          torrents.forEach((tor: { downloadDir?: string }) => {
             if (tor.downloadDir) {
               dirSet.add(tor.downloadDir)
             }
@@ -70,8 +70,8 @@ export function BatchMoveDirectoryDialog({ open, onOpenChange, onSuccess }: Batc
       const targetOldDir = oldDir.trim()
       
       const matches: MatchingTorrent[] = torrents
-        .filter((tor: any) => tor.downloadDir === targetOldDir)
-        .map((tor: any) => ({
+        .filter((tor: { id: number; name: string; downloadDir: string }) => tor.downloadDir === targetOldDir)
+        .map((tor: { id: number; name: string; downloadDir: string }) => ({
           id: tor.id,
           name: tor.name,
           downloadDir: tor.downloadDir
@@ -128,8 +128,8 @@ export function BatchMoveDirectoryDialog({ open, onOpenChange, onSuccess }: Batc
             }
         }
     }}>
-      <DialogContent className="sm:max-w-[500px] rounded-3xl border-none shadow-2xl bg-card border border-muted/20 p-0 overflow-hidden">
-        <DialogHeader className="px-6 pt-6 pb-4 border-b border-muted/50 bg-muted/20">
+      <DialogContent className="sm:max-w-[500px] rounded-3xl border-none shadow-2xl bg-card border border-muted/20 p-0 overflow-hidden flex flex-col max-h-[calc(100svh-2rem)]">
+        <DialogHeader className="px-6 pt-6 pb-4 border-b border-muted/50 bg-muted/20 shrink-0">
              <div>
                 <DialogTitle className="text-2xl font-medium tracking-tight">{t('common.batch_move_directory')}</DialogTitle>
                 <DialogDescription className="text-base font-medium opacity-70">
@@ -138,7 +138,7 @@ export function BatchMoveDirectoryDialog({ open, onOpenChange, onSuccess }: Batc
              </div>
         </DialogHeader>
 
-        <div className="p-6">
+        <div className="p-6 overflow-y-auto flex-1">
           {step === "input" ? (
             <div className="space-y-6">
               <div className="space-y-4">
@@ -204,7 +204,7 @@ export function BatchMoveDirectoryDialog({ open, onOpenChange, onSuccess }: Batc
           )}
         </div>
 
-        <DialogFooter className="p-6 bg-muted/10 border-t border-muted/50">
+        <DialogFooter className="p-6 bg-muted/10 border-t border-muted/50 shrink-0">
           {step === "input" ? (
             <Button
               className="w-full h-12 rounded-2xl font-medium tracking-widest uppercase transition-all shadow-lg shadow-primary/20 bg-primary hover:scale-[1.01] active:scale-[0.99] text-xs"
