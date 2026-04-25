@@ -8,8 +8,6 @@ import {
   ArrowUpCircle,
   PauseCircle,
   Settings,
-  Search,
-  Plus
 } from "lucide-react"
 
 const Github = (props: React.SVGProps<SVGSVGElement>) => (
@@ -36,8 +34,6 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
-import { AddTorrentDialog } from "@/components/add-torrent-dialog"
 import { cn } from "@/lib/utils"
 import { useLocation } from "react-router-dom"
 import { useI18n } from "@/lib/i18n-context"

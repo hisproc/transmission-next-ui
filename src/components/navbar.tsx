@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Link } from "react-router-dom"
-import { Menu, Search, Bell, User, ArrowUpCircle } from "lucide-react"
+import { Search, Bell, ArrowUpCircle } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,20 +11,19 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
 import { ThemeSwitcher } from "@/components/theme-switcher"
 import { LanguageSwitcher } from "@/components/language-switcher"
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuLabel,
-  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu"
 import { useI18n } from "@/lib/i18n-context"
 import { useSearch } from "@/lib/search-context"
 import { APP_CONFIG } from "@/lib/config"
+import { formatDate } from "@/lib/formatters"
 
 export function Navbar() {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const { searchQuery, setSearchQuery } = useSearch()
   const searchInputRef = React.useRef<HTMLInputElement>(null)
   const [newVersion, setNewVersion] = React.useState(false)
@@ -83,13 +82,14 @@ export function Navbar() {
         id: "version",
         title: t('common.new_version', 'Update Available'),
         desc: `New version ${latestTag} is ready to download.`,
-        date: new Date().toLocaleDateString(),
+        // eslint-disable-next-line react-hooks/purity
+        date: formatDate(Date.now() / 1000, locale),
         icon: <ArrowUpCircle className="h-4 w-4 text-primary" />,
         url: `${APP_CONFIG.githubUrl}/releases/latest`
       })
     }
     return list
-  }, [newVersion, latestTag, t])
+  }, [newVersion, latestTag, t, locale])
 
   return (
     <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-4 border-b bg-background px-6">

@@ -121,7 +121,12 @@
     "verify_desc": "Selected torrents queued for verification",
     "reannounce": "Reannounce",
     "reannounce_success": "Reannounced",
-    "reannounce_desc": "Selected torrents reannounced to trackers"
+    "reannounce_desc": "Selected torrents reannounced to trackers",
+    "display_columns": "Display Columns",
+    "reset": "Reset",
+    "visible": "Visible",
+    "hidden": "Hidden",
+    "all_columns_visible": "All columns are visible"
   },
   "details": {
     "general": "General",

@@ -1,4 +1,6 @@
-import { TorrentStatus, type Session, type SessionStats, type Torrent } from "./rpc-types";
+import { TorrentStatus, type Session, type SessionStats, type Torrent } from "./rpc-types"
+
+const now = Math.floor(Date.now() / 1000)
 
 export const MOCK_SESSION: Session = {
   "alt-speed-down": 2048,
@@ -8,23 +10,23 @@ export const MOCK_SESSION: Session = {
   "alt-speed-time-enabled": false,
   "alt-speed-time-end": 1020,
   "alt-speed-time-day": 127,
-  "download-dir": "/downloads",
+  "download-dir": "/srv/downloads",
   "download-queue-enabled": true,
-  "download-queue-size": 5,
+  "download-queue-size": 8,
   "encryption": "preferred",
-  "peer-limit-global": 240,
-  "peer-limit-per-torrent": 60,
+  "peer-limit-global": 320,
+  "peer-limit-per-torrent": 80,
   "peer-port": 51413,
   "peer-port-random-on-start": false,
   "port-forwarding-enabled": true,
   "rename-partial-files": true,
   "rpc-version": 17,
   "rpc-version-semver": "17.0.0",
-  "seed-queue-enabled": false,
-  "seed-queue-size": 10,
-  "speed-limit-down": 10240,
+  "seed-queue-enabled": true,
+  "seed-queue-size": 12,
+  "speed-limit-down": 51200,
   "speed-limit-down-enabled": false,
-  "speed-limit-up": 1024,
+  "speed-limit-up": 5120,
   "speed-limit-up-enabled": false,
   "start-added-torrents": true,
   "trash-original-torrent-files": false,
@@ -32,147 +34,159 @@ export const MOCK_SESSION: Session = {
     "speed-units": ["kB/s", "MB/s", "GB/s", "TB/s"],
     "speed-bytes": 1024,
     "size-units": ["kB", "MB", "GB", "TB"],
-    "size-bytes": 1024
+    "size-bytes": 1024,
   },
   "version": "4.0.0",
   "dht-enabled": true,
   "pex-enabled": true,
   "lpd-enabled": false,
   "utp-enabled": true,
-  "blocklist-enabled": false,
-  "blocklist-url": "http://www.example.com/blocklist",
-  "blocklist-size": 0,
-  "incomplete-dir": "/downloads/incomplete",
-  "incomplete-dir-enabled": false
-};
+  "blocklist-enabled": true,
+  "blocklist-url": "https://cdn.example.net/blocklists/level1.txt",
+  "blocklist-size": 182304,
+  "incomplete-dir": "/srv/downloads/.incomplete",
+  "incomplete-dir-enabled": true,
+}
 
 export const MOCK_STATS: SessionStats = {
-  activeTorrentCount: 3,
-  downloadSpeed: 12500000, // 12.5 MB/s
-  pausedTorrentCount: 1,
-  torrentCount: 4,
-  uploadSpeed: 850000,    // 0.85 MB/s
+  activeTorrentCount: 11,
+  downloadSpeed: 18940000,
+  pausedTorrentCount: 4,
+  torrentCount: 24,
+  uploadSpeed: 5230000,
   "cumulative-stats": {
-    downloadedBytes: 1245000000000,
-    uploadedBytes: 450000000000,
-    filesAdded: 156,
-    sessionCount: 24,
-    secondsActive: 1250000
+    downloadedBytes: 3824500000000,
+    uploadedBytes: 1640000000000,
+    filesAdded: 642,
+    sessionCount: 91,
+    secondsActive: 8452000,
   },
   "current-stats": {
-    downloadedBytes: 5400000000,
-    uploadedBytes: 1200000000,
-    filesAdded: 2,
+    downloadedBytes: 18400000000,
+    uploadedBytes: 4200000000,
+    filesAdded: 7,
     sessionCount: 1,
-    secondsActive: 3600
-  }
-};
+    secondsActive: 21600,
+  },
+}
 
-export const MOCK_TORRENTS: Torrent[] = [
+function jsonLabel(text: string) {
+  return JSON.stringify({ text })
+}
+
+const TRACKERS = {
+  blender: "https://tracker.blender.org/announce",
+  ubuntu: "https://torrent.ubuntu.com/announce",
+  arch: "https://tracker.archlinux.org/announce",
+  private: "https://tracker.privatehd.example/announce",
+  music: "https://tracker.lossless.example/announce",
+  anime: "https://nyaa.tracker.example/announce",
+  books: "https://tracker.books.example/announce",
+  games: "https://tracker.games.example/announce",
+  backup: "udp://open.stealth.si:80/announce",
+}
+
+const BASE_TORRENTS: Torrent[] = [
   {
     id: 1,
-    name: "Big Buck Bunny.mp4",
+    name: "Big.Buck.Bunny.2008.REMASTERED.2160p.HEVC.DTS-HD.MA.5.1-GRP.mkv",
     status: TorrentStatus.DOWNLOAD,
     hashString: "8f56e9c9a0b1d3e1f5a4b3c2d1e0f9a8b1c2d3e4",
-    totalSize: 1250000000,
-    percentDone: 0.654,
-    rateDownload: 8500000,
-    rateUpload: 450000,
-    eta: 120,
-    addedDate: Date.now() / 1000 - 3600,
+    totalSize: 18650000000,
+    percentDone: 0.674,
+    rateDownload: 12400000,
+    rateUpload: 510000,
+    eta: 2840,
+    addedDate: now - 7200,
     doneDate: 0,
-    downloadDir: "/downloads/movies",
+    editDate: now - 900,
+    downloadDir: "/srv/downloads/movies",
     error: 0,
     errorString: "",
-    uploadedEver: 120000000,
-    downloadedEver: 817500000,
-    uploadRatio: 0.15,
+    uploadedEver: 2840000000,
+    downloadedEver: 12570000000,
+    uploadRatio: 0.23,
     queuePosition: 0,
     isFinished: false,
     isPrivate: false,
     isStalled: false,
-    peersConnected: 45,
-    peersSendingToUs: 12,
-    peersGettingFromUs: 5,
-    labels: ["Movie", "HD"],
+    peersConnected: 63,
+    peersSendingToUs: 22,
+    peersGettingFromUs: 4,
+    labels: [jsonLabel("Movie"), jsonLabel("4K"), "HEVC"],
     files: [
-      { name: "Big Buck Bunny.mp4", length: 1150000000, bytesCompleted: 785000000 },
-      { name: "Poster.jpg", length: 2500000, bytesCompleted: 2500000 },
-      { name: "Subtitle.srt", length: 150000, bytesCompleted: 150000 },
-      { name: "Notes.txt", length: 1200, bytesCompleted: 1200 }
+      { name: "Big.Buck.Bunny.2008.REMASTERED.2160p.mkv", length: 18400000000, bytesCompleted: 12350000000 },
+      { name: "Big.Buck.Bunny-poster.jpg", length: 6500000, bytesCompleted: 6500000 },
+      { name: "subs/en.srt", length: 160000, bytesCompleted: 160000 },
+    ],
+    trackers: [
+      { id: 0, tier: 0, announce: TRACKERS.blender, scrape: "", sitename: "Blender Tracker" },
+      { id: 1, tier: 1, announce: TRACKERS.backup, scrape: "", sitename: "Open Tracker" },
     ],
     trackerStats: [
-      {
-        announce: "https://tracker.blender.org/announce",
-        host: "tracker.blender.org",
-        seederCount: 452,
-        leecherCount: 120,
-        lastAnnounceSucceeded: true,
-        lastAnnounceResult: "Success",
-        isBackup: false
-      },
-      {
-        announce: "https://open.tracker.org/announce",
-        host: "open.tracker.org",
-        seederCount: 1250,
-        leecherCount: 850,
-        lastAnnounceSucceeded: true,
-        lastAnnounceResult: "Success",
-        isBackup: false
-      }
+      { announce: TRACKERS.blender, host: "tracker.blender.org", seederCount: 890, leecherCount: 214, lastAnnounceSucceeded: true, lastAnnounceResult: "Success", isBackup: false },
+      { announce: TRACKERS.backup, host: "open.stealth.si", seederCount: 1543, leecherCount: 903, lastAnnounceSucceeded: true, lastAnnounceResult: "Success", isBackup: true },
     ],
     peers: [
-      { address: "192.168.1.50", clientName: "Transmission 4.0.0", rateToClient: 1250000, rateToPeer: 45000, progress: 1.0, isEncrypted: true },
-      { address: "85.24.11.22", clientName: "qBittorrent 4.6.0", rateToClient: 850000, rateToPeer: 12000, progress: 0.85, isEncrypted: true },
-      { address: "42.156.4.8", clientName: "Deluge 2.1.1", rateToClient: 450000, rateToPeer: 0, progress: 0.42, isEncrypted: false },
-      { address: "103.22.45.1", clientName: "uTorrent 3.5.5", rateToClient: 0, rateToPeer: 24000, progress: 0.12, isEncrypted: true }
-    ]
+      { address: "192.168.1.50", clientName: "Transmission 4.0.6", rateToClient: 2250000, rateToPeer: 35000, progress: 1.0, isEncrypted: true },
+      { address: "85.24.11.22", clientName: "qBittorrent 5.1.0", rateToClient: 1640000, rateToPeer: 12000, progress: 0.86, isEncrypted: true },
+      { address: "42.156.4.8", clientName: "Deluge 2.1.1", rateToClient: 710000, rateToPeer: 0, progress: 0.55, isEncrypted: false },
+      { address: "103.22.45.1", clientName: "uTorrent 3.6.0", rateToClient: 0, rateToPeer: 28000, progress: 0.14, isEncrypted: true },
+    ],
   },
   {
     id: 2,
-    name: "Ubuntu Desktop 24.04.iso",
+    name: "ubuntu-24.04.2-desktop-amd64.iso",
     status: TorrentStatus.SEED,
-    hashString: "1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t",
-    totalSize: 4500000000,
-    percentDone: 1.0,
+    hashString: "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b",
+    totalSize: 5930000000,
+    percentDone: 1,
     rateDownload: 0,
-    rateUpload: 1200000,
+    rateUpload: 2350000,
     eta: -1,
-    addedDate: Date.now() / 1000 - 86400,
-    doneDate: Date.now() / 1000 - 3600,
-    downloadDir: "/downloads/iso",
+    addedDate: now - 86400 * 6,
+    doneDate: now - 86400 * 4,
+    editDate: now - 3600,
+    downloadDir: "/srv/downloads/iso",
     error: 0,
     errorString: "",
-    uploadedEver: 9500000000,
-    downloadedEver: 4500000000,
-    uploadRatio: 2.11,
+    uploadedEver: 16800000000,
+    downloadedEver: 5930000000,
+    uploadRatio: 2.83,
     queuePosition: 1,
     isFinished: true,
     isPrivate: false,
     isStalled: false,
-    peersConnected: 156,
+    peersConnected: 182,
     peersSendingToUs: 0,
-    peersGettingFromUs: 85,
-    labels: ["Linux", "ISO"]
+    peersGettingFromUs: 91,
+    labels: [jsonLabel("Linux"), "ISO"],
+    trackers: [
+      { id: 0, tier: 0, announce: TRACKERS.ubuntu, scrape: "", sitename: "Ubuntu" },
+    ],
+    trackerStats: [
+      { announce: TRACKERS.ubuntu, host: "torrent.ubuntu.com", seederCount: 5201, leecherCount: 1834, lastAnnounceSucceeded: true, lastAnnounceResult: "Success", isBackup: false },
+    ],
   },
   {
     id: 3,
-    name: "Sintel.2010.1080p.mkv",
-    status: TorrentStatus.STOPPED,
+    name: "ArchLinux-2026.04.01-x86_64.iso",
+    status: TorrentStatus.SEED_WAIT,
     hashString: "f1e2d3c4b5a697887766554433221100aabbccdd",
-    totalSize: 850000000,
-    percentDone: 1.0,
+    totalSize: 1270000000,
+    percentDone: 1,
     rateDownload: 0,
     rateUpload: 0,
     eta: -1,
-    addedDate: Date.now() / 1000 - 172800,
-    doneDate: Date.now() / 1000 - 150000,
-    downloadDir: "/downloads/movies",
+    addedDate: now - 86400 * 3,
+    doneDate: now - 86400 * 2,
+    editDate: now - 7200,
+    downloadDir: "/srv/downloads/iso",
     error: 0,
     errorString: "",
-    uploadedEver: 450000000,
-    downloadedEver: 850000000,
-    uploadRatio: 0.53,
+    uploadedEver: 760000000,
+    downloadedEver: 1270000000,
+    uploadRatio: 0.6,
     queuePosition: 2,
     isFinished: true,
     isPrivate: false,
@@ -180,33 +194,282 @@ export const MOCK_TORRENTS: Torrent[] = [
     peersConnected: 0,
     peersSendingToUs: 0,
     peersGettingFromUs: 0,
-    labels: ["Movie"]
+    labels: ["Linux", jsonLabel("Queued")],
+    trackers: [
+      { id: 0, tier: 0, announce: TRACKERS.arch, scrape: "", sitename: "Arch Linux" },
+    ],
+    trackerStats: [
+      { announce: TRACKERS.arch, host: "tracker.archlinux.org", seederCount: 983, leecherCount: 113, lastAnnounceSucceeded: true, lastAnnounceResult: "Success", isBackup: false },
+    ],
   },
   {
     id: 4,
-    name: "Free Music Album - FLAC.zip",
-    status: TorrentStatus.DOWNLOAD,
+    name: "Sintel.2010.1080p.BluRay.x264.DTS-WiKi.mkv",
+    status: TorrentStatus.STOPPED,
     hashString: "ccddeeff00112233445566778899aabbccddeeff",
-    totalSize: 450000000,
-    percentDone: 0.12,
-    rateDownload: 4000000,
-    rateUpload: 150000,
-    eta: 300,
-    addedDate: Date.now() / 1000 - 600,
-    doneDate: 0,
-    downloadDir: "/downloads/music",
+    totalSize: 8940000000,
+    percentDone: 1,
+    rateDownload: 0,
+    rateUpload: 0,
+    eta: -1,
+    addedDate: now - 86400 * 30,
+    doneDate: now - 86400 * 28,
+    editDate: now - 86400 * 5,
+    downloadDir: "/srv/downloads/movies/classics",
     error: 0,
     errorString: "",
-    uploadedEver: 5000000,
-    downloadedEver: 54000000,
-    uploadRatio: 0.09,
+    uploadedEver: 4020000000,
+    downloadedEver: 8940000000,
+    uploadRatio: 0.45,
     queuePosition: 3,
+    isFinished: true,
+    isPrivate: false,
+    isStalled: false,
+    peersConnected: 0,
+    peersSendingToUs: 0,
+    peersGettingFromUs: 0,
+    labels: [jsonLabel("Archive"), "Movie"],
+    trackers: [
+      { id: 0, tier: 0, announce: TRACKERS.blender, scrape: "", sitename: "Blender Tracker" },
+    ],
+  },
+  {
+    id: 5,
+    name: "Lossless.Discography.Collection.1998-2025.FLAC",
+    status: TorrentStatus.DOWNLOAD_WAIT,
+    hashString: "11bb33dd55ff77aa99cc00ee22dd44ff66aa88cc",
+    totalSize: 265000000000,
+    percentDone: 0.031,
+    rateDownload: 0,
+    rateUpload: 0,
+    eta: -1,
+    addedDate: now - 5400,
+    doneDate: 0,
+    editDate: now - 300,
+    downloadDir: "/srv/downloads/music",
+    error: 0,
+    errorString: "",
+    uploadedEver: 0,
+    downloadedEver: 8215000000,
+    uploadRatio: 0,
+    queuePosition: 4,
     isFinished: false,
     isPrivate: false,
     isStalled: false,
+    peersConnected: 0,
+    peersSendingToUs: 0,
+    peersGettingFromUs: 0,
+    labels: [jsonLabel("Music"), "FLAC", jsonLabel("Queue")],
+    trackers: [
+      { id: 0, tier: 0, announce: TRACKERS.music, scrape: "", sitename: "Lossless" },
+    ],
+    trackerStats: [
+      { announce: TRACKERS.music, host: "tracker.lossless.example", seederCount: 302, leecherCount: 88, lastAnnounceSucceeded: true, lastAnnounceResult: "Queued", isBackup: false },
+    ],
+  },
+  {
+    id: 6,
+    name: "Debian-Bookworm-Install-DVD-1.iso",
+    status: TorrentStatus.CHECK,
+    hashString: "44aabb66ccdd88ee00ff11aa22bb33cc44dd55ee",
+    totalSize: 3960000000,
+    percentDone: 1,
+    rateDownload: 0,
+    rateUpload: 0,
+    eta: -1,
+    addedDate: now - 4800,
+    doneDate: now - 3600,
+    editDate: now - 240,
+    downloadDir: "/srv/downloads/iso",
+    error: 0,
+    errorString: "",
+    uploadedEver: 500000000,
+    downloadedEver: 3960000000,
+    uploadRatio: 0.13,
+    queuePosition: 5,
+    isFinished: true,
+    isPrivate: false,
+    isStalled: false,
+    peersConnected: 0,
+    peersSendingToUs: 0,
+    peersGettingFromUs: 0,
+    labels: ["Linux", jsonLabel("Verifying")],
+    trackers: [
+      { id: 0, tier: 0, announce: TRACKERS.arch, scrape: "", sitename: "Arch Linux" },
+    ],
+  },
+  {
+    id: 7,
+    name: "PrivateHD.Show.S02E05.2160p.WEB-DL.DV.HDR10+.mkv",
+    status: TorrentStatus.DOWNLOAD,
+    hashString: "99887766554433221100ffeeddccbbaa99887766",
+    totalSize: 9810000000,
+    percentDone: 0.982,
+    rateDownload: 340000,
+    rateUpload: 1800000,
+    eta: 420,
+    addedDate: now - 12800,
+    doneDate: 0,
+    editDate: now - 180,
+    downloadDir: "/srv/downloads/tv",
+    error: 0,
+    errorString: "",
+    uploadedEver: 7420000000,
+    downloadedEver: 9630000000,
+    uploadRatio: 0.77,
+    queuePosition: 6,
+    isFinished: false,
+    isPrivate: true,
+    isStalled: false,
     peersConnected: 12,
-    peersSendingToUs: 4,
-    peersGettingFromUs: 2,
-    labels: ["Music", "FLAC"]
+    peersSendingToUs: 1,
+    peersGettingFromUs: 7,
+    labels: [jsonLabel("TV"), jsonLabel("Private"), "HDR"],
+    trackers: [
+      { id: 0, tier: 0, announce: TRACKERS.private, scrape: "", sitename: "PrivateHD" },
+    ],
+    trackerStats: [
+      { announce: TRACKERS.private, host: "tracker.privatehd.example", seederCount: 17, leecherCount: 3, lastAnnounceSucceeded: true, lastAnnounceResult: "Success", isBackup: false },
+    ],
+  },
+  {
+    id: 8,
+    name: "Old.Course.Bundle.2017.REPACK.torrent-data",
+    status: TorrentStatus.STOPPED,
+    hashString: "554433221100ffeeddccbbaa9988776655443322",
+    totalSize: 78000000000,
+    percentDone: 0.431,
+    rateDownload: 0,
+    rateUpload: 0,
+    eta: -1,
+    addedDate: now - 86400 * 120,
+    doneDate: 0,
+    editDate: now - 86400 * 30,
+    downloadDir: "/srv/downloads/courses",
+    error: 3,
+    errorString: "No space left on device",
+    uploadedEver: 210000000,
+    downloadedEver: 33600000000,
+    uploadRatio: 0.01,
+    queuePosition: 7,
+    isFinished: false,
+    isPrivate: false,
+    isStalled: true,
+    peersConnected: 0,
+    peersSendingToUs: 0,
+    peersGettingFromUs: 0,
+    labels: [jsonLabel("Course"), jsonLabel("Error")],
+    trackers: [
+      { id: 0, tier: 0, announce: TRACKERS.books, scrape: "", sitename: "Books" },
+    ],
+    trackerStats: [
+      { announce: TRACKERS.books, host: "tracker.books.example", seederCount: 0, leecherCount: 0, lastAnnounceSucceeded: false, lastAnnounceResult: "Could not connect to tracker", isBackup: false },
+    ],
+  },
+]
+
+const GENERATED_TORRENTS: Torrent[] = Array.from({ length: 48 }, (_, index) => {
+  const id = 100 + index
+  const variant = index % 8
+  const statusCycle = [
+    TorrentStatus.DOWNLOAD,
+    TorrentStatus.SEED,
+    TorrentStatus.STOPPED,
+    TorrentStatus.DOWNLOAD_WAIT,
+    TorrentStatus.CHECK_WAIT,
+    TorrentStatus.CHECK,
+    TorrentStatus.SEED_WAIT,
+    TorrentStatus.DOWNLOAD,
+  ] as const
+  const status = statusCycle[variant]
+  const isFinished = status === TorrentStatus.SEED || status === TorrentStatus.SEED_WAIT || status === TorrentStatus.STOPPED || status === TorrentStatus.CHECK
+  const totalSize = 700000000 + index * 420000000
+  const percentDone = isFinished ? 1 : Number((0.08 + ((index * 13) % 87) / 100).toFixed(3))
+  const addedAgo = 1800 * (index + 2)
+  const doneDate = isFinished ? now - addedAgo / 2 : 0
+  const rateDownload = status === TorrentStatus.DOWNLOAD ? 250000 + index * 145000 : 0
+  const rateUpload = status === TorrentStatus.SEED ? 140000 + index * 90000 : status === TorrentStatus.DOWNLOAD ? 20000 + index * 17000 : 0
+  const labelsByVariant = [
+    [jsonLabel("Movie"), "Test"],
+    [jsonLabel("Linux"), jsonLabel("Seeding")],
+    [jsonLabel("Paused")],
+    [jsonLabel("Queue")],
+    [jsonLabel("Verify")],
+    [jsonLabel("Verifying")],
+    [jsonLabel("Seed Queue")],
+    [],
+  ]
+
+  return {
+    id,
+    name:
+      index === 0
+        ? "A.Very.Long.Release.Name.Used.To.Test.Truncation.And.Table.Layout.2026.2160p.UHD.BluRay.REMUX.HEVC.TrueHD.Atmos.7.1-ExampleGroup.mkv"
+        : variant === 1
+          ? `Linux Distro Mirror Snapshot ${2026 - index}.iso`
+          : variant === 2
+            ? `Paused Archive Package #${index + 1}.tar.zst`
+            : variant === 3
+              ? `Queued Download Job #${index + 1}`
+              : variant === 4
+                ? `Hash Check Pending Item #${index + 1}`
+                : variant === 5
+                  ? `Rechecking Data Set #${index + 1}`
+                  : variant === 6
+                    ? `Queued Seeder #${index + 1}`
+                    : `General Test Torrent #${index + 1}`,
+    status,
+    hashString: `mock-hash-${id.toString(16).padStart(8, "0")}${index}abcdef0123456789`,
+    totalSize,
+    percentDone,
+    rateDownload,
+    rateUpload,
+    eta: status === TorrentStatus.DOWNLOAD ? 900 + index * 320 : -1,
+    addedDate: now - addedAgo,
+    doneDate,
+    editDate: now - 120 * (index + 1),
+    downloadDir:
+      variant <= 1
+        ? "/srv/downloads/movies"
+        : variant <= 3
+          ? "/srv/downloads/queue"
+          : variant <= 5
+            ? "/srv/downloads/checks"
+            : "/srv/downloads/misc",
+    error: variant === 2 && index % 2 === 0 ? 1 : 0,
+    errorString: variant === 2 && index % 2 === 0 ? "Tracker returned warning: unregistered torrent" : "",
+    uploadedEver: isFinished ? totalSize + index * 180000000 : Math.floor(totalSize * percentDone * 0.12),
+    downloadedEver: Math.floor(totalSize * percentDone),
+    uploadRatio: isFinished ? Number((0.4 + index * 0.17).toFixed(2)) : Number((0.01 + index * 0.03).toFixed(2)),
+    queuePosition: 8 + index,
+    isFinished,
+    isPrivate: variant === 7,
+    isStalled: status === TorrentStatus.DOWNLOAD_WAIT || (status === TorrentStatus.STOPPED && percentDone < 1),
+    peersConnected: status === TorrentStatus.DOWNLOAD ? 4 + index : status === TorrentStatus.SEED ? 11 + index : 0,
+    peersSendingToUs: status === TorrentStatus.DOWNLOAD ? Math.max(1, Math.floor((4 + index) / 2)) : 0,
+    peersGettingFromUs: status === TorrentStatus.SEED ? Math.max(2, Math.floor((11 + index) / 2)) : status === TorrentStatus.DOWNLOAD ? 1 : 0,
+    labels: labelsByVariant[variant],
+    trackers: [
+      {
+        id: 0,
+        tier: 0,
+        announce: variant === 1 ? TRACKERS.ubuntu : variant === 7 ? TRACKERS.private : TRACKERS.backup,
+        scrape: "",
+        sitename: variant === 1 ? "Ubuntu" : variant === 7 ? "PrivateHD" : "Open Tracker",
+      },
+    ],
+    trackerStats: [
+      {
+        announce: variant === 1 ? TRACKERS.ubuntu : variant === 7 ? TRACKERS.private : TRACKERS.backup,
+        host: variant === 1 ? "torrent.ubuntu.com" : variant === 7 ? "tracker.privatehd.example" : "open.stealth.si",
+        seederCount: 80 + index * 14,
+        leecherCount: 12 + index * 5,
+        lastAnnounceSucceeded: !(variant === 2 && index % 2 === 0),
+        lastAnnounceResult: variant === 2 && index % 2 === 0 ? "Tracker warning" : "Success",
+        isBackup: variant !== 1 && variant !== 7,
+      },
+    ],
   }
-];
+})
+
+export const MOCK_TORRENTS: Torrent[] = [...BASE_TORRENTS, ...GENERATED_TORRENTS]

@@ -1,6 +1,6 @@
 "use client"
 
-import { TorrentView } from "@/components/torrent-view"
+import { TorrentView } from "@/components/torrents/torrent-view"
 import { useI18n } from "@/lib/i18n-context"
 
 export default function Page() {

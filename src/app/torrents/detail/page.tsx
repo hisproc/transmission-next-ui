@@ -6,7 +6,6 @@ import {
   ArrowUp,
   Clock,
   Play,
-  Pause,
   Square,
   Trash2,
   Server,
@@ -21,35 +20,26 @@ import {
   Activity,
   Info,
   ExternalLink,
-  MapPin,
   Tag
 } from "lucide-react"
 
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle 
-} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
-import { cn } from "@/lib/utils"
-import { RemoveTorrentDialog } from "@/components/remove-torrent-dialog"
+import { RemoveTorrentDialog } from "@/components/torrents/remove-torrent-dialog"
 
 import { rpc } from "@/lib/rpc-client"
 import { useI18n } from "@/lib/i18n-context"
 import { useAppSettings } from "@/lib/app-settings-context"
-import { type Torrent, TorrentStatus } from "@/lib/rpc-types"
-import { formatSize, formatSpeed, formatDuration, getStatusLabel } from "@/lib/formatters"
+import { type Torrent, type TorrentFile, type TrackerStat, type Peer, TorrentStatus } from "@/lib/rpc-types"
+import { formatSize, formatSpeed, formatDuration, getStatusLabel, formatDate } from "@/lib/formatters"
+import { parseTorrentLabel } from "@/lib/torrent-labels"
 
 function TorrentDetailsContent() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const idValue = searchParams.get('id')
   const [activeTab, setActiveTab] = useState("general")
   const [torrent, setTorrent] = useState<Torrent | null>(null)
@@ -306,7 +296,7 @@ function TorrentDetailsContent() {
                     <div className="space-y-4">
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center group gap-1 sm:gap-4">
                         <span className="text-[11px] md:text-sm font-medium text-muted-foreground flex items-center gap-2"><Calendar className="h-4 w-4" /> {t('details.added_date')}</span>
-                        <span className="text-xs md:text-sm font-medium">{new Date(tor.addedDate * 1000).toLocaleString()}</span>
+                        <span className="text-xs md:text-sm font-medium">{formatDate(tor.addedDate, locale)}</span>
                       </div>
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center group gap-1 sm:gap-4">
                         <span className="text-[11px] md:text-sm font-medium text-muted-foreground flex items-center gap-2"><Layers className="h-4 w-4" /> {t('details.comment')}</span>
@@ -320,20 +310,11 @@ function TorrentDetailsContent() {
                         <span className="text-[11px] md:text-sm font-medium text-muted-foreground flex items-center gap-2"><Tag className="h-4 w-4" /> {t('common.labels')}</span>
                         <div className="flex flex-wrap gap-1.5 sm:justify-end">
                           {(tor.labels && tor.labels.length > 0) && (
-                            tor.labels.map((l: string, i: number) => {
-                              let text = l;
-                              try {
-                                const parsed = JSON.parse(l);
-                                text = typeof parsed === 'object' && parsed !== null && 'text' in parsed ? parsed.text : l;
-                              } catch {
-                                text = l;
-                              }
-                              return (
-                                <span key={i} className="text-xs md:text-sm font-medium p-1 px-2 bg-muted rounded-lg w-fit whitespace-nowrap">
-                                  {text}
-                                </span>
-                              );
-                            })
+                            tor.labels.map((label, i) => (
+                              <span key={i} className="text-xs md:text-sm font-medium p-1 px-2 bg-muted rounded-lg w-fit whitespace-nowrap">
+                                {parseTorrentLabel(label)}
+                              </span>
+                            ))
                           )}
                         </div>
                       </div>
@@ -350,7 +331,7 @@ function TorrentDetailsContent() {
                       </div>
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center group gap-1 sm:gap-4">
                         <span className="text-[11px] md:text-sm font-medium text-muted-foreground flex items-center gap-2"><Calendar className="h-4 w-4" /> {t('details.creation_date')}</span>
-                        <span className="text-xs md:text-sm font-medium">{tor.dateCreated ? new Date(tor.dateCreated * 1000).toLocaleDateString() : t('common.unknown', 'Unknown')}</span>
+                        <span className="text-xs md:text-sm font-medium">{tor.dateCreated ? formatDate(tor.dateCreated, locale) : t('common.unknown', 'Unknown')}</span>
                       </div>
                     </div>
                   </div>
@@ -392,7 +373,7 @@ function TorrentDetailsContent() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {tor.files?.map((file: any, idx: number) => {
+                    {tor.files?.map((file: TorrentFile, idx: number) => {
                       const progress = (file.bytesCompleted / file.length * 100).toFixed(1)
                       return (
                         <TableRow key={idx} className="hover:bg-muted/30 transition-colors border-b last:border-0 border-muted/30 group">
@@ -428,7 +409,7 @@ function TorrentDetailsContent() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {tor.trackerStats?.map((tr: any, idx: number) => (
+                    {tor.trackerStats?.map((tr: TrackerStat, idx: number) => (
                       <TableRow key={idx} className="hover:bg-muted/30 transition-colors border-b last:border-0 border-muted/30">
                         <TableCell className="font-medium pl-6 md:pl-8 py-4 flex items-center gap-3 group">
                           <Globe className="h-4 w-4 text-blue-500 opacity-40 group-hover:opacity-100 transition-opacity" />
@@ -457,7 +438,7 @@ function TorrentDetailsContent() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {tor.peers?.map((peer: any, idx: number) => (
+                    {tor.peers?.map((peer: Peer, idx: number) => (
                       <TableRow key={idx} className="hover:bg-muted/30 transition-colors border-b last:border-0 border-muted/30 group">
                         <TableCell className="font-medium pl-6 md:pl-8 py-4 text-xs">{peer.address}</TableCell>
                         <TableCell className="font-normal text-[11px] text-muted-foreground">{peer.clientName}</TableCell>

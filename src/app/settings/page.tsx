@@ -1,18 +1,13 @@
 import { useState, useEffect, useCallback } from "react"
-import { 
-  Globe, 
-  Shield, 
-  HardDrive, 
-  Network, 
-  Lock, 
+import {
+  Shield,
+  HardDrive,
+  Network,
+  Lock,
   Terminal,
-  Save,
   RefreshCw,
   Zap,
-  ShieldCheck,
   Activity,
-  User,
-  ExternalLink,
   CheckCircle2,
   XCircle,
   Monitor
@@ -57,7 +52,7 @@ export default function SettingsPage() {
     fetchSession()
   }, [fetchSession])
 
-  const handleChange = (key: keyof Session, value: any) => {
+  const handleChange = (key: keyof Session, value: Session[keyof Session]) => {
     setPendingChanges(prev => ({ ...prev, [key]: value }))
   }
 
@@ -114,7 +109,7 @@ export default function SettingsPage() {
           icon: <XCircle className="h-4 w-4 text-destructive" />
         })
       }
-    } catch (err) {
+    } catch {
       toast.error(t('settings.network.port_test_error', 'Port test failed'))
     } finally {
       setTestingPort(false)

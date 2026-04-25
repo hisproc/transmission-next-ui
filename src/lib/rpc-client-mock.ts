@@ -1,10 +1,11 @@
-import type { Session, Torrent } from "./rpc-types";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { Session } from "./rpc-types";
 import { MOCK_SESSION, MOCK_STATS, MOCK_TORRENTS } from "./mock-data";
 
 class TransmissionRPCMock {
   private baseUrl: string = "/transmission/rpc";
 
-  constructor(_config?: { baseUrl?: string; username?: string; password?: string }) {
+  constructor() {
     console.log("TransmissionRPC Mock initialized");
   }
 

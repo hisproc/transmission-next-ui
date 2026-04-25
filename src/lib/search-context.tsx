@@ -19,6 +19,7 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useSearch() {
   const context = React.useContext(SearchContext)
   if (context === undefined) {

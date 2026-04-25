@@ -7,7 +7,7 @@ import { useI18n } from "@/lib/i18n-context"
 import { cn } from "@/lib/utils"
 
 export function LanguageSwitcher() {
-  const { locale, setLocale, t } = useI18n()
+  const { locale, setLocale } = useI18n()
   const [isOpen, setIsOpen] = React.useState(false)
   const containerRef = React.useRef<HTMLDivElement>(null)
 
