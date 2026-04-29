@@ -126,7 +126,16 @@
     "reset": "Reset",
     "visible": "Visible",
     "hidden": "Hidden",
-    "all_columns_visible": "All columns are visible"
+    "all_columns_visible": "All columns are visible",
+    "set_torrent_labels": "Set Torrent Labels",
+    "set_torrent_labels_desc": "Set labels for {count} selected torrents",
+    "set_labels_mode": "Mode",
+    "set_labels_overwrite": "Overwrite",
+    "set_labels_append": "Append",
+    "set_labels_overwrite_hint": "Replace all existing labels on selected torrents",
+    "set_labels_append_hint": "Add new labels to existing labels on selected torrents",
+    "set_labels_confirm": "Apply to {count} torrents",
+    "set_labels_success": "Successfully set labels for {count} torrents"
   },
   "details": {
     "general": "General",
