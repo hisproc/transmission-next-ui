@@ -133,7 +133,16 @@
     "reset": "重置",
     "visible": "显示中",
     "hidden": "已隐藏",
-    "all_columns_visible": "所有列均已显示"
+    "all_columns_visible": "所有列均已显示",
+    "set_torrent_labels": "设置种子标签",
+    "set_torrent_labels_desc": "为已选中的 {count} 个种子设置标签",
+    "set_labels_mode": "设置模式",
+    "set_labels_overwrite": "覆盖",
+    "set_labels_append": "追加",
+    "set_labels_overwrite_hint": "替换选中种子的所有现有标签",
+    "set_labels_append_hint": "在选中种子的现有标签基础上添加新标签",
+    "set_labels_confirm": "应用到 {count} 个种子",
+    "set_labels_success": "已成功为 {count} 个种子设置标签"
   },
   "details": {
     "general": "常规",

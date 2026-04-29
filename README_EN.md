@@ -37,6 +37,8 @@ English | [简体中文](README.md)
 - [x] Tracker Filter
 - [x] Torrent Label Support
 - [x] Batch Replace Trackers
+- [x] Batch Move Download Directory
+- [x] Batch Set Torrent Labels
 
 ⚠️**Notice**: This is an early version of the project. It has not been fully tested yet. Please verify its functionality before using it in production.
 

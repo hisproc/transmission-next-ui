@@ -24,9 +24,11 @@ import {
   ChevronsRight,
   ShieldCheck,
   Radio,
+  Tag,
 } from "lucide-react"
 import { BatchReplaceTrackerDialog } from "@/components/torrents/batch-replace-tracker-dialog"
 import { BatchMoveDirectoryDialog } from "@/components/torrents/batch-move-directory-dialog"
+import { BatchSetLabelsSelectedDialog } from "@/components/torrents/batch-set-labels-selected-dialog"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import { RemoveTorrentDialog } from "@/components/torrents/remove-torrent-dialog"
@@ -127,6 +129,7 @@ export function TorrentView({ statusFilter, showStats = true }: TorrentViewProps
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isBatchReplaceOpen, setIsBatchReplaceOpen] = useState(false)
   const [isBatchMoveOpen, setIsBatchMoveOpen] = useState(false)
+  const [isBatchSetLabelsOpen, setIsBatchSetLabelsOpen] = useState(false)
   const [idsToDelete, setIdsToDelete] = useState<number[]>([])
   const [clickedCard, setClickedCard] = useState<string | null>(null)
   const [pageSize, setPageSize] = useState<number>(() => {
@@ -532,6 +535,13 @@ export function TorrentView({ statusFilter, showStats = true }: TorrentViewProps
                     <Radio className="h-4 w-4 opacity-60" />
                     {t('common.reannounce', 'Reannounce')}
                   </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="rounded-xl py-2.5 px-3 cursor-pointer gap-3 font-medium focus:bg-muted"
+                    onClick={() => setIsBatchSetLabelsOpen(true)}
+                  >
+                    <Tag className="h-4 w-4 opacity-60" />
+                    {t('common.set_torrent_labels')}
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -564,6 +574,13 @@ export function TorrentView({ statusFilter, showStats = true }: TorrentViewProps
       <BatchMoveDirectoryDialog
         open={isBatchMoveOpen}
         onOpenChange={setIsBatchMoveOpen}
+        onSuccess={fetchData}
+      />
+
+      <BatchSetLabelsSelectedDialog
+        open={isBatchSetLabelsOpen}
+        onOpenChange={setIsBatchSetLabelsOpen}
+        selectedIds={selectedIds}
         onSuccess={fetchData}
       />
     </div>
