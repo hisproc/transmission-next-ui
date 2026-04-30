@@ -89,8 +89,14 @@ docker-compose up -d   # 后台启动
 docker-compose down    # 停止并移除容器
 ```
 
-默认情况下容器使用 `network_mode: host` 网络模式，更适合 Linux 系统。  
-**注意：** macOS 不支持 `host` 网络模式，此时请手动改为端口映射（如 `9091:9091`），并在 `docker-compose.yml` 中进行相应修改。
+默认使用端口映射方式，映射了以下两个端口：
+
+| 端口 | 协议 | 用途 |
+| --- | --- | --- |
+| `9091` | TCP | Web UI 及 RPC 接口，启动后通此端口访问 Web UI（如 `http://localhost:9091`） |
+| `51413` | TCP/UDP | BT 数据传输端口，用于与其他节点交换数据 |
+
+如果修改了 Transmission 在 config 目录下的配置文件中的端口设置，请确保在 `docker-compose.yml` 中也做相应修改。
 
 ### 2. 手动安装
 
