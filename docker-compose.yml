@@ -17,12 +17,9 @@ services:
       - ./config:/config
       - ./downloads:/downloads
       - ./watch:/watch
-    # work on windows or linux
-    network_mode: "host"
-    # work on mac
-    # ports:
-      # - 9091:9091
-      # - 51413:51413
-      # - 51413:51413/udp
+    ports:
+      - "9091:9091"
+      - "51413:51413"
+      - "51413:51413/udp"
 
     restart: unless-stopped
