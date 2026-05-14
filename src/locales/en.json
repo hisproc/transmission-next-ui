@@ -126,6 +126,7 @@
     "reset": "Reset",
     "visible": "Visible",
     "hidden": "Hidden",
+    "resize_column": "Resize column",
     "all_columns_visible": "All columns are visible",
     "set_torrent_labels": "Set Torrent Labels",
     "set_torrent_labels_desc": "Set labels for {count} selected torrents",

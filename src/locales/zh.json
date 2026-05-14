@@ -133,6 +133,7 @@
     "reset": "重置",
     "visible": "显示中",
     "hidden": "已隐藏",
+    "resize_column": "调整列宽",
     "all_columns_visible": "所有列均已显示",
     "set_torrent_labels": "设置种子标签",
     "set_torrent_labels_desc": "为已选中的 {count} 个种子设置标签",

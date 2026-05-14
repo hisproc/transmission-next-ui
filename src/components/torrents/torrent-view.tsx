@@ -140,9 +140,11 @@ export function TorrentView({ statusFilter, showStats = true }: TorrentViewProps
 
   const {
     visibleColumns,
+    columnWidths,
     columnDnDSensors,
     toggleColumn,
     resetVisibleColumns,
+    resizeColumn,
     handleColumnDragEnd,
     allColumns,
     hiddenColumns,
@@ -388,6 +390,7 @@ export function TorrentView({ statusFilter, showStats = true }: TorrentViewProps
             paginatedTorrents={paginatedTorrents}
             visibleColumns={visibleColumns}
             allColumns={allColumns}
+            columnWidths={columnWidths}
             selectedIds={selectedIds}
             filteredCount={filteredTorrents.length}
             sortConfig={sortConfig}
@@ -397,6 +400,7 @@ export function TorrentView({ statusFilter, showStats = true }: TorrentViewProps
             onToggleSelectAll={toggleSelectAll}
             onSort={handleSort}
             onSingleAction={handleSingleAction}
+            onResizeColumn={resizeColumn}
           />
         ) : (
           <TorrentGridView
