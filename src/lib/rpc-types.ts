@@ -40,6 +40,8 @@ export interface Torrent {
   trackers?: Tracker[]
   trackerStats?: TrackerStat[]
   files?: TorrentFile[]
+  fileStats?: TorrentFileStat[]
+  metadataPercentComplete?: number
   peers?: Peer[]
   peersConnected: number
   peersSendingToUs: number
@@ -71,6 +73,8 @@ export interface TorrentAddArgs {
   filename?: string
   metainfo?: string
   "download-dir"?: string
+  "files-wanted"?: number[]
+  "files-unwanted"?: number[]
   paused?: boolean
 }
 
@@ -80,6 +84,8 @@ export interface TorrentAddResponse {
 }
 
 export interface TorrentSetArgs {
+  "files-wanted"?: number[]
+  "files-unwanted"?: number[]
   bandwidthPriority?: number
   downloadLimit?: number
   downloadLimited?: boolean
@@ -131,6 +137,12 @@ export interface TorrentFile {
   name: string
   length: number
   bytesCompleted: number
+}
+
+export interface TorrentFileStat {
+  bytesCompleted: number
+  wanted: boolean
+  priority: number
 }
 
 export interface Session {
