@@ -26,11 +26,17 @@ class TransmissionRPCMock {
       case "torrent-start":
       case "torrent-stop":
       case "torrent-remove":
-      case "torrent-add":
       case "torrent-set":
       case "torrent-set-location":
       case "torrent-rename-path":
         return {} as any;
+      case "torrent-add":
+        return {
+          "torrent-added": {
+            id: MOCK_TORRENTS[0].id,
+            name: MOCK_TORRENTS[0].name,
+          },
+        } as any;
       case "free-space":
         return { 
           path: args.path, 
@@ -76,6 +82,8 @@ class TransmissionRPCMock {
     filename?: string; 
     metainfo?: string; 
     "download-dir"?: string; 
+    "files-wanted"?: number[];
+    "files-unwanted"?: number[];
     paused?: boolean 
   }) {
     return this.request("torrent-add", args);

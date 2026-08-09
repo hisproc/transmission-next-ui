@@ -23,6 +23,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.2.1
         version: 4.2.2(vite@7.3.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.32.0))
+      bencode:
+        specifier: 4.0.1
+        version: 4.0.1
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -2069,6 +2072,10 @@ packages:
     engines: {node: '>=6.0.0'}
     hasBin: true
 
+  bencode@4.0.1:
+    resolution: {integrity: sha512-/bCR3FvgfB8AZk4LlowShU+nfaTNRM2vruJ9aejDa5LpgkCoRjFyEauFiZFxbpxVxQbBFapYCN42Er2dkE/Qgw==}
+    engines: {node: '>=12.20.0'}
+
   bidi-js@1.0.3:
     resolution: {integrity: sha512-RKshQI1R3YQ+n9YJz2QQ147P66ELpa1FQEg20Dk8oW9t2KgLbpDLLp9aGZ7y8WHSshDknG0bknqGw5/tyCs5tw==}
 
@@ -3715,6 +3722,9 @@ packages:
     resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
     engines: {node: '>=14.17'}
     hasBin: true
+
+  uint8-util@2.3.2:
+    resolution: {integrity: sha512-u1c0/eiT1IW+c5+ogbmE2Fu2hmtJQPkuzDmXD/4crMU4FPMjkTkFnjJ2NN/9AsZ9YWcc7yE869uc3WB8wIZEEA==}
 
   undici-types@7.16.0:
     resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
@@ -5861,6 +5871,10 @@ snapshots:
 
   baseline-browser-mapping@2.10.12: {}
 
+  bencode@4.0.1:
+    dependencies:
+      uint8-util: 2.3.2
+
   bidi-js@1.0.3:
     dependencies:
       require-from-string: 2.0.2
@@ -7507,6 +7521,8 @@ snapshots:
       - supports-color
 
   typescript@5.9.3: {}
+
+  uint8-util@2.3.2: {}
 
   undici-types@7.16.0: {}
 

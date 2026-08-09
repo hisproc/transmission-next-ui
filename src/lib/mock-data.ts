@@ -119,6 +119,11 @@ const BASE_TORRENTS: Torrent[] = [
       { name: "Big.Buck.Bunny-poster.jpg", length: 6500000, bytesCompleted: 6500000 },
       { name: "subs/en.srt", length: 160000, bytesCompleted: 160000 },
     ],
+    fileStats: [
+      { bytesCompleted: 12350000000, wanted: true, priority: 0 },
+      { bytesCompleted: 6500000, wanted: true, priority: 0 },
+      { bytesCompleted: 160000, wanted: false, priority: 0 },
+    ],
     trackers: [
       { id: 0, tier: 0, announce: TRACKERS.blender, scrape: "", sitename: "Blender Tracker" },
       { id: 1, tier: 1, announce: TRACKERS.backup, scrape: "", sitename: "Open Tracker" },
