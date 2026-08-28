@@ -84,7 +84,7 @@
     "applying": "Applying...",
     "select_all": "Select all",
     "reading_torrent_files": "Reading file list...",
-    "invalid_torrent_file": "Unable to read this torrent file",
+    "unsupported_file_type": "Please select a .torrent file",
     "select_at_least_one_file": "Select at least one file from each torrent",
     "resume_desc": "Selected torrents started",
     "pause_desc": "Selected torrents stopped",
