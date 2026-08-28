@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import {
-  AlertCircle,
   Check,
   Clipboard,
   FileIcon,
@@ -47,7 +46,7 @@ interface TorrentUpload {
   file: File
   metainfo?: TorrentMetainfo
   selectedFileIndexes: number[]
-  parseError?: string
+  metainfoParsed: boolean
 }
 
 const toBase64 = (file: File): Promise<string> =>
@@ -81,10 +80,20 @@ export function AddTorrentDialog({
     const torrentFiles = selectedFiles.filter((file) =>
       file.name.toLowerCase().endsWith(".torrent"),
     )
+    if (selectedFiles.length > torrentFiles.length) {
+      toast.error(
+        t("common.unsupported_file_type", "Please select a .torrent file"),
+      )
+    }
+    if (torrentFiles.length === 0) {
+      return
+    }
+
     const uploads = torrentFiles.map((file) => ({
       id: crypto.randomUUID(),
       file,
       selectedFileIndexes: [],
+      metainfoParsed: false,
     }))
 
     if (uploads.length === 0) return
@@ -102,6 +111,7 @@ export function AddTorrentDialog({
                   ...item,
                   metainfo,
                   selectedFileIndexes: metainfo.files.map((file) => file.index),
+                  metainfoParsed: true,
                 }
               : item,
           ),
@@ -113,10 +123,7 @@ export function AddTorrentDialog({
             item.id === upload.id
               ? {
                   ...item,
-                  parseError: t(
-                    "common.invalid_torrent_file",
-                    "Unable to read this torrent file",
-                  ),
+                  metainfoParsed: true,
                 }
               : item,
           ),
@@ -185,7 +192,7 @@ export function AddTorrentDialog({
 
     if (
       files.some(
-        (file) => !file.metainfo || file.selectedFileIndexes.length === 0,
+        (file) => file.metainfo && file.selectedFileIndexes.length === 0,
       )
     ) {
       toast.error(
@@ -215,16 +222,20 @@ export function AddTorrentDialog({
 
       for (const upload of files) {
         const metainfo = await toBase64(upload.file)
-        const selectedIndexes = new Set(upload.selectedFileIndexes)
-        const unwantedIndexes = upload
-          .metainfo!.files.filter((file) => !selectedIndexes.has(file.index))
-          .map((file) => file.index)
-        await rpc.addTorrent({
+        const args: Parameters<typeof rpc.addTorrent>[0] = {
           metainfo,
           "download-dir": location,
-          "files-unwanted": unwantedIndexes,
           paused: !startImmediately,
-        })
+        }
+
+        if (upload.metainfo) {
+          const selectedIndexes = new Set(upload.selectedFileIndexes)
+          args["files-unwanted"] = upload.metainfo.files
+            .filter((file) => !selectedIndexes.has(file.index))
+            .map((file) => file.index)
+        }
+
+        await rpc.addTorrent(args)
       }
 
       toast.success(t("common.add_success", "Torrent added successfully"))
@@ -352,20 +363,13 @@ export function AddTorrentDialog({
                             </Button>
                           </div>
 
-                          {!upload.metainfo && !upload.parseError && (
+                          {!upload.metainfo && !upload.metainfoParsed && (
                             <div className="flex items-center gap-2 border-t border-muted/30 px-4 py-3 text-xs text-muted-foreground">
                               <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
                               {t(
                                 "common.reading_torrent_files",
                                 "Reading file list...",
                               )}
-                            </div>
-                          )}
-
-                          {upload.parseError && (
-                            <div className="flex items-center gap-2 border-t border-destructive/20 bg-destructive/5 px-4 py-3 text-xs text-destructive">
-                              <AlertCircle className="h-3.5 w-3.5" />
-                              {upload.parseError}
                             </div>
                           )}
 
@@ -496,7 +500,7 @@ export function AddTorrentDialog({
                 (files.length === 0 && !magnetLink) ||
                 files.some(
                   (file) =>
-                    !file.metainfo || file.selectedFileIndexes.length === 0,
+                    file.metainfo && file.selectedFileIndexes.length === 0,
                 )
               }
               onClick={handleSubmit}
