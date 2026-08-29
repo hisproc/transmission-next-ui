@@ -8,9 +8,29 @@ import { useI18n } from "@/lib/i18n-context"
 
 export type LabeledColumnConfig = ColumnConfig & { label: string }
 
+const DEFAULT_COLUMN_WIDTHS = Object.fromEntries(
+  TORRENT_COLUMNS.map((column) => [column.id, column.width])
+)
+
 function normalizeVisibleColumns(columns: string[]) {
   const uniqueColumns = Array.from(new Set(columns.filter((column) => column !== "name")))
   return ["name", ...uniqueColumns]
+}
+
+function normalizeColumnWidths(widths: unknown) {
+  if (!widths || typeof widths !== "object") return DEFAULT_COLUMN_WIDTHS
+
+  return TORRENT_COLUMNS.reduce<Record<string, string>>((acc, column) => {
+    const value = (widths as Record<string, unknown>)[column.id]
+    acc[column.id] = typeof value === "string" && value.trim() ? value : column.width
+    return acc
+  }, {})
+}
+
+function getApproximatePixelWidth(width: string) {
+  if (width.endsWith("%")) return 250
+  const parsed = Number.parseInt(width, 10)
+  return Number.isFinite(parsed) ? parsed : 0
 }
 
 export function useColumnManager() {
@@ -19,6 +39,10 @@ export function useColumnManager() {
   const [visibleColumns, setVisibleColumns] = useState<string[]>(() => {
     const saved = localStorage.getItem('torrent-visible-columns')
     return saved ? normalizeVisibleColumns(JSON.parse(saved) as string[]) : DEFAULT_VISIBLE_COLUMNS
+  })
+  const [columnWidths, setColumnWidths] = useState<Record<string, string>>(() => {
+    const saved = localStorage.getItem('torrent-column-widths')
+    return normalizeColumnWidths(saved ? JSON.parse(saved) : null)
   })
 
   const columnDnDSensors = useSensors(
@@ -29,6 +53,10 @@ export function useColumnManager() {
   useEffect(() => {
     localStorage.setItem('torrent-visible-columns', JSON.stringify(visibleColumns))
   }, [visibleColumns])
+
+  useEffect(() => {
+    localStorage.setItem('torrent-column-widths', JSON.stringify(columnWidths))
+  }, [columnWidths])
 
   const toggleColumn = (id: string) => {
     if (id === "name") return
@@ -43,6 +71,19 @@ export function useColumnManager() {
 
   const resetVisibleColumns = () => {
     setVisibleColumns(normalizeVisibleColumns(DEFAULT_VISIBLE_COLUMNS))
+    setColumnWidths(DEFAULT_COLUMN_WIDTHS)
+  }
+
+  const resizeColumn = (id: string, width: number) => {
+    const column = TORRENT_COLUMNS.find(c => c.id === id)
+    if (!column) return
+
+    const minWidth = column.minWidth ?? column.width
+    const nextWidth = Math.max(width, getApproximatePixelWidth(minWidth))
+    setColumnWidths(prev => ({
+      ...prev,
+      [id]: `${Math.round(nextWidth)}px`,
+    }))
   }
 
   const handleColumnDragEnd = (event: DragEndEvent) => {
@@ -78,17 +119,23 @@ export function useColumnManager() {
     const columnsWidth = visibleColumns.reduce((acc, id) => {
       const col = TORRENT_COLUMNS.find(c => c.id === id)
       if (!col) return acc
-      const w = col.minWidth || col.width
-      return acc + (w.includes('%') ? 250 : parseInt(w))
+      const width = columnWidths[id] ?? col.width
+      const minWidth = col.minWidth ?? col.width
+      return acc + Math.max(
+        getApproximatePixelWidth(width),
+        getApproximatePixelWidth(minWidth)
+      )
     }, 0)
     return fixedWidths + columnsWidth
-  }, [visibleColumns])
+  }, [columnWidths, visibleColumns])
 
   return {
     visibleColumns,
+    columnWidths,
     columnDnDSensors,
     toggleColumn,
     resetVisibleColumns,
+    resizeColumn,
     handleColumnDragEnd,
     allColumns,
     hiddenColumns,
