@@ -114,6 +114,55 @@ describe("AddTorrentDialog file selection", () => {
     })
   })
 
+  test("tracks uploads independently without crypto.randomUUID", async () => {
+    vi.spyOn(crypto as { randomUUID: unknown }, "randomUUID", "get")
+      .mockReturnValue(undefined)
+    const user = userEvent.setup()
+    const { container } = render(
+      <I18nProvider>
+        <AddTorrentDialog>
+          <button type="button">Open</button>
+        </AddTorrentDialog>
+      </I18nProvider>,
+    )
+    const torrents = ["first", "second", "third"].map((name) => {
+      const file = new File([new Uint8Array([100, 101])], `${name}.torrent`)
+      Object.defineProperty(file, "arrayBuffer", {
+        value: vi.fn().mockResolvedValue(new ArrayBuffer(2)),
+      })
+      return file
+    })
+    const input = container.querySelector<HTMLInputElement>('input[type="file"]')!
+
+    await user.upload(input, torrents.slice(0, 2))
+    await waitFor(() => {
+      expect(screen.getAllByRole("checkbox", { name: /sample\.txt/ })).toHaveLength(2)
+    })
+    await user.click(screen.getAllByRole("checkbox", { name: /sample\.txt/ })[0])
+    expect(screen.getAllByRole("checkbox", { name: /sample\.txt/ })[1])
+      .toHaveAttribute("aria-checked", "true")
+
+    await user.click(screen.getAllByTitle("Remove")[0])
+    expect(screen.queryByText("first.torrent")).not.toBeInTheDocument()
+    expect(screen.getByText("second.torrent")).toBeInTheDocument()
+
+    await user.upload(input, torrents[2])
+    await waitFor(() => {
+      expect(screen.getAllByRole("checkbox", { name: /sample\.txt/ })).toHaveLength(2)
+    })
+    await user.click(screen.getAllByTitle("Remove")[0])
+    expect(screen.queryByText("second.torrent")).not.toBeInTheDocument()
+    expect(screen.getByText("third.torrent")).toBeInTheDocument()
+
+    await user.click(screen.getByRole("button", { name: "Add Torrent" }))
+    await waitFor(() => {
+      expect(rpcMock.addTorrent).toHaveBeenCalledTimes(1)
+    })
+    expect(rpcMock.addTorrent).toHaveBeenCalledWith(
+      expect.objectContaining({ metainfo: expect.any(String), paused: false }),
+    )
+  })
+
   test("falls back to direct file add when local metainfo parsing fails", async () => {
     parseTorrentMetainfoMock.mockImplementation(() => {
       throw new Error("unsupported torrent metadata")
