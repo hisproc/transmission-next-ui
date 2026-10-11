@@ -74,6 +74,8 @@ export function AddTorrentDialog({
   const [startImmediately, setStartImmediately] = React.useState(true)
 
   const fileInputRef = React.useRef<HTMLInputElement>(null)
+  // IDs are local to this dialog; avoid secure-context-only crypto APIs.
+  const nextUploadId = React.useRef(0)
   const { t } = useI18n()
 
   const addFiles = (selectedFiles: File[]) => {
@@ -90,7 +92,7 @@ export function AddTorrentDialog({
     }
 
     const uploads = torrentFiles.map((file) => ({
-      id: crypto.randomUUID(),
+      id: `upload-${nextUploadId.current++}`,
       file,
       selectedFileIndexes: [],
       metainfoParsed: false,
